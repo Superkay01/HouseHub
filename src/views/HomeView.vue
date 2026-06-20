@@ -7,6 +7,7 @@
     <BrowseByState />
     <FeaturedProperties/>
     <HowItWorks/>
+    <WhyChooseUs/>
 
     <!-- Other sections... -->
   </div>
@@ -17,5 +18,6 @@ import HeroSection from '@/components/HeroSection.vue'
 import BrowseByState from '@/components/BrowseByState.vue'
 import FeaturedProperties from '@/components/FeaturedProperties.vue';
 import HowItWorks from '@/components/HowItWorks.vue';
+import WhyChooseUs from '@/components/WhyChooseUs.vue';
 
 </script>

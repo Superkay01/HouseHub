@@ -18,13 +18,13 @@
     <!-- Content -->
     <div class="relative z-10 w-full max-w-5xl mx-auto text-center px-5 sm:px-6 lg:px-8 pt-20 pb-16">
       <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tighter text-white mb-6 px-2">
-        Find Your Perfect Home<br class="hidden sm:block">Across Nigeria
+        Find Your Perfect Home<br class="hidden sm:block">Withn Ilorin and Ijebu Ode
       </h1>
       
-      <p class="text-lg sm:text-xl md:text-2xl text-[#ebf8ff] max-w-3xl mx-auto mb-10 px-4">
-        Discover verified houses and apartments in all 36 states.<br class="hidden md:block">
-        From Lagos to Kano — Rent smarter and faster.
-      </p>
+        <p class="text-lg sm:text-xl md:text-2xl text-[#ebf8ff] max-w-3xl mx-auto mb-10 px-4">
+          Find verified homes and apartments across Ilorin and Ijebu Ode.<br class="hidden md:block">
+          Browse trusted listings, connect with agents, and rent with confidence.
+        </p>
 
       <!-- Search Bar -->
       <div class="max-w-2xl mx-auto bg-white rounded-3xl p-2 shadow-2xl mx-4">
@@ -34,14 +34,14 @@
             <input
               type="text"
               v-model="searchLocation"
-              placeholder="Enter city or state (e.g. Lekki, Abuja, Port Harcourt)"
-              class="w-full pl-14 pr-6 py-4 md:py-5 rounded-3xl focus:outline-none text-[#424242] placeholder:text-medium-gray text-base"
+              placeholder="Enter city or state (e.g. Ilorin, Ijebu Ode)"
+              class="w-full pl-14 pr-6 py-1 md:py-2 rounded-3xl focus:outline-none text-[#424242] placeholder:text-medium-gray text-base"
             />
           </div>
           
           <button 
             @click="handleSearch"
-            class="bg-royal-blue hover:bg-medium-blue active:bg-medium-blue text-white px-8 md:px-12 py-4 md:py-5 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-all text-base whitespace-nowrap">
+            class="bg-royal-blue hover:bg-medium-blue active:bg-medium-blue text-white px-8 md:px-12 py-1 md:py-2 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-all text-base whitespace-nowrap">
             <span><Search class="w-5 h-5"/> </span>
             Search Homes
           </button>
@@ -55,7 +55,7 @@
           <div class="text-sm sm:text-base opacity-80">Properties</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl sm:text-4xl font-bold">36</div>
+          <div class="text-3xl sm:text-4xl font-bold">2</div>
           <div class="text-sm sm:text-base opacity-80">States</div>
         </div>
         <div class="text-center">

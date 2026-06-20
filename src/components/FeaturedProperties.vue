@@ -11,7 +11,7 @@
           Featured Homes
         </h2>
         <p class="max-w-2xl mx-auto text-xl text-[#707070]">
-          Explore some of the most sought-after rental properties across Nigeria. 
+          Explore some of the most sought-after rental properties within Ilorin and Ijebu Ode. 
           Verified listings, trusted agents, and premium locations.
         </p>
       </div>

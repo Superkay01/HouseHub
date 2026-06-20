@@ -16,7 +16,7 @@
           <span>3 SIMPLE STEPS</span>
         </div>
         <h2 class="text-5xl md:text-6xl font-bold text-[#424242] tracking-tight mb-4 heading-font">
-          How HouseHub Works
+          How LodgeNext Works
         </h2>
         <p class="max-w-2xl mx-auto text-xl text-[#707070]">
           Find your next home in just a few simple steps. Search, explore, and connect with trusted agents anywhere in Nigeria.
@@ -71,7 +71,7 @@
           Start Searching Homes
           <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
         </button>
-        <p class="text-sm text-[#707070] mt-4">Join thousands of happy renters across Nigeria</p>
+        <p class="text-sm text-[#707070] mt-4">Join thousands of happy renters within Ilorin and Ijebu Ode</p>
       </div>
     </div>
   </section>
@@ -92,7 +92,7 @@ const steps = ref([
     id: 1,
     icon: "Map",
     title: "Search Location",
-    description: "Choose your preferred state, city, or neighborhood from our nationwide property database covering all 36 states and the FCT."
+    description: "Explore verified rental properties in your preferred location across Ilorin and Ijebu Ode, with listings tailored to your housing needs."
   },
   {
     id: 2,

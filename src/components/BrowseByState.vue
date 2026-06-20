@@ -5,7 +5,7 @@
       <!-- Header -->
       <div class="text-center mb-12">
         <h2 class="text-4xl md:text-5xl font-bold text-dark-gray tracking-tight mb-3">
-          Browse Homes Across Nigeria
+          Browse Homes with Ilorin and Ijebu Ode
         </h2>
         <p class="text-lg text-medium-gray max-w-2xl mx-auto">
           Explore verified rental properties across Nigeria's most popular states and cities.
@@ -51,9 +51,10 @@
           to="/states"
           class="inline-flex items-center gap-3 bg-mediumBlue hover:bg-steel-blue text-royal-blue px-8 py-4 rounded-2xl font-semibold text-lg transition-all active:scale-95 shadow-lg hover:shadow-xl"
         >
-          View All 36 States
+          View All States
           <span class="text-xl text-royal-blue"> →</span>
         </router-link>
+        
       </div>
     </div>
   </section>
