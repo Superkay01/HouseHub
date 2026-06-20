@@ -21,11 +21,11 @@ const mobileMenuOpen = ref(false)
 
           <div>
             <h1 class="font-bold text-xl md:text-2xl text-royal-blue">
-              HouseHub
+              LodgeNext
             </h1>
 
             <p class="hidden sm:block text-xs text-medium-gray">
-              Find Home • Across Nigeria
+              Find Home • Within Ilorin & Ijebu Ode
             </p>
           </div>
         </router-link>
