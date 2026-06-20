@@ -1,0 +1,99 @@
+{
+  "navbar": {
+    "home": "Ụlọ",
+    "listings": "Ụlọ mgbazinye",
+    "about": "Banyere anyị",
+    "contact": "Kpọtụrụ anyị",
+    "dashboard": "Dashboard",
+    "admin": "Nchekọta",
+    "logout": "Pụọ",
+    "login": "Banye",
+    "register": "Debanye aha"
+  },
+  
+  "hero": {
+    "findHomes": "Chọta Ụlọ Dị Mfe",
+    "findHomesSub": "Chọpụta ụlọ akwụkwọ kwụsiri ike nso n'ụlọ akwụkwọ gị.",
+    "trustedByLandlords": "Ndị nwe ụlọ na-enye anyị nkwenye",
+    "trustedByLandlordsSub": "Anyị na-ejikọta ụmụakwụkwọ na ụlọ dị ọnụ ala ma dị nchebe.",
+    "moveInConfidence": "Banye n'ụlọ na nkwenye",
+    "moveInConfidenceSub": "Nwee nnwere onwe na mmegharị n’enweghị nrụgide.",
+    "getStarted": "Malite Ugbu a"
+  },
+   "about": {
+    "heading": "Banyere LodgeLink",
+    "intro": "Ọtụtụ ụmụakwụkwọ nọ na Naịjịrịa na-enwe nsogbu ịchọta ebe obibi dị ọnụ ala, dị mma, na dị n'ebe dị nso — karịsịa mgbe ha na-apụ n'obodo ha. Ha na-ejikarị aghụghọ, ọnụ ahịa elu, ma ọ bụ nkọwa ụlọ na-ezighi ezi.",
+    "solution": "kere ka ọ gbanwee ihe a. LodgeLink na-ejikọta ụmụakwụkwọ na ndị nwe ụlọ a tụkwasịrị obi, na-enye ha ebe obibi e nyochala dị nso na mahadum. Ọ dịghị aghụghọ, ọ dịghị mgbagwoju anya — naanị ihe doro anya na ịdị n’udo.",
+    "peaceOfMind": "LodgeLink abụghị naanị ịchọta ụlọ — ọ bụ maka inye ụmụakwụkwọ nkwado na ezi uche ka ha dị jụụ ma dị njikere.",
+    "visionTitle": "Ebumnuche anyị?",
+    "vision": "I mepụta usoro zuru ezu nke inye enyemaka na ebe obibi iji nyere ndị ntorobịa aka ịgbazite, ịzụta, ma ọ bụ biri n’enweghị nchegbu.",
+    "cta": "Gaa na Ndepụta"
+  },
+  "howItWorks": {
+    "title": "Otu LodgeLink Si arụ Ọrụ",
+    "students": {
+      "title": "Maka Ụmụakwụkwọ",
+      "steps": {
+        "1": {
+          "title": "Mepụta Akaụntụ",
+          "desc": "Debanye aha n’efu ma mezuo profaịlụ gị dị ka nwa akwụkwọ."
+        },
+        "2": {
+          "title": "Lelee Ndepụta E Kwadoro",
+          "desc": "Chọgharịa ụlọ ndị e nyochara nke ọma n’akụkụ ụlọ akwụkwọ gị."
+        },
+        "3": {
+          "title": "Soro Ndị nwe Ụlọ Kwuo",
+          "desc": "Kwuo na ha ozugbo tupu ịdebanye."
+        },
+        "4": {
+          "title": "Debe & Gbaa N'ime",
+          "desc": "Debe ụlọ gị ma gbaba n'ime ya n'enweghị nsogbu."
+        }
+      },
+      "cta": "Malite Nyocha"
+    },
+    "landlords": {
+      "title": "Maka Ndị nwe Ụlọ",
+      "steps": {
+        "1": {
+          "title": "Debanye & Nyocha",
+          "desc": "Debanye, mezuo profaịlụ gị, ma nyochaa ụlọ gị."
+        },
+        "2": {
+          "title": "Depụta Ụlọ Gị",
+          "desc": "Bulite foto, kwuo ọnụahịa, kọwaa ihe dị na ụlọ."
+        },
+        "3": {
+          "title": "Zaa Ụmụakwụkwọ",
+          "desc": "Nata ajụjụ, kwuo na ha, họpụta ụbọchị ile ụlọ."
+        },
+        "4": {
+          "title": "Kwadoro & Nata Ego",
+          "desc": "Kwadoro bookings ma nata ego site n'usoro ziri ezi."
+        }
+      },
+      "cta": "Depụta Ụlọ"
+    }
+  },
+  
+ "footer": {
+    "aboutTitle": "Banyere LodgeLink",
+    "aboutText": "LodgeLink na-enyere ụmụ akwụkwọ ịchọta ụlọ a tụrụ anya ya, dị ọnụ ala, dị nso na mahadum ha. Ọ na-eme ime njem ka dị mfe na nchebe.",
+    "readMore": "Gụọkwuo",
+    "quickLinks": "Njikọ ngwa ngwa",
+    "links": {
+      "home": "Ụlọ",
+      "howItWorks": "Olee otú LodgeLink si arụ ọrụ",
+      "listings": "Ndepụta ụlọ",
+      "contact": "Kpọtụrụ Anyị",
+      "faqs": "Ajụjụ a na-ajụkarị",
+      "privacy": "Nzuzo",
+      "terms": "Okwu na ọnọdụ"
+    },
+    "contact": "Kpọtụrụ Nkọwa",
+    "connect": "Jikọọ na anyị",
+    "cta": "Lelee Ndepụta",
+    "rights": "A kwadoro ikike niile."
+  }
+}

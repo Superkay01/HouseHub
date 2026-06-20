@@ -1,0 +1,33 @@
+/* Import Roboto from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --light-blue: #ebf8ff;
+  --royal-blue: #0025cc;
+  --white: #ffffff;
+  --mediumBlue: #2e4cd5;
+  --black: #000000;
+  --steel-blue: #546cdd;
+  --dark-gray: #424242;
+  --medium-gray: #707070;
+  --bright-green: #00db00;
+  --periwinkle: #697fe1;
+  --hover-blue: #9faffa;
+}
+
+/* Global Styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optional Helper Classes */
+.bg-primary {
+  background-color: var(--royal-blue);
+}
+
+.text-primary {
+  color: var(--royal-blue);
+}

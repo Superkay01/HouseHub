@@ -1,0 +1,100 @@
+{
+  "navbar": {
+    "home": "Ile",
+    "listings": "Awọn ile",
+    "about": "Nipa wa",
+    "contact": "Pe wa",
+    "dashboard": "Dasibodu",
+    "admin": "Igbimọ Alakoso",
+    "logout": "Jade",
+    "login": "Wọlé",
+    "register": "Forukọsilẹ"
+  },
+  "hero": {
+    "findHomes": "Wa Ilé Rọrun",
+    "findHomesSub": "Ṣàwárí àwọn ilé amúlétutù tí a fọwọ́sí lẹ́gbẹ̀ẹ́ ilé-ẹ̀kọ́ rẹ.",
+    "trustedByLandlords": "Àwọn onílé gbẹ́kẹ̀ lé wa",
+    "trustedByLandlordsSub": "A so àwọn akẹ́kọ̀ọ́ pọ̀ mọ́ àwọn ilé tó dájú tí kò gbowó púpọ̀.",
+   "moveInConfidence": "Wọ Ilé Pẹ̀lú Ìdánilójú",
+"moveInConfidenceSub": "Gbadun  ilé láìsí ìṣòro àti pẹ̀lú ìtóju to péye.",
+
+    "getStarted": "Bẹrẹ Níbayìí"
+  },
+  "about": {
+    "heading": "Nipa LodgeLink",
+    "intro": "Ọ̀pọ̀lọpọ̀ akẹ́kọ̀ọ́ ní Nàìjíríà ní ìṣòro láti rí ilé tí kò gbowó, tí ó dájú, tí ó wà nítòsí ilé-ẹ̀kọ́ — pàápàá jùlọ nígbà tí wọ́n bá ń rìn àjò sí agbègbè tuntun. Ọ̀pọ̀ wọ́n ń dojú kọ́ àwọn aláìtóòtọ́, owó ilé tó pọ̀ jù, tàbí àpèjúwe ilé tí kì í ṣe gẹ́gẹ́ bí wọ́n ṣe sọ.",
+    "solution": "ni a dá láti yí iyẹn padà. A sọ àwọn akẹ́kọ̀ọ́ pọ̀ mọ́ àwọn onílé tó gbẹ́kẹ̀ lé àti àwọn ilé tí a ti fọwọ́ sí tẹlẹ ní agbègbè tó sunmọ́ ilé-ẹ̀kọ́. Kò sí àtẹ̀yìnwá, kò sí ìtàn làì dájú — ilé tó dájú, ìlànà tó mọ̀, ààbò tó péye.",
+    "peaceOfMind": "LodgeLink kì í ṣe ilé nìkan — ó tún jẹ́ àǹfààní àkànṣe fún àlàáfíà ọkàn, pẹ̀lú ìbáṣepọ̀ tó rọrùn àti ìkànìyàn lórí ohun tí akẹ́kọ̀ọ́ ń yá.",
+    "visionTitle": "Ìran wa?",
+    "vision": "Láti di pẹpẹ ilé àti ìtajà ilé tí ó péye, tó ń ràn àwọn ọdọ lọwọ láti yá, rà, tàbí kọ́ ilé pẹ̀lú ìdánilójú.",
+    "cta": "Ṣàwárí Ilé"
+  },
+  "howItWorks": {
+    "title": "Bá LodgeLink Ṣe N Ṣe É",
+    "students": {
+      "title": "Fún Àwọn Akẹ́kọ̀ọ́",
+      "steps": {
+        "1": {
+          "title": "Ṣẹ̀dá Àkọọlẹ",
+          "desc": "Forúkọsílẹ̀ láìsí owó, kí o sì parí àkọọlẹ rẹ gẹ́gẹ́ bí akẹ́kọ̀ọ́."
+        },
+        "2": {
+          "title": "Ṣàwárí Àwọn Ilé Tí A Fọwọ́sí",
+          "desc": "Wò ó ká àwọn ilé tí a fọwọ́sí tó wà nítòsí ilé-ẹ̀kọ rẹ."
+        },
+        "3": {
+          "title": "Bá Onílé Sọ̀rọ̀",
+          "desc": "Firanṣẹ ìfọ̀rọ̀wánilẹ́nuwò sí onílé kí o tó ṣe ìfowópa móra."
+        },
+        "4": {
+          "title": "Fowó Sí Ilé & Gbé Dé",
+          "desc": "Yàn àyè rẹ, fowó sí i, kí o sì rìn sínú rẹ pẹ̀lú ìdánilójú."
+        }
+      },
+      "cta": "Bẹrẹ Ṣàwárí"
+    },
+    "landlords": {
+      "title": "Fún Àwọn Onílé",
+      "steps": {
+        "1": {
+          "title": "Forúkọsílẹ̀ & Fọwọ́sí",
+          "desc": "Forúkọsílẹ̀, parí profaili rẹ, kí o sì jẹ́ kó fọwọ́sí ilé rẹ."
+        },
+        "2": {
+          "title": "Ṣàtòjọ Ilé Rẹ",
+          "desc": "Po fọ́tò, fi iye kún un, kó sì ṣàlàyé àwọn ìfowópasẹ̀."
+        },
+        "3": {
+          "title": "Fèsì sí Àwọn Akẹ́kọ̀ọ́",
+          "desc": "Gba ìbéèrè, sọ̀rọ̀ pẹ̀lú àwọn akẹ́kọ̀ọ́, ṣètò ìfihàn ilé."
+        },
+        "4": {
+          "title": "Jẹ́wọ́ & Gba Owó",
+          "desc": "Fọwọ́sí ìtòlé, gba owó rẹ pẹ̀lú ààbò."
+        }
+      },
+      "cta": "Ṣàtòjọ Ilé Kan"
+    }
+  },
+  
+
+  "footer": {
+    "aboutTitle": "Nipa LodgeLink",
+    "aboutText": "LodgeLink n ràn àwọn akẹ́kọ̀ọ́ lọ́wọ́ láti rí ibùgbé tó dájú, tó wù ú ní ayika ilé-ẹ̀kọ́ wọn. A mú kí gbigbe wọlé rọrùn, ààbò, àti òye.",
+    "readMore": "Ka siwaju",
+    "quickLinks": "Ìjápọ̀ Kánkán",
+    "links": {
+      "home": "Ilé",
+      "howItWorks": "Bá LodgeLink Ṣe Nṣiṣẹ",
+      "listings": "Àwọn Ìbùgbé",
+      "contact": "Bá wa sọ̀rọ̀",
+      "faqs": "Ìbéèrè tí wọpọ̀",
+      "privacy": "Ètò Àṣírí",
+      "terms": "Àwọn Ọ̀rọ̀ & Ìpinnu"
+    },
+    "contact": "Alákóso ìbánisọ̀rọ̀",
+    "connect": "Sopọ̀ pẹ̀lú wa",
+    "cta": "Ṣàyẹ̀wò àwọn ibùgbé",
+    "rights": "Gbogbo ẹ̀tọ́ tó yẹ ni a fi pamọ̀."
+  }
+}

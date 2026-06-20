@@ -1,0 +1,99 @@
+{
+  "navbar": {
+    "home": "Home",
+    "listings": "Listings",
+    "about": "About",
+    "contact": "Contact",
+    "dashboard": "Dashboard",
+    "admin": "Admin Panel",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "hero": {
+    "findHomes": "Find Homes Easily",
+    "findHomesSub": "Discover verified hostels and housing near your school.",
+    "trustedByLandlords": "Trusted by Landlords",
+    "trustedByLandlordsSub": "We connect students to safe, affordable homes.",
+    "moveInConfidence": "Move In With Confidence",
+    "moveInConfidenceSub": "Enjoy stress-free renting and move-in support.",
+    "getStarted": "Get Started"
+  },
+  
+  "about": {
+    "heading": "About LodgeLink",
+    "intro": "For many students in Nigeria, securing safe, affordable, and genuine accommodation, especially in a new city, remains a major challenge. From unverified agents to inflated prices and misleading listings, finding a suitable lodge near campus can feel overwhelming.",
+    "solution": "Is built to change that. We connect students directly with trusted landlords and pre-verified housing options near campuses. No more scams, no more guesswork, just clear listings and peace of mind.",
+    "peaceOfMind": "Beyond listings, LodgeLink supports students with reliable communication and a smooth rental process, so they feel informed, protected, and at home from the start.",
+    "visionTitle": "Our vision?",
+    "vision": "To evolve into a full-service housing and real estate platform that helps young people rent, buy, and settle with confidence.",
+    "cta": "Explore Listings"
+  },
+  "howItWorks": {
+    "title": "How LodgeLink Works",
+    "students": {
+      "title": "For Students",
+      "steps": {
+        "1": {
+          "title": "Create an Account",
+          "desc": "Sign up for free and complete your student profile."
+        },
+        "2": {
+          "title": "Browse Verified Listings",
+          "desc": "Explore a wide range of pre-approved hostels near your campus."
+        },
+        "3": {
+          "title": "Chat With Landlords",
+          "desc": "Message property owners directly and ask questions before booking."
+        },
+        "4": {
+          "title": "Book & Move In",
+          "desc": "Secure your space and move in with confidence."
+        }
+      },
+      "cta": "Start Searching"
+    },
+    "landlords": {
+      "title": "For Landlords",
+      "steps": {
+        "1": {
+          "title": "Register & Verify",
+          "desc": "Sign up, complete your landlord profile, and verify your property."
+        },
+        "2": {
+          "title": "List Your Property",
+          "desc": "Upload photos, set pricing, and describe amenities clearly."
+        },
+        "3": {
+          "title": "Respond to Students",
+          "desc": "Receive inquiries, chat with students, and schedule viewings."
+        },
+        "4": {
+          "title": "Confirm & Get Paid",
+          "desc": "Approve bookings and receive payments securely through the platform."
+        }
+      },
+      "cta": "List a Property"
+    }
+  },
+  
+  "footer": {
+    "aboutTitle": "About LodgeLink",
+    "aboutText": "LodgeLink helps students find verified, affordable housing near campus. We make moving easier, safer, and smarter.",
+    "readMore": "Read more",
+    "quickLinks": "Quick Links",
+    "links": {
+      "home": "Home",
+      "howItWorks": "How It Works",
+      "listings": "Listings",
+      "contact": "Contact Us",
+      "faqs": "FAQs",
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions"
+    },
+    "contact": "Contact Information",
+    "connect": "Connect With Us",
+    "cta": "Browse Listings",
+    "rights": "All rights reserved."
+  }
+}

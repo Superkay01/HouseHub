@@ -1,0 +1,98 @@
+{
+  "navbar": {
+    "home": "Gida",
+    "listings": "Gidaje",
+    "about": "Game da mu",
+    "contact": "Tuntuɓe mu",
+    "dashboard": "Dashboard",
+    "admin": "Kwamitin Admin",
+    "logout": "Fita",
+    "login": "Shiga",
+    "register": "Rajista"
+  },
+  "hero": {
+    "findHomes": "Nemo Gidaje Cikin Sauƙi",
+    "findHomesSub": "Gano dakuna da gidaje masu aminci kusa da makarantar ku.",
+    "trustedByLandlords": "Masu gidaje sun yarda da mu",
+    "trustedByLandlordsSub": "Muna haɗa ɗalibai da gidaje masu aminci da araha.",
+    "moveInConfidence": "Shiga Gida Cikin Tabbaci",
+    "moveInConfidenceSub": "Ji daɗin haya ba tare da damuwa ba da kuma taimakon sauƙin shiga.",
+    "getStarted": "Fara Yanzu"
+  },
+  "about": {
+    "heading": "Game da LodgeLink",
+    "intro": "Ga ɗalibai da dama a Najeriya, samun gida mai tsaro, arha, kuma na gaskiya — musamman idan sun koma wani sabon gari — na iya zama kalubale. Sau da yawa suna fuskantar masu zamba, tsadar haya, da bayanan da ba daidai ba.",
+    "solution": "an ƙirƙire shi don sauya hakan. Muna haɗa ɗalibai da masu gidaje na gaskiya da zaɓaɓɓun gidaje masu kusa da makarantu. Babu damuwa, babu yaudara — kawai bayyanannun zaɓuɓɓuka da tabbaci.",
+    "peaceOfMind": "LodgeLink ba wai kawai neman gida ba ne — muna ba da damar haɗin kai mai sauƙi da taimako domin ɗalibai su ji daɗi da kwanciyar hankali tun kafin su tafi makaranta.",
+    "visionTitle": "Manufarmu?",
+    "vision": "Mu zama cikakkiyar cibiyar harkar gidaje da ke tallafa wa matasa wajen haya, saya, da zama cikin kwanciyar hankali.",
+    "cta": "Duba Gidaje"
+  },
+  "howItWorks": {
+    "title": "Yadda LodgeLink Ke Aiki",
+    "students": {
+      "title": "Ga Dalibai",
+      "steps": {
+        "1": {
+          "title": "Ƙirƙiri Asusun",
+          "desc": "Yi rijista kyauta kuma cika bayanan ɗalibi naka."
+        },
+        "2": {
+          "title": "Duba Jerin da Aka Tabbatar",
+          "desc": "Duba gidaje da aka tabbatar da su kusa da makarantar ku."
+        },
+        "3": {
+          "title": "Yi Magana da Masu Gida",
+          "desc": "Yi hira da masu gida kai tsaye kafin yin rijista."
+        },
+        "4": {
+          "title": "Yi Rijista & Shiga Gida",
+          "desc": "Tabbatar da wurin zama ka kuma shiga cikin kwanciyar hankali."
+        }
+      },
+      "cta": "Fara Bincike"
+    },
+    "landlords": {
+      "title": "Ga Masu Gida",
+      "steps": {
+        "1": {
+          "title": "Yi Rijista & Tabbatarwa",
+          "desc": "Yi rijista, kammala bayanan ku kuma tabbatar da gidan ku."
+        },
+        "2": {
+          "title": "Sanya Gidan Ku",
+          "desc": "Dora hotuna, sa farashi, da bayyana abubuwan gidan."
+        },
+        "3": {
+          "title": "Amsa Saƙonni",
+          "desc": "Karɓi tambayoyi, yi hira, da tsara duba gida."
+        },
+        "4": {
+          "title": "Amince & Karɓi Kuɗi",
+          "desc": "Amince da booking kuma karɓi kuɗi cikin tsaro."
+        }
+      },
+      "cta": "Sanya Gida"
+    }
+  },
+
+  "footer": {
+    "aboutTitle": "Game da LodgeLink",
+    "aboutText": "LodgeLink yana taimaka wa ɗalibai su samo ɗakunan haya masu aminci da araha kusa da makaranta. Muna sauƙaƙa ƙaura da tsaro.",
+    "readMore": "Kara karantawa",
+    "quickLinks": "Hanyoyi masu sauri",
+    "links": {
+      "home": "Gida",
+      "howItWorks": "Yadda LodgeLink ke Aiki",
+      "listings": "Jerun gidaje",
+      "contact": "Tuntuɓi Mu",
+      "faqs": "Tambayoyi",
+      "privacy": "Tsare Sirri",
+      "terms": "Sharuɗɗa da Ka'idoji"
+    },
+    "contact": "Bayanin Tuntuɓa",
+    "connect": "Haɗa da Mu",
+    "cta": "Duba jerin gidaje",
+    "rights": "Dukkan haƙƙoƙi an tanada su."
+  }
+}
