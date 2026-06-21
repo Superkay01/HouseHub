@@ -68,7 +68,7 @@ const mobileMenuOpen = ref(false)
             class="hidden md:flex items-center gap-2 text-sm font-medium"
           >
             <MapPin class="w-4 h-4 text-royal-blue" />
-            Lagos
+            Ilorin
           </div>
 
           <!-- Desktop Auth -->
@@ -82,7 +82,7 @@ const mobileMenuOpen = ref(false)
 
             <router-link
               to="/signup"
-              class="bg-royal-blue text-white px-5 py-2 rounded-xl"
+              class="bg-[var(--royal-blue)] text-[var(--white)] px-5 py-2 rounded-xl"
             >
               Sign Up
             </router-link>

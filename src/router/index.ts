@@ -13,7 +13,10 @@ const router = createRouter({
       name: 'states',
       component: () => import('../views/StatesView.vue')
 
-    }
+    },
+    
+
+    
     // {
     //   path: '/properties',
     //   name: 'properties',
@@ -29,16 +32,26 @@ const router = createRouter({
     //   name: 'for-agents',
     //   component: () => import('../views/ForAgentsView.vue')
     // },
-    // {
-    //   path: '/login',
-    //   name: 'login',
-    //   component: () => import('../views/auth/LoginView.vue')
-    // },
-    // {
-    //   path: '/signup',
-    //   name: 'signup',
-    //   component: () => import('../views/auth/SignupView.vue')
-    // }
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/auth/LoginView.vue')
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: () => import('../views/auth/SignupView.vue')
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/views/auth/ForgotPasswordView.vue')
+    },
+    {
+      path: '/SignupForm',
+      name: 'signupform',
+      component: () => import('@/components/auth/SignupForm.vue')
+    }
   ]
 })
 
