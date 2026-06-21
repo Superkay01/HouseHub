@@ -13,7 +13,7 @@
       </div>
 
       <!-- States Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8">
         <router-link
           v-for="state in states"
           :key="state.name"
@@ -47,11 +47,18 @@
 
       <!-- View All States Button -->
       <div class="text-center mt-12">
-        <router-link
+        <!-- <router-link
           to="/states"
           class="inline-flex items-center gap-3 bg-mediumBlue hover:bg-steel-blue text-royal-blue px-8 py-4 rounded-2xl font-semibold text-lg transition-all active:scale-95 shadow-lg hover:shadow-xl"
         >
           View All States
+          <span class="text-xl text-royal-blue"> →</span>
+        </router-link> -->
+        <router-link
+          to="/states"
+          class="inline-flex items-center gap-3 bg-mediumBlue hover:bg-steel-blue text-royal-blue px-8 py-4 rounded-2xl font-semibold text-lg transition-all active:scale-95 shadow-lg hover:shadow-xl"
+        >
+          Explore Properties
           <span class="text-xl text-royal-blue"> →</span>
         </router-link>
         
@@ -62,42 +69,42 @@
 
 <script setup>
 const states = [
-  {
-    name: "Lagos",
-    slug: "lagos",
-    listings: 5200,
-    image: "/dillon-kydd-2keCPb73aQY-unsplash.jpg"
+  // {
+  //   name: "Lagos",
+  //   slug: "lagos",
+  //   listings: 5200,
+  //   image: "/dillon-kydd-2keCPb73aQY-unsplash.jpg"
     
-  },
+  // },
+  // {
+  //   name: "Abuja",
+  //   slug: "abuja",
+  //   listings: 3800,
+  //   image: "/wes-fischer-g39p1kDjvSY-unsplash.jpg"
+  // },
+  // {
+  //   name: "Oyo",
+  //   slug: "oyo",
+  //   listings: 1900,
+  //   image: "/zac-gudakov-wwqZ8CM21gg-unsplash.jpg"
+  // },
   {
-    name: "Abuja",
-    slug: "abuja",
-    listings: 3800,
-    image: "/wes-fischer-g39p1kDjvSY-unsplash.jpg"
-  },
-  {
-    name: "Oyo",
-    slug: "oyo",
-    listings: 1900,
-    image: "/zac-gudakov-wwqZ8CM21gg-unsplash.jpg"
-  },
-  {
-    name: "Kwara",
-    slug: "kwara",
+    name: "Ilorin",
+    slug: "ilorin",
     listings: 850,
     image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80"
   },
   {
-    name: "Kano",
-    slug: "kano",
+    name: "Ijebu Ode",
+    slug: "ijebu ode",
     listings: 1300,
     image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&q=80"
   },
-  {
-    name: "Enugu",
-    slug: "enugu",
-    listings: 1100,
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80"
-  }
+  // {
+  //   name: "Enugu",
+  //   slug: "enugu",
+  //   listings: 1100,
+  //   image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80"
+  // }
 ]
 </script>

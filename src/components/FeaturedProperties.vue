@@ -1,16 +1,16 @@
 <template>
-  <section class="py-20 bg-white">
+  <section class="py-20 bg-[var(--steel-blue)]">
     <div class="max-w-7xl mx-auto px-6">
       <!-- Header -->
       <div class="text-center mb-16">
-        <div class="inline-flex items-center gap-2 bg-[#ebf8ff] text-[#0025cc] px-6 py-2 rounded-full text-sm font-medium mb-4">
+        <div class="inline-flex items-center gap-2 bg-[var(--light-blue)] text-[var(--royal-blue)] px-6 py-2 rounded-full text-sm font-medium mb-4">
           <i class="fas fa-star"></i>
           <span>PREMIUM SELECTION</span>
         </div>
-        <h2 class="text-5xl md:text-6xl font-bold text-[#424242] tracking-tight mb-4 heading-font">
+        <h2 class="text-5xl md:text-6xl font-bold text-[var(--white)] tracking-tight mb-4 heading-font">
           Featured Homes
         </h2>
-        <p class="max-w-2xl mx-auto text-xl text-[#707070]">
+        <p class="max-w-2xl mx-auto text-xl text-[var(--white)]">
           Explore some of the most sought-after rental properties within Ilorin and Ijebu Ode. 
           Verified listings, trusted agents, and premium locations.
         </p>
@@ -129,7 +129,7 @@
           Browse All Properties
           <ArrowRight class="w-5 h-5 transition-transform group-hover:translate-x-1"></ArrowRight>
         </button>
-        <p class="text-sm text-[#707070] mt-4">Over 12,450 verified homes in 36 states</p>
+        <!-- <p class="text-sm text-[var(--white)] mt-4">Over 12,450 verified homes in 36 states</p> -->
       </div>
     </div>
   </section>
@@ -145,7 +145,7 @@ const properties = ref([
     price: "3.5M",
     period: "year",
     title: "4 Bedroom Duplex",
-    location: "Lekki, Lagos",
+    location: "Basin, Ilorin",
     beds: 4,
     baths: 5,
     parking: 3,
@@ -171,7 +171,7 @@ const properties = ref([
     price: "2.8M",
     period: "year",
     title: "3 Bedroom Apartment",
-    location: "Wuse, Abuja",
+    location: "Obalende, Ijebu Ode",
     beds: 3,
     baths: 3,
     parking: 2,
