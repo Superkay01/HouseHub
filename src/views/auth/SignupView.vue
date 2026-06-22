@@ -5,12 +5,16 @@
       <!-- Logo -->
       <div class="flex justify-center mb-5">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-[var(--royal-blue)] rounded-xl flex items-center justify-center text-3xl shadow-xl">
-            🏠
+          <div class="w-40 h-12  flex items-center justify-center ">
+            <img
+              src="/Lodgenext_logo__2_-removebg-preview.png"
+              alt="Lodgenext logo"
+              class="w-50 h-25 object-cover"
+            />
           </div>
-          <div>
+          <!-- <div>
             <span class="font-bold text-3xl tracking-tighter text-[var(--royal-blue)]">LodgeNext</span>
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -33,11 +37,11 @@
             >
               <div class="flex items-center gap-5">
                 <div class="w-14 h-14 bg-[var(--light-blue)] rounded-2xl flex items-center justify-center text-4xl transition-transform group-hover:scale-110">
-                  👤
+                  <User class="w-5 h-5"/>
                 </div>
                 <div class="flex-1">
-                  <h3 class="font-semibold md:text-xl text-lg text-dark-gray mb-1">I'm a Customer</h3>
-                  <p class="text-medium-gray md:text-sm text-[12px]">Looking for a house or apartment to rent</p>
+                  <h3 class="font-semibold md:text-xl text-lg text-[var(--royal-blue)] mb-1">I'm a Customer</h3>
+                  <p class="text-[var(--steel-blue)] md:text-sm text-[12px]">Looking for a house or apartment to rent</p>
                 </div>
               </div>
             </button>
@@ -48,11 +52,11 @@
             >
               <div class="flex items-center gap-5">
                 <div class="w-14 h-14 bg-[var(--light-blue)] rounded-2xl flex items-center justify-center text-4xl transition-transform group-hover:scale-110">
-                  🏢
+                  <House class="w-5 h-5"/>
                 </div>
                 <div class="flex-1">
-                  <h3 class="font-semibold md:text-xl text-lg text-dark-gray mb-1">I'm a Property Agent</h3>
-                  <p class="text-medium-gray md:text-sm text-[12px]">I want to list properties for rent</p>
+                  <h3 class="font-semibold md:text-xl text-lg text-[var(--royal-blue)] mb-1">I'm a Property Agent</h3>
+                  <p class="text-[var(--steel-blue)] md:text-sm text-[12px]">I want to list properties for rent</p>
                 </div>
               </div>
             </button>
@@ -66,7 +70,7 @@
                 class="text-[var(--royal-blue)] font-medium flex items-center gap-2 hover:underline">
                 ← Back
               </button>
-              <h2 class="font-bold text-2xl text-dark-gray">
+              <h2 class="font-bold text-2xl text-[var(--royal-blue)]">
                 {{ selectedRole === 'customer' ? 'Customer Signup' : 'Agent Signup' }}
               </h2>
             </div>
@@ -85,11 +89,14 @@
       </p>
     </div>
   </div>
+  <Footer/>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import SignupForm from './SignupForm.vue'
+import { House, User } from 'lucide-vue-next'
+import Footer from '@/components/Footer.vue'
 
 const selectedRole = ref(null)
 

@@ -12,10 +12,14 @@ import { Facebook, Instagram } from 'lucide-vue-next'
         <!-- Brand Column -->
         <div class="lg:col-span-5">
           <div class="flex items-center gap-3 mb-4">
-            <div class="w-11 h-11 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-lg">
-              🏠
+            <div class="w-50 h-10 mb-5  rounded-2xl flex items-center justify-center text-4xl shadow-lg">
+              <img
+              src="/Lodgenext_logo__3_-removebg-preview.png"
+              alt="Lodgenext logo"
+              class="w-50 h-35 object-cover"
+            />
             </div>
-            <span class="font-bold text-3xl tracking-tight">LodgeNext</span>
+            <!-- <span class="font-bold text-3xl tracking-tight">LodgeNext</span> -->
           </div>
           
           <p class="text-[var(--light-blue)] text-lg mb-6">
