@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-[var(--light-blue)] flex items-center justify-center py-8 px-4">
-    <div class="max-w-md w-full">
+  <div class="min-h-screen bg-[var(--light-blue)] flex items-center justify-center py-5 px-2">
+    <div class="max-w-4xl w-full">
       
       <!-- Logo -->
       <div class="flex justify-center mb-5">
@@ -37,7 +37,7 @@
             >
               <div class="flex items-center gap-5">
                 <div class="w-14 h-14 bg-[var(--light-blue)] rounded-2xl flex items-center justify-center text-4xl transition-transform group-hover:scale-110">
-                  <User class="w-5 h-5"/>
+                  <User class="w-5 h-5 text-[var(--royal-blue)]"/>
                 </div>
                 <div class="flex-1">
                   <h3 class="font-semibold md:text-xl text-lg text-[var(--royal-blue)] mb-1">I'm a Customer</h3>
@@ -52,7 +52,7 @@
             >
               <div class="flex items-center gap-5">
                 <div class="w-14 h-14 bg-[var(--light-blue)] rounded-2xl flex items-center justify-center text-4xl transition-transform group-hover:scale-110">
-                  <House class="w-5 h-5"/>
+                  <House class="w-5 h-5 text-[var(--royal-blue)]"/>
                 </div>
                 <div class="flex-1">
                   <h3 class="font-semibold md:text-xl text-lg text-[var(--royal-blue)] mb-1">I'm a Property Agent</h3>
