@@ -1,6 +1,7 @@
 <template>
   <div>
     <!-- Hero Section -->
+     <Navbar/>
     <HeroSection />
 
     <!-- Browse by State -->
@@ -27,5 +28,6 @@ import BecomeAgentCTA from '@/components/BecomeAgentCTA.vue';
 import Testimonials from '@/components/Testimonials.vue';
 import FAQSection from '@/components/FAQSection.vue';
 import Footer from '@/components/Footer.vue';
+import Navbar from '@/components/Navbar.vue';
 
 </script>

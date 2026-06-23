@@ -1,11 +1,12 @@
 <template>
+ 
   <div class="min-h-screen bg-[var(--light-blue)] flex items-center justify-center py-5 px-2">
     <div class="max-w-7xl w-full grid md:grid-cols-2 gap-8 bg-white rounded-3xl shadow-2xl overflow-hidden">
 
       <!-- Left Column - Image & Welcome -->
       <div class="hidden md:flex relative bg-cover bg-center items-center justify-center p-10"
            :style="{ backgroundImage: `url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80')` }">
-        <div class="absolute inset-0 bg-gradient-to-br from-[var(--royal-blue)]/80 to-[var(--medium-blue)]/70"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-[var(--royal-blue)]/80 to-[var(--medium-blue)]"></div>
         
         <div class="relative z-10 text-white text-center max-w-sm">
           <h2 class="md:text-3xl text-2xl font-bold mb-4">Welcome to LodgeNext</h2>
@@ -139,6 +140,7 @@ import { ref, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../../supabaseClient.js'
 import { Eye, EyeClosed } from 'lucide-vue-next'
+
 
 const props = defineProps({
   role: { type: String, required: true }

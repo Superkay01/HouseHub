@@ -50,7 +50,22 @@ const router = createRouter({
     {
       path: '/SignupForm',
       name: 'signupform',
-      component: () => import('@/components/auth/SignupForm.vue')
+      component: () => import('@/views/auth/SignupForm.vue')
+    },
+    {
+      path: '/customer/dashboard',
+      name: 'Customer Dashboard',
+      component: () => import ('@/views/customer/Dashboard.vue')
+    },
+    {
+      path: '/agent/dashboard',
+      name: 'Agent Dashboard',
+      component: () => import ('@/views/agent/Dashboard.vue')
+    },
+    {
+      path: '/reset-password',
+      name: 'Reset Password',
+      component: () => import ('@/views/auth/ResetPasswordView.vue')
     }
   ]
 })

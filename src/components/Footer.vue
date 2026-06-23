@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Camera, Phone, X } from 'lucide-vue-next';
+import { Camera, MapPin, Phone, PhoneCall, X } from 'lucide-vue-next';
 import { Facebook, Instagram } from 'lucide-vue-next'
 
 </script>
@@ -33,7 +33,7 @@ import { Facebook, Instagram } from 'lucide-vue-next'
           <!-- Contact Info -->
           <div class="space-y-3 text-white/80">
             <div class="flex items-center gap-3">
-              <span>📍</span>
+              <span><MapPin class="w-5 h-5"/></span>
               <span>Ilorin & Ijebu Ode, Nigeria</span>
             </div>
             <div class="flex items-center gap-3">
@@ -43,8 +43,9 @@ import { Facebook, Instagram } from 'lucide-vue-next'
               </a>
             </div>
             <div class="flex items-center gap-3">
-              <span>📞</span>
+              <span><PhoneCall class="w-5 h-5"/></span>
               <span>+234 903 003 1328</span>
+              <span>+234 816 916 8873</span>
             </div>
           </div>
         </div>

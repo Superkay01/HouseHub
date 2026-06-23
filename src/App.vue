@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-light-blue">
-    <Navbar />
+    <!-- <Navbar /> -->
     <router-view />
   </div>
 </template>
