@@ -25,7 +25,6 @@
           </div>
 
           <!-- Stats Cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-12">
                         <StatsCard
                         title="Saved Properties"
@@ -55,30 +54,11 @@
                         trend="3 unread"
                         color="medium-blue"
                         />
-                        </div>
+           
           </div>
 
           <!-- Recommended Properties -->
-          <div class="mb-12">
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-2xl font-semibold text-dark-gray">Recommended for You</h2>
-              <button class="text-[var(--royal-blue)] font-medium hover:underline">Browse All →</button>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              <!-- Add PropertyCard components here -->
-            </div>
           </div>
-
-          <!-- My Requests -->
-          <div>
-            <div class="flex justify-between items-center mb-5">
-              <h2 class="text-2xl font-semibold text-dark-gray">My Requests</h2>
-              <button class="text-[var(--royal-blue)] font-medium">View All →</button>
-            </div>
-            <RequestsTable />
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -92,7 +72,7 @@ import { supabase } from '@/supabaseClient.js'
 import CustomerSidebar from '@/components/customer/CustomerSidebar.vue'
 import CustomerNavbar from '@/components/customer/CustomerNavbar.vue'
 import StatsCard from '@/components/customer/StatsCard.vue'
-import RequestsTable from '@/components/customer/RequestsTable.vue'
+import { Bell, Calendar, Notebook, House } from 'lucide-vue-next'
 
 const sidebarRef = ref(null)
 
