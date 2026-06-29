@@ -4,8 +4,8 @@
       
       <!-- Header -->
       <div class="px-6 py-8 border-b text-center">
-        <h1 class="text-3xl font-bold">Agent Verification</h1>
-        <p class="text-gray-600 mt-2">Complete all steps to get verified</p>
+        <h1 class="md:text-3xl text-xl font-bold text-[var(--royal-blue)]">Agent Verification</h1>
+        <p class="text-[var(--royal-blue)] mt-2 md:text-xl text-xs">Complete all steps to get verified</p>
       </div>
 
       <!-- Progress -->
@@ -28,71 +28,71 @@
         <!-- Success Screen -->
         <div v-if="isSubmitted" class="text-center py-12">
           <div class="text-6xl mb-6">🎉</div>
-          <h2 class="text-3xl font-bold text-green-600 mb-4">Verification Submitted Successfully!</h2>
-          <p class="text-gray-600 text-lg max-w-md mx-auto">
+          <h2 class="md:text-2xl text-xl font-bold text-green-600 mb-4">Verification Submitted Successfully!</h2>
+          <p class="text-[var(--royal-blue)] md:text-xl text-xs max-w-md mx-auto">
             You have successfully submitted your verification.<br>
             You will be verified within <strong>12-24 hours</strong>.
           </p>
           <button 
             @click="goToDashboard"
-            class="mt-10 px-10 py-4 bg-[var(--royal-blue)] text-white rounded-3xl font-semibold text-lg">
+            class="mt-10 px-10 py-4 bg-[var(--royal-blue)] text-white rounded-3xl font-semibold md:text-xl text-xs">
             Return to Dashboard
           </button>
         </div>
 
         <!-- Step 1: Personal Information -->
         <div v-else-if="currentStep === 1">
-          <h2 class="text-2xl font-semibold mb-6">Personal Information</h2>
+          <h2 class="md:text-2xl text-xl font-semibold mb-6 text-[var(--royal-blue)]">Personal Information</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium mb-1">Full Name</label>
-              <p class="bg-gray-50 px-4 py-3 rounded-2xl">{{ profile.full_name || 'N/A' }}</p>
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Full Name</label>
+              <p class="bg-gray-50 px-4 py-3 rounded-2xl text-[var(--royal-blue)]">{{ profile.full_name || 'N/A' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">Phone Number</label>
-              <p class="bg-gray-50 px-4 py-3 rounded-2xl">{{ profile.phone || 'N/A' }}</p>
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Phone Number</label>
+              <p class="bg-gray-50 px-4 py-3 rounded-2xl text-[var(--royal-blue)]">{{ profile.phone || 'N/A' }}</p>
             </div>
           </div>
         </div>
 
         <!-- Step 2: Agency Info -->
         <div v-else-if="currentStep === 2">
-          <h2 class="text-2xl font-semibold mb-6">Agency & Verification Information</h2>
+          <h2 class="md:text-2xl text-xl font-semibold mb-6 text-[var(--royal-blue)]">Agency & Verification Information</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium mb-1">Agency Name</label>
-              <input v-model="form.agency_name" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl">
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Agency Name</label>
+              <input v-model="form.agency_name" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">Office Address</label>
-              <input v-model="form.office_address" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl">
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Office Address</label>
+              <input v-model="form.office_address" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">Date of Birth</label>
-              <input v-model="form.date_of_birth" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-2xl">
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Date of Birth</label>
+              <input v-model="form.date_of_birth" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">Years of Experience</label>
-              <input v-model="form.years_of_experience" type="number" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-2xl">
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Years of Experience</label>
+              <input v-model="form.years_of_experience" type="number" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">State</label>
-              <input v-model="form.state" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl">
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">State</label> 
+              <input v-model="form.state" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">City</label>
-              <input v-model="form.city" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl">
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">City</label>
+              <input v-model="form.city" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">Local Government Area (LGA)</label>
-              <input v-model="form.lga" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl">
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Local Government Area (LGA)</label>
+              <input v-model="form.lga" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-1">Business Registration Number</label>
-              <input v-model="form.business_registration_number" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl">
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Business Registration Number</label>
+              <input v-model="form.business_registration_number" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium mb-1">Areas of Operation</label>
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Areas of Operation</label>
               <input 
                 v-model="areasInput" 
                 placeholder="e.g. Lagos, Abuja, Port Harcourt (comma separated)"
@@ -105,29 +105,29 @@
 
         <!-- Step 3: Documents -->
         <div v-else-if="currentStep === 3">
-          <h2 class="text-2xl font-semibold mb-6">Upload Verification Documents</h2>
+          <h2 class="md:text-2xl text-xl font-semibold mb-6 text-[var(--royal-blue)]">Upload Verification Documents</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="border-2 border-dashed border-gray-300 rounded-3xl p-8 text-center hover:border-[var(--royal-blue)] cursor-pointer"
                  @click="triggerFileInput('government_id')" @drop.prevent="handleDrop($event, 'government_id')" @dragover.prevent>
               <div class="text-5xl mb-4">🪪</div>
-              <h4 class="font-semibold">Government Issued ID</h4>
-              <p class="text-sm text-gray-500 mt-1">National ID, Driver's License, Passport</p>
+              <h4 class="font-semibold text-[var(--royal-blue)]">Government Issued ID</h4>
+              <p class="text-sm text-[var(--royal-blue)] mt-1">National ID, Driver's License, Passport</p>
               <div v-if="uploadedFiles.government_id" class="mt-4 text-green-600 text-sm font-medium">✅ Uploaded</div>
             </div>
 
             <div class="border-2 border-dashed border-gray-300 rounded-3xl p-8 text-center hover:border-[var(--royal-blue)] cursor-pointer"
                  @click="triggerFileInput('passport_photo')" @drop.prevent="handleDrop($event, 'passport_photo')" @dragover.prevent>
               <div class="text-5xl mb-4">📸</div>
-              <h4 class="font-semibold">Passport Photograph</h4>
-              <p class="text-sm text-gray-500 mt-1">Recent clear passport size photo</p>
+              <h4 class="font-semibold text-[var(--royal-blue)]">Passport Photograph</h4>
+              <p class="text-sm text-[var(--royal-blue)] mt-1">Recent clear passport size photo</p>
               <div v-if="uploadedFiles.passport_photo" class="mt-4 text-green-600 text-sm font-medium">✅ Uploaded</div>
             </div>
 
             <div class="border-2 border-dashed border-gray-300 rounded-3xl p-8 text-center hover:border-[var(--royal-blue)] cursor-pointer md:col-span-2"
                  @click="triggerFileInput('proof_of_address')" @drop.prevent="handleDrop($event, 'proof_of_address')" @dragover.prevent>
               <div class="text-5xl mb-4">📍</div>
-              <h4 class="font-semibold">Proof of Address</h4>
-              <p class="text-sm text-gray-500 mt-1">Utility bill, Bank statement, etc.</p>
+              <h4 class="font-semibold text-[var(--royal-blue)]">Proof of Address</h4>
+              <p class="text-sm text-[var(--royal-blue)] mt-1">Utility bill, Bank statement, etc.</p>
               <div v-if="uploadedFiles.proof_of_address" class="mt-4 text-green-600 text-sm font-medium">✅ Uploaded</div>
             </div>
           </div>
@@ -135,7 +135,7 @@
 
         <!-- Step 4: Review -->
         <div v-else-if="currentStep === 4">
-          <h2 class="text-2xl font-semibold mb-6">Review & Submit</h2>
+          <h2 class="md:text-2xl text-xl font-semibold mb-6 text-[var(--royal-blue)]">Review & Submit</h2>
           <div class="bg-gray-50 p-6 rounded-2xl space-y-6">
             <div>
               <h3 class="font-semibold mb-3">Agency Information</h3>
