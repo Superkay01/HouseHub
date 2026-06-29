@@ -14,6 +14,11 @@ const router = createRouter({
       component: () => import('../views/StatesView.vue')
 
     },
+   {
+  path: '/agent/verification',
+  name: 'agent-verification',
+  component: () => import('../views/agent/AgentVerification.vue')
+},
     
 
     
@@ -52,21 +57,33 @@ const router = createRouter({
       name: 'signupform',
       component: () => import('@/views/auth/SignupForm.vue')
     },
-    {
-      path: '/customer/dashboard',
-      name: 'Customer Dashboard',
-      component: () => import ('@/views/customer/Dashboard.vue')
-    },
-    {
-      path: '/agent/dashboard',
-      name: 'Agent Dashboard',
-      component: () => import ('@/views/agent/Dashboard.vue')
-    },
+    // {
+    //   path: '/customer/dashboard',
+    //   name: 'Customer Dashboard',
+    //   component: () => import ('@/views/customer/Dashboard.vue')
+    // },
+    
     {
       path: '/reset-password',
       name: 'Reset Password',
       component: () => import ('@/views/auth/ResetPasswordView.vue')
-    }
+    },
+    // router/index.js
+{
+  path: '/agent',
+  component: () => import('../layouts/AgentLayout.vue'), 
+  children: [
+    {
+      path: 'dashboard',
+      component: () => import('../views/agent/Dashboard.vue')
+    },
+    {
+        path: 'verification',
+        name: 'agent-verification',
+        component: () => import('../views/agent/AgentVerification.vue')
+      }
+  ]
+}
   ]
 })
 

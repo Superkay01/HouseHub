@@ -1,64 +1,107 @@
 <template>
   <div class="flex h-screen bg-[var(--light-blue)] overflow-hidden">
-    
-    <!-- Responsive Sidebar -->
-    <AgentSidebar ref="sidebarRef" />
-
-    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden">
-      
-      <!-- Top Navbar -->
-      <AgentNavbar @toggle-sidebar="toggleSidebar" />
-
-      <!-- Dashboard Content -->
       <div class="flex-1 overflow-auto p-6 md:p-8">
         <div class="max-w-7xl mx-auto">
           
-          <!-- Welcome Header -->
-          <div class="mb-8">
-            <h1 class="text-4xl font-bold text-dark-gray">
-              Welcome back, {{ userProfile.full_name || 'Agent' }} 👋
-            </h1>
-            <p class="text-medium-gray mt-1 text-lg">
-              Here's what's happening with your properties today
-            </p>
+          <!-- Welcome Header + Verification Badge -->
+          <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 class="text-4xl font-bold text-[var(--royal-blue)]">
+                Welcome back, {{ userProfile.full_name || 'Agent' }} 👋
+              </h1>
+              <p class="text-[var(--royal-blue)] mt-1 text-lg">
+                Here's what's happening with your properties today
+              </p>
+            </div>
+
+            <!-- Verification Badge -->
+            <div v-if="verificationStatus" class="flex-shrink-0">
+              <button 
+                v-if="verificationStatus !== 'approved'"
+                @click="goToVerification"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold hover:scale-105 transition-all active:scale-95"
+                :class="[
+                  verificationStatus === 'pending' 
+                    ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 hover:bg-yellow-200' 
+                    : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                ]"
+              >
+                <span v-if="verificationStatus === 'pending'" class="text-lg">⏳</span>
+                <span v-else class="text-lg">🔒</span>
+                {{
+                  verificationStatus === 'pending' ? 'Verification Pending' : 'Complete Verification'
+                }}
+              </button>
+
+              <!-- Verified Badge (Non-clickable) -->
+              <div 
+                v-else
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold bg-green-100 text-green-700 border border-green-200"
+              >
+                <span class="text-lg">✅</span>
+                Verified Agent
+              </div>
+            </div>
           </div>
 
           <!-- Stats Cards -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <StatsCard 
-              title="Total Properties" 
-              :value="stats.totalProperties" 
-              icon="🏠" 
-              trend="+3 this month"
-              color="royal-blue"
-            />
-            <StatsCard 
-              title="Active Listings" 
-              :value="stats.activeListings" 
-              icon="📌" 
-              trend="+2"
-              color="bright-green"
-            />
-            <StatsCard 
-              title="New Requests" 
-              :value="stats.newRequests" 
-              icon="👥" 
-              trend="+12"
-              color="periwinkle"
-            />
-            <StatsCard 
-              title="Scheduled Inspections" 
-              :value="stats.inspections" 
-              icon="📅" 
-              trend="4 today"
-              color="medium-blue"
-            />
+            <div class="bg-white rounded-3xl p-6 shadow-sm">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-gray-500 text-sm">Total Properties</p>
+                  <h3 class="text-3xl font-bold mt-2">{{ stats.totalProperties }}</h3>
+                  <p class="text-sm text-gray-400 mt-2">+3 this month</p>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-[var(--light-blue)] flex items-center justify-center">
+                  <House class="w-7 h-7 text-[var(--royal-blue)]" />
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-sm">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-gray-500 text-sm">Active Listings</p>
+                  <h3 class="text-3xl font-bold mt-2">{{ stats.activeListings }}</h3>
+                  <p class="text-sm text-gray-400 mt-2">+2</p>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
+                  <MapPin class="w-7 h-7 text-green-600" />
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-sm">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-gray-500 text-sm">New Requests</p>
+                  <h3 class="text-3xl font-bold mt-2">{{ stats.newRequests }}</h3>
+                  <p class="text-sm text-gray-400 mt-2">+12</p>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center">
+                  <User class="w-7 h-7 text-purple-600" />
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-sm">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-gray-500 text-sm">Scheduled Inspections</p>
+                  <h3 class="text-3xl font-bold mt-2">{{ stats.inspections }}</h3>
+                  <p class="text-sm text-gray-400 mt-2">4 today</p>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
+                  <Calendar class="w-7 h-7 text-blue-600" />
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Property Performance Section -->
+          <!-- Rest of your dashboard content remains the same -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Chart -->
             <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm">
               <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-semibold text-dark-gray">Property Performance</h2>
@@ -70,7 +113,6 @@
               <AnalyticsChart />
             </div>
 
-            <!-- Quick Actions -->
             <div class="bg-white rounded-3xl p-6 shadow-sm">
               <h2 class="text-xl font-semibold mb-6">Quick Actions</h2>
               <div class="grid grid-cols-2 gap-4">
@@ -94,19 +136,20 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/supabaseClient.js'
-import { Camera, Plus } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'   // ← Added
+import {
+  House,
+  MapPin,
+  User,
+  Calendar,
+  Camera,
+  Plus
+} from 'lucide-vue-next'
 
-// Components
-import AgentSidebar from '@/components/agent/AgentSidebar.vue'
-import AgentNavbar from '@/components/agent/AgentNavbar.vue'
-import StatsCard from '@/components/agent/StatsCard.vue'
-import AnalyticsChart from '@/components/agent/AnalyticsChart.vue'
+const router = useRouter()
 
-const sidebarRef = ref(null)
-
-const userProfile = ref({
-  full_name: 'Loading...'
-})
+const userProfile = ref({ full_name: 'Loading...' })
+const verificationStatus = ref(null) // 'approved' | 'pending' | null
 
 const stats = ref({
   totalProperties: 0,
@@ -120,7 +163,7 @@ const fetchDashboardData = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // Fetch Profile
+    // Profile
     const { data: profile } = await supabase
       .from('profiles')
       .select('full_name')
@@ -129,15 +172,24 @@ const fetchDashboardData = async () => {
 
     if (profile) userProfile.value = profile
 
-    // Fetch Stats (You can expand this later)
+    // Verification Status
+    const { data: verif } = await supabase
+      .from('agent_verifications')
+      .select('verification_status')
+      .eq('user_id', user.id)
+      .single()
+
+    verificationStatus.value = verif?.verification_status || null
+
+    // Stats...
     const { count: totalProps } = await supabase
       .from('properties')
-      .select('*', { count: 'exact' })
+      .select('*', { count: 'exact', head: true })
       .eq('listed_by', user.id)
 
     const { count: activeProps } = await supabase
       .from('properties')
-      .select('*', { count: 'exact' })
+      .select('*', { count: 'exact', head: true })
       .eq('listed_by', user.id)
       .eq('status', 'approved')
 
@@ -149,8 +201,8 @@ const fetchDashboardData = async () => {
   }
 }
 
-const toggleSidebar = () => {
-  sidebarRef.value?.toggleSidebar()
+const goToVerification = () => {
+  router.push('/agent/verification')   
 }
 
 onMounted(() => {

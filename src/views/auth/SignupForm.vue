@@ -138,7 +138,7 @@
 <script setup>
 import { ref, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '../../supabaseClient.js'
+import { supabase } from '../../supabaseClient.ts'
 import { Eye, EyeClosed } from 'lucide-vue-next'
 
 

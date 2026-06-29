@@ -16,16 +16,16 @@
     ]"
   >
     <!-- Header with Cancel Button (Mobile Only) -->
-    <div class="px-6 py-1 border-b  flex items-center justify-between">
-      <div class="flex items-center gap-1">
+    <div class="px-6 py-0 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
         <img
           src="/Lodgenext_logo__3_-removebg-preview.png"
           alt="Lodgenext logo"
-          class="h-13.5 w-50 object-contain"
+          class="h-20 w-45 object-contain"
         />
       </div>
 
-      <!-- Cancel Button (Visible only on Mobile) -->
+      <!-- Cancel Button -->
       <button 
         v-if="isMobile"
         @click="closeSidebar"
@@ -38,13 +38,19 @@
     </div>
 
     <!-- Navigation -->
-    <div class="flex-1 overflow-auto py-6 px-3">
+    <div class="flex-1 overflow-auto py-1 px-3">
       <nav class="space-y-1">
         <SidebarLink 
           icon="dashboard" 
           label="Dashboard" 
           :to="'/agent/dashboard'" 
           :active="isActive('/agent/dashboard')"
+          @click="closeSidebar"
+        />
+        <SidebarLink 
+          icon="verification" 
+          label="Verification" 
+          :to="'/agent/verification'"
           @click="closeSidebar"
         />
         <SidebarLink 
