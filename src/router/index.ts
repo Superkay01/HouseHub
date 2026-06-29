@@ -81,6 +81,11 @@ const router = createRouter({
         path: 'verification',
         name: 'agent-verification',
         component: () => import('../views/agent/AgentVerification.vue')
+      },
+      {
+        path: 'add-property',
+        name: 'add-new-property',
+        component: () => import('../views/agent/AddNewProperty.vue')
       }
   ]
 }

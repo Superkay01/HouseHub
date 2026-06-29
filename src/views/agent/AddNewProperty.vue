@@ -1,0 +1,369 @@
+<template>
+  <div class="min-h-screen bg-[#ebf8ff] pb-12">
+    <div class="max-w-5xl mx-auto px-4 pt-8">
+      <!-- Header -->
+      <div class="flex justify-between items-start mb-10">
+        <div>
+          <h1 class="text-4xl font-bold text-[#0025cc]">Add New Property</h1>
+          <p class="text-[#546cdd] mt-2 text-lg">
+            List your property and connect with potential tenants
+          </p>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="text-sm flex items-center gap-2 text-gray-500">
+            <span v-if="saveStatus === 'saving'" class="animate-pulse">Saving...</span>
+            <span v-else-if="saveStatus === 'saved'" class="text-green-600 flex items-center gap-1">
+              ✓ Saved
+            </span>
+            <span v-if="lastSaved">• {{ lastSaved }}</span>
+          </div>
+
+          <button 
+            @click="manualSaveDraft"
+            class="px-6 py-3 text-[#0025cc] border border-[#0025cc] rounded-2xl hover:bg-white transition-all flex items-center gap-2">
+            <span>💾</span> Save as Draft
+          </button>
+        </div>
+      </div>
+
+      <!-- Stepper -->
+      <PropertyStepper 
+        :steps="steps" 
+        :current-step="currentStep" 
+        @step-click="goToStep" 
+      />
+
+      <div class="mt-10 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+        <!-- Step Content -->
+        <div class="p-8 md:p-12">
+          <!-- STEP 1: Property Information -->
+          <div v-if="currentStep === 1">
+            <h2 class="text-2xl font-semibold mb-8 text-[#0025cc]">Property Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-2">Property Title</label>
+                <input v-model="form.title" type="text" 
+                       class="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:border-[#0025cc] outline-none"
+                       placeholder="e.g. 2 Bedroom Flat in Tanke" />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">Property Type</label>
+                <select v-model="form.property_type" class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+                  <option value="">Select Type</option>
+                  <option value="Apartment">Apartment</option>
+                  <option value="Duplex">Duplex</option>
+                  <option value="Mini Flat">Mini Flat</option>
+                  <option value="Self Contain">Self Contain</option>
+                  <option value="Bungalow">Bungalow</option>
+                  <option value="Shop">Shop</option>
+                  <option value="Office Space">Office Space</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">Purpose</label>
+                <div class="flex gap-4">
+                  <label class="flex items-center gap-2">
+                    <input type="radio" v-model="form.purpose" value="For Rent" class="accent-[#0025cc]" />
+                    For Rent
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <input type="radio" v-model="form.purpose" value="For Lease" class="accent-[#0025cc]" />
+                    For Lease
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">State</label>
+                <select v-model="form.state" class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+                  <option value="Kwara">Kwara</option>
+                  <option value="Ogun">Ogun</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">City</label>
+                <select v-model="form.city" class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+                  <option value="Ilorin">Ilorin</option>
+                  <option value="Ijebu Ode">Ijebu Ode</option>
+                </select>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-2">Area / Neighborhood</label>
+                <input v-model="form.area" type="text" class="w-full px-5 py-4 border border-gray-300 rounded-2xl" />
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-2">Full Address</label>
+                <input v-model="form.address" type="text" class="w-full px-5 py-4 border border-gray-300 rounded-2xl" />
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-2">Description <span class="text-gray-400">({{ form.description.length }}/800)</span></label>
+                <textarea v-model="form.description" rows="6"
+                          class="w-full px-5 py-4 border border-gray-300 rounded-2xl resize-none"
+                          placeholder="Describe the property..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Property Features -->
+          <div v-if="currentStep === 2">
+            <h2 class="text-2xl font-semibold mb-8 text-[#0025cc]">Property Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium mb-2">Rent Price (₦ per year)</label>
+                <input v-model="form.price" type="number" class="w-full px-5 py-4 border border-gray-300 rounded-2xl" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Service Charge (Optional)</label>
+                <input v-model="form.service_charge" type="number" class="w-full px-5 py-4 border border-gray-300 rounded-2xl" />
+              </div>
+
+              <div><label class="block text-sm font-medium mb-2">Bedrooms</label><input v-model="form.bedrooms" type="number" class="w-full px-5 py-4 border border-gray-300 rounded-2xl" /></div>
+              <div><label class="block text-sm font-medium mb-2">Bathrooms</label><input v-model="form.bathrooms" type="number" class="w-full px-5 py-4 border border-gray-300 rounded-2xl" /></div>
+              <div><label class="block text-sm font-medium mb-2">Toilets</label><input v-model="form.toilets" type="number" class="w-full px-5 py-4 border border-gray-300 rounded-2xl" /></div>
+              <div><label class="block text-sm font-medium mb-2">Parking Spaces</label><input v-model="form.parking_spaces" type="number" class="w-full px-5 py-4 border border-gray-300 rounded-2xl" /></div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-4">Amenities</label>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <label v-for="amenity in amenitiesList" :key="amenity" class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" :value="amenity" v-model="form.amenities" class="accent-[#0025cc] w-5 h-5" />
+                    <span>{{ amenity }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">Property Condition</label>
+                <select v-model="form.condition" class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+                  <option value="Newly Built">Newly Built</option>
+                  <option value="Renovated">Renovated</option>
+                  <option value="Fairly Used">Fairly Used</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">Availability</label>
+                <select v-model="form.availability" class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+                  <option value="Available Now">Available Now</option>
+                  <option value="Available Soon">Available Soon</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Photos & Media -->
+          <div v-if="currentStep === 3">
+            <h2 class="text-2xl font-semibold mb-8 text-[#0025cc]">Photos & Media</h2>
+            <PropertyMediaUploader v-model="form.images" v-model:cover="form.cover_image" />
+          </div>
+
+          <!-- STEP 4: Review -->
+          <div v-if="currentStep === 4">
+            <h2 class="text-2xl font-semibold mb-8 text-[#0025cc]">Review & Submit</h2>
+            <PropertyReview :form="form" />
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="border-t p-8 flex justify-between bg-gray-50">
+          <button v-if="currentStep > 1" @click="prevStep"
+                  class="px-8 py-4 border border-gray-300 rounded-2xl font-medium hover:bg-white">
+            ← Previous
+          </button>
+          
+          <button v-if="currentStep < 4" @click="nextStep"
+                  class="px-10 py-4 bg-[#0025cc] text-white rounded-2xl font-semibold hover:bg-[#2e4cd5] transition-all">
+            Continue →
+          </button>
+
+          <button v-if="currentStep === 4" @click="submitProperty"
+                  :disabled="isSubmitting"
+                  class="px-10 py-4 bg-[#00db00] text-white rounded-2xl font-semibold hover:bg-green-600 transition-all">
+            {{ isSubmitting ? 'Submitting...' : 'Submit Property' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, watch, onUnmounted } from 'vue'
+import { supabase } from '@/supabaseClient'
+import PropertyStepper from '@/components/properties/PropertyStepper.vue'
+import PropertyMediaUploader from '@/components/properties/PropertyMediaUploader.vue'
+import PropertyReview from '@/components/properties/PropertyReview.vue'
+
+// Custom debounce function
+const debounce = <T extends (...args: any[]) => any>(fn: T, delay: number) => {
+  let timeoutId: ReturnType<typeof setTimeout>
+  return ((...args: Parameters<T>) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), delay)
+  }) as T
+}
+
+const currentStep = ref(1)
+const isSubmitting = ref(false)
+
+const form = ref({
+  id: null as string | null,
+  title: '',
+  property_type: '',
+  purpose: 'For Rent',
+  state: 'Kwara',
+  city: 'Ilorin',
+  area: '',
+  address: '',
+  description: '',
+  price: null as number | null,
+  service_charge: null as number | null,
+  bedrooms: null as number | null,
+  bathrooms: null as number | null,
+  toilets: null as number | null,
+  parking_spaces: null as number | null,
+  amenities: [] as string[],
+  condition: 'Newly Built',
+  availability: 'Available Now',
+  images: [] as string[],
+  cover_image: '',
+  video_url: ''
+})
+
+const saveStatus = ref<'idle' | 'saving' | 'saved'>('idle')
+const lastSaved = ref<string>('')
+
+const steps = [
+  'Property Information',
+  'Property Features',
+  'Photos & Media',
+  'Review & Submit'
+]
+
+const amenitiesList = [
+  'Borehole', 'Running Water', 'Security', 'Fenced Compound',
+  'POP Ceiling', 'Balcony', 'Air Conditioning', 'Prepaid Meter',
+  'Wi-Fi', 'Generator'
+]
+
+// Debounced Auto-Save
+// ==================== DEBOUNCED AUTO SAVE ====================
+const autoSave = debounce(async () => {
+  if (!form.value.title?.trim()) return
+
+  saveStatus.value = 'saving'
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    // Prepare payload - exclude id when inserting new record
+    const { id, ...dataWithoutId } = form.value
+
+    const payload = {
+      agent_id: user.id,
+      ...dataWithoutId,
+      status: 'draft' as const
+    }
+
+    let result
+
+    if (form.value.id) {
+      // Update existing draft
+      result = await supabase
+        .from('properties')
+        .update(payload)
+        .eq('id', form.value.id)
+        .select()
+        .single()
+    } else {
+      // Create new draft
+      result = await supabase
+        .from('properties')
+        .insert(payload)
+        .select()
+        .single()
+    }
+
+    // Save the generated ID for future updates
+    if (result.data && !form.value.id) {
+      form.value.id = result.data.id
+    }
+
+    saveStatus.value = 'saved'
+    lastSaved.value = 'Just now'
+
+  } catch (err: any) {
+    console.error('Auto-save failed:', err)
+    saveStatus.value = 'idle'
+  }
+}, 1500)
+
+// Watch for form changes
+watch(form, autoSave, { deep: true })
+
+const manualSaveDraft = () => {
+  autoSave()
+}
+
+const nextStep = () => { if (currentStep.value < 4) currentStep.value++ }
+const prevStep = () => { if (currentStep.value > 1) currentStep.value-- }
+const goToStep = (step: number) => { currentStep.value = step }
+
+const submitProperty = async () => {
+  isSubmitting.value = true
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    // Remove id from payload for new inserts (let database generate it)
+    const { id, ...payload } = form.value
+
+    const finalPayload = {
+      agent_id: user.id,
+      ...payload,
+      status: 'pending' as const
+    }
+
+    let error
+
+    if (form.value.id) {
+      // Update existing draft
+      const { error: updateError } = await supabase
+        .from('properties')
+        .update(finalPayload)
+        .eq('id', form.value.id)
+      error = updateError
+    } else {
+      // Insert new property
+      const { error: insertError } = await supabase
+        .from('properties')
+        .insert(finalPayload)
+      error = insertError
+    }
+
+    if (error) throw error
+
+    alert('🎉 Property submitted successfully! Our team will review it within 24-48 hours.')
+    // router.push('/my-properties')  // Uncomment when ready
+
+  } catch (err: any) {
+    console.error(err)
+    alert('Submission failed: ' + err.message)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// Cleanup
+onUnmounted(() => {
+  autoSave()
+})
+</script>
