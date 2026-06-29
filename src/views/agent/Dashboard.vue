@@ -7,10 +7,10 @@
           <!-- Welcome Header + Verification Badge -->
           <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 class="text-4xl font-bold text-[var(--royal-blue)]">
+              <h1 class="md:text-3xl text-xl font-bold text-[var(--royal-blue)]">
                 Welcome back, {{ userProfile.full_name || 'Agent' }} 👋
               </h1>
-              <p class="text-[var(--royal-blue)] mt-1 text-lg">
+              <p class="text-[var(--royal-blue)] mt-1 md:text-[15px] text-xs">
                 Here's what's happening with your properties today
               </p>
             </div>
@@ -50,9 +50,9 @@
             <div class="bg-white rounded-3xl p-6 shadow-sm">
               <div class="flex justify-between items-start">
                 <div>
-                  <p class="text-gray-500 text-sm">Total Properties</p>
-                  <h3 class="text-3xl font-bold mt-2">{{ stats.totalProperties }}</h3>
-                  <p class="text-sm text-gray-400 mt-2">+3 this month</p>
+                  <p class="text-[var(--royal-blue)] text-sm">Total Properties</p>
+                  <h3 class="text-3xl font-bold mt-2 text-[var(--royal-blue)]">{{ stats.totalProperties }}</h3>
+                  <p class="text-sm text-[var(--royal-blue)] mt-2">+3 this month</p>
                 </div>
                 <div class="w-14 h-14 rounded-2xl bg-[var(--light-blue)] flex items-center justify-center">
                   <House class="w-7 h-7 text-[var(--royal-blue)]" />
@@ -63,9 +63,9 @@
             <div class="bg-white rounded-3xl p-6 shadow-sm">
               <div class="flex justify-between items-start">
                 <div>
-                  <p class="text-gray-500 text-sm">Active Listings</p>
-                  <h3 class="text-3xl font-bold mt-2">{{ stats.activeListings }}</h3>
-                  <p class="text-sm text-gray-400 mt-2">+2</p>
+                  <p class="text-[var(--bright-green)] text-sm">Active Listings</p>
+                  <h3 class="text-3xl font-bold mt-2 text-[var(--bright-green)]">{{ stats.activeListings }}</h3>
+                  <p class="text-sm text-[var(--bright-green)] mt-2">+2</p>
                 </div>
                 <div class="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
                   <MapPin class="w-7 h-7 text-green-600" />
@@ -76,9 +76,9 @@
             <div class="bg-white rounded-3xl p-6 shadow-sm">
               <div class="flex justify-between items-start">
                 <div>
-                  <p class="text-gray-500 text-sm">New Requests</p>
-                  <h3 class="text-3xl font-bold mt-2">{{ stats.newRequests }}</h3>
-                  <p class="text-sm text-gray-400 mt-2">+12</p>
+                  <p class="text-[var(--periwinkle)] text-sm">New Requests</p>
+                  <h3 class="text-3xl font-bold mt-2 text-[var(--periwinkle)]">{{ stats.newRequests }}</h3>
+                  <p class="text-sm text-[var(--periwinkle)] mt-2">+12</p>
                 </div>
                 <div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center">
                   <User class="w-7 h-7 text-purple-600" />
@@ -89,9 +89,9 @@
             <div class="bg-white rounded-3xl p-6 shadow-sm">
               <div class="flex justify-between items-start">
                 <div>
-                  <p class="text-gray-500 text-sm">Scheduled Inspections</p>
-                  <h3 class="text-3xl font-bold mt-2">{{ stats.inspections }}</h3>
-                  <p class="text-sm text-gray-400 mt-2">4 today</p>
+                  <p class="text-[var(--medium-blue)] text-sm">Scheduled Inspections</p>
+                  <h3 class="text-3xl font-bold mt-2 text-[var(--medium-blue)]">{{ stats.inspections }}</h3>
+                  <p class="text-sm text-[var(--medium-blue)] mt-2">4 today</p>
                 </div>
                 <div class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
                   <Calendar class="w-7 h-7 text-blue-600" />
@@ -104,25 +104,25 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm">
               <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold text-dark-gray">Property Performance</h2>
+                <h2 class="md:text-xl text-xs font-semibold text-[var(--royal-blue)]">Property Performance</h2>
                 <div class="flex gap-2 text-sm">
-                  <button class="px-4 py-1.5 rounded-xl bg-[var(--royal-blue)] text-white">This Month</button>
-                  <button class="px-4 py-1.5 rounded-xl hover:bg-gray-100">This Year</button>
+                  <button class="md:px-4 md:py-1.5 px-2 py-1 rounded-xl md:text-xs text-[10px] bg-[var(--royal-blue)] text-white">This Month</button>
+                  <button class="md:px-4 md:py-1.5 px-2 py-1 rounded-xl hover:bg-[var(--light-blue)]">This Year</button>
                 </div>
               </div>
               <AnalyticsChart />
             </div>
 
             <div class="bg-white rounded-3xl p-6 shadow-sm">
-              <h2 class="text-xl font-semibold mb-6">Quick Actions</h2>
+              <h2 class="md:text-xl text-[15px] font-semibold mb-6 text-[var(--royal-blue)]">Quick Actions</h2>
               <div class="grid grid-cols-2 gap-4">
                 <button class="p-6 rounded-2xl border border-dashed border-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition-all text-center">
                   <Plus class="w-10 h-10 mx-auto mb-3 text-[var(--royal-blue)]" />
-                  <div class="font-medium text-[var(--royal-blue)]">Add Property</div>
+                  <div class="font-medium text-[var(--royal-blue)] md:text-xl text-[12px]">Add Property</div>
                 </button>
                 <button class="p-6 rounded-2xl border border-dashed border-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition-all text-center">
                   <Camera class="w-10 h-10 mx-auto mb-3 text-[var(--royal-blue)]" />
-                  <div class="font-medium text-[var(--royal-blue)]">Upload Photos</div>
+                  <div class="font-medium text-[var(--royal-blue)] md:text-xl text-[12px]">Upload Photos</div>
                 </button>
               </div>
             </div>
