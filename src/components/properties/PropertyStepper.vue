@@ -22,8 +22,8 @@
           class="w-11 h-11 flex items-center justify-center rounded-full border-4 transition-all duration-300 text-sm font-semibold mb-3"
           :class="[
             index + 1 < currentStep ? 'bg-[var(--bright-green)] border-[var(--bright-green)] text-[var(--white)]' : '',
-            index + 1 === currentStep ? 'border-[#0025cc] text-[#0025cc] bg-white' : '',
-            index + 1 > currentStep ? 'border-gray-300 text-gray-400 bg-white' : ''
+            index + 1 === currentStep ? 'border-[var(--royal-blue)] text-[var(--royal-blue)] bg-[var(--white)]' : '',
+            index + 1 > currentStep ? 'border-[var(--hover-blue)] text-[var(--medium-gray)] bg-[var(--white)]' : ''
           ]"
         >
           {{ index + 1 }}

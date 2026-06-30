@@ -2,13 +2,13 @@
   <div class="flex h-screen bg-[var(--light-blue)] overflow-hidden">
     
     <!-- Sidebar -->
-    <CustomerSidebar ref="sidebarRef" />
+    
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">
       
       <!-- Top Navbar -->
-      <CustomerNavbar @toggle-sidebar="toggleSidebar" />
+     
 
       <!-- Dashboard Content -->
       <div class="flex-1 overflow-auto p-6 md:p-8">

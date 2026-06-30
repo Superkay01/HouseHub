@@ -88,6 +88,17 @@ const router = createRouter({
         component: () => import('../views/agent/AddNewProperty.vue')
       }
   ]
+},
+{
+  path: '/customer',
+  component: () => import('../layouts/CustomerLayout.vue'), 
+  children: [
+    {
+      path: 'dashboard',
+      component: () => import('../views/customer/Dashboard.vue')
+    }
+    
+  ]
 }
   ]
 })
