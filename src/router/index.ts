@@ -86,7 +86,18 @@ const router = createRouter({
         path: 'add-property',
         name: 'add-new-property',
         component: () => import('../views/agent/AddNewProperty.vue')
-      }
+      },
+      {
+        path: 'properties',
+        name: 'property',
+        component: () => import('../views/agent/MyProperties.vue')
+      },
+      // Inside your routes array
+{
+  path: '/properties/:id',
+  name: 'property-detail',
+  component: () => import('../views/agent/PropertyDetail.vue')
+},
   ]
 },
 {

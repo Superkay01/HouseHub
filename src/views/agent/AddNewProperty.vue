@@ -37,6 +37,7 @@
       <div class="mt-10 bg-[var(--white)] rounded-3xl shadow-xl overflow-hidden border border-[var(--hover-blue)]">
         <!-- Step Content -->
         <div class="p-8 md:p-12">
+          
           <!-- STEP 1: Property Information -->
           <div v-if="currentStep === 1">
             <h2 class="text-2xl font-semibold mb-8 text-[var(--royal-blue)]">Property Information</h2>
@@ -66,11 +67,11 @@
                 <label class="block text-sm font-medium mb-2 text-[var(--steel-blue)]">Purpose</label>
                 <div class="flex gap-4">
                   <label class="flex items-center gap-2">
-                    <input type="radio" v-model="form.purpose" value="For Rent" class="accent-[var(--royal-blue)] text-[var(--royal-blue)]" />
+                    <input type="radio" v-model="form.purpose" value="For Rent" class="accent-[var(--royal-blue)]" />
                     <span class="text-[var(--royal-blue)]">For Rent</span>
                   </label>
                   <label class="flex items-center gap-2">
-                    <input type="radio" v-model="form.purpose" value="For Lease" class="accent-[var(--royal-blue)] text-[var(--royal-blue)]" />
+                    <input type="radio" v-model="form.purpose" value="For Lease" class="accent-[var(--royal-blue)]" />
                     <span class="text-[var(--royal-blue)]">For Lease</span>
                   </label>
                 </div>
@@ -160,8 +161,16 @@
 
           <!-- STEP 3: Photos & Media -->
           <div v-if="currentStep === 3">
-            <h2 class="text-2xl font-semibold mb-8 text-[var(--royal-blue)]">Photos & Media</h2>
-            <PropertyMediaUploader v-model="form.images" v-model:cover="form.cover_image" />
+            <h2 class="text-2xl font-semibold mb-8 text-[#0025cc]">Photos & Media</h2>
+            <PropertyMediaUploader 
+              v-model:image1="form.image_1"
+              v-model:image2="form.image_2"
+              v-model:image3="form.image_3"
+              v-model:image4="form.image_4"
+              v-model:image5="form.image_5"
+              v-model:cover="form.cover_image"
+              v-model:video="form.video_url" 
+            />
           </div>
 
           <!-- STEP 4: Review -->
@@ -174,18 +183,18 @@
         <!-- Navigation -->
         <div class="border-t p-8 flex justify-between bg-[var(--hover-blue)]">
           <button v-if="currentStep > 1" @click="prevStep"
-                  class="px-8 py-4 border border-[var(--steel-blue)] bg-[var(--white)] rounded-2xl font-medium hover:bg-[var(--white)] cursor-pointer">
+                  class="px-8 py-4 border border-[var(--steel-blue)] bg-[var(--white)] rounded-2xl font-medium hover:bg-gray-50">
             ← Previous
           </button>
           
           <button v-if="currentStep < 4" @click="nextStep"
-                  class="px-10 py-4 bg-[var(--royal-blue)] text-[var(--white)] rounded-2xl font-semibold hover:bg-[var(--royal-blue)] transition-all cursor-pointer">
+                  class="px-10 py-4 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold hover:bg-[#001da3]">
             Continue →
           </button>
 
           <button v-if="currentStep === 4" @click="submitProperty"
                   :disabled="isSubmitting"
-                  class="px-10 py-4 bg-[var(--bright-green)] text-[var(--white)] rounded-2xl font-semibold hover:bg-green-600 transition-all">
+                  class="px-10 py-4 bg-[var(--bright-green)] text-white rounded-2xl font-semibold hover:bg-green-600 transition-all">
             {{ isSubmitting ? 'Submitting...' : 'Submit Property' }}
           </button>
         </div>
@@ -195,24 +204,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onUnmounted } from 'vue'
+import { ref, watch } from 'vue'
 import { supabase } from '@/supabaseClient'
 import PropertyStepper from '@/components/properties/PropertyStepper.vue'
 import PropertyMediaUploader from '@/components/properties/PropertyMediaUploader.vue'
 import PropertyReview from '@/components/properties/PropertyReview.vue'
 import { Save } from 'lucide-vue-next'
 
-// Custom debounce function
+// Debounce function
 const debounce = <T extends (...args: any[]) => any>(fn: T, delay: number) => {
-  let timeoutId: ReturnType<typeof setTimeout>
+  let timeout: ReturnType<typeof setTimeout>
   return ((...args: Parameters<T>) => {
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => fn(...args), delay)
+    clearTimeout(timeout)
+    timeout = setTimeout(() => fn(...args), delay)
   }) as T
 }
 
 const currentStep = ref(1)
 const isSubmitting = ref(false)
+const saveStatus = ref<'idle' | 'saving' | 'saved'>('idle')
+const lastSaved = ref<string>('')
 
 const form = ref({
   id: null as string | null,
@@ -233,20 +244,16 @@ const form = ref({
   amenities: [] as string[],
   condition: 'Newly Built',
   availability: 'Available Now',
-  images: [] as string[],
   cover_image: '',
+  image_1: '',
+  image_2: '',
+  image_3: '',
+  image_4: '',
+  image_5: '',
   video_url: ''
 })
 
-const saveStatus = ref<'idle' | 'saving' | 'saved'>('idle')
-const lastSaved = ref<string>('')
-
-const steps = [
-  'Property Information',
-  'Property Features',
-  'Photos & Media',
-  'Review & Submit'
-]
+const steps = ['Property Information', 'Property Features', 'Photos & Media', 'Review & Submit']
 
 const amenitiesList = [
   'Borehole', 'Running Water', 'Security', 'Fenced Compound',
@@ -254,8 +261,7 @@ const amenitiesList = [
   'Wi-Fi', 'Generator'
 ]
 
-// Debounced Auto-Save
-// ==================== DEBOUNCED AUTO SAVE ====================
+// Auto Save
 const autoSave = debounce(async () => {
   if (!form.value.title?.trim()) return
 
@@ -265,19 +271,16 @@ const autoSave = debounce(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // Prepare payload - exclude id when inserting new record
-    const { id, ...dataWithoutId } = form.value
+    const { id, ...data } = form.value
 
     const payload = {
       agent_id: user.id,
-      ...dataWithoutId,
+      ...data,
       status: 'draft' as const
     }
 
     let result
-
     if (form.value.id) {
-      // Update existing draft
       result = await supabase
         .from('properties')
         .update(payload)
@@ -285,7 +288,6 @@ const autoSave = debounce(async () => {
         .select()
         .single()
     } else {
-      // Create new draft
       result = await supabase
         .from('properties')
         .insert(payload)
@@ -293,7 +295,6 @@ const autoSave = debounce(async () => {
         .single()
     }
 
-    // Save the generated ID for future updates
     if (result.data && !form.value.id) {
       form.value.id = result.data.id
     }
@@ -301,18 +302,15 @@ const autoSave = debounce(async () => {
     saveStatus.value = 'saved'
     lastSaved.value = 'Just now'
 
-  } catch (err: any) {
+  } catch (err) {
     console.error('Auto-save failed:', err)
     saveStatus.value = 'idle'
   }
-}, 1500)
+}, 1200)
 
-// Watch for form changes
 watch(form, autoSave, { deep: true })
 
-const manualSaveDraft = () => {
-  autoSave()
-}
+const manualSaveDraft = () => autoSave()
 
 const nextStep = () => { if (currentStep.value < 4) currentStep.value++ }
 const prevStep = () => { if (currentStep.value > 1) currentStep.value-- }
@@ -324,47 +322,36 @@ const submitProperty = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
-    // Remove id from payload for new inserts (let database generate it)
-    const { id, ...payload } = form.value
+    const { id, ...data } = form.value
 
-    const finalPayload = {
+    const cleanPayload = {
       agent_id: user.id,
-      ...payload,
+      ...data,
+      price: data.price ? Number(data.price) : null,
+      service_charge: data.service_charge ? Number(data.service_charge) : null,
+      bedrooms: data.bedrooms ? Number(data.bedrooms) : null,
+      bathrooms: data.bathrooms ? Number(data.bathrooms) : null,
+      toilets: data.toilets ? Number(data.toilets) : null,
+      parking_spaces: data.parking_spaces ? Number(data.parking_spaces) : null,
       status: 'pending' as const
     }
 
     let error
-
     if (form.value.id) {
-      // Update existing draft
-      const { error: updateError } = await supabase
-        .from('properties')
-        .update(finalPayload)
-        .eq('id', form.value.id)
-      error = updateError
+      const { error: e } = await supabase.from('properties').update(cleanPayload).eq('id', form.value.id)
+      error = e
     } else {
-      // Insert new property
-      const { error: insertError } = await supabase
-        .from('properties')
-        .insert(finalPayload)
-      error = insertError
+      const { error: e } = await supabase.from('properties').insert(cleanPayload)
+      error = e
     }
 
     if (error) throw error
 
-    alert('🎉 Property submitted successfully! Our team will review it within 24-48 hours.')
-    // router.push('/my-properties')  // Uncomment when ready
-
+    alert('🎉 Property submitted successfully! Our team will review it soon.')
   } catch (err: any) {
-    console.error(err)
     alert('Submission failed: ' + err.message)
   } finally {
     isSubmitting.value = false
   }
 }
-
-// Cleanup
-onUnmounted(() => {
-  autoSave()
-})
 </script>
