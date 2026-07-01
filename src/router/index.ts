@@ -62,6 +62,11 @@ const router = createRouter({
       name: 'admin-signup',
       component: () => import('../views/auth/AdminSignup.vue')
     },
+    {
+      path: '/AdminLogin',
+      name: 'admin-login',
+      component: () => import('../views/auth/AdminLogin.vue')
+    },
     // {
     //   path: '/customer/dashboard',
     //   name: 'Customer Dashboard',
@@ -120,7 +125,19 @@ const router = createRouter({
     }
     
   ]
+},
+{
+  path: '/admin',
+  component: () => import('../layouts/AdminLayout.vue'), 
+  children: [
+    {
+      path: 'dashboard',
+      component: () => import('../views/admin/Dashboard.vue')
+    }
+    
+  ]
 }
+
   ]
 })
 
