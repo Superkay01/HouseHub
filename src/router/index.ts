@@ -57,6 +57,11 @@ const router = createRouter({
       name: 'signupform',
       component: () => import('@/views/auth/SignupForm.vue')
     },
+    {
+      path: '/AdminSignup',
+      name: 'admin-signup',
+      component: () => import('../views/auth/AdminSignup.vue')
+    },
     // {
     //   path: '/customer/dashboard',
     //   name: 'Customer Dashboard',
@@ -93,11 +98,16 @@ const router = createRouter({
         component: () => import('../views/agent/MyProperties.vue')
       },
       // Inside your routes array
-{
-  path: '/properties/:id',
-  name: 'property-detail',
-  component: () => import('../views/agent/PropertyDetail.vue')
-},
+      {
+        path: '/properties/:id',
+        name: 'property-detail',
+        component: () => import('../views/agent/PropertyDetail.vue')
+      },
+      {
+        path: '/properties/edit/:id',
+        name: 'PropertyEdit',
+        component: () => import('@/views/agent/PropertyEdit.vue')
+      }
   ]
 },
 {
