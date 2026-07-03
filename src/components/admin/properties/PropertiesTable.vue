@@ -13,11 +13,11 @@
 
     <div v-if="properties.length === 0" 
          class="text-center py-16 border border-dashed border-[var(--hover-blue)] rounded-3xl">
-      <div class="text-6xl mb-4">
+      <div class="text-6xl mb-4 ">
         <img
-          src="/Lodgenext_logo__3_-removebg-preview.png"
+          src="/Lodgenext_logo__2_-removebg-preview.png"
           alt="Lodgenext logo"
-          class="h-25 w-55 object-contain"
+          class="h-25 w-55 object-contain m-auto"
         />
       </div>
       <p class="text-lg text-medium-gray">

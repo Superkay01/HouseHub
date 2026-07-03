@@ -5,7 +5,7 @@
       <div class="flex justify-between items-start mb-8">
         <div>
           <h1 class="text-4xl font-bold text-[var(--royal-blue)]">Properties Management</h1>
-          <p class="text-[var(--steel-blue)] mt-2">
+          <p class="text-medium-gray mt-2">
             Managing properties in <span class="font-semibold">{{ adminProfile.city }}, {{ adminProfile.state }}</span>
           </p>
         </div>
@@ -25,21 +25,21 @@
       </div>
 
       <!-- Filters -->
-      <div class="bg-[var(--white)] rounded-3xl p-6 shadow-sm mb-8">
+      <div class="bg-white rounded-3xl p-6 shadow-sm mb-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="lg:col-span-2">
-            <label class="block text-sm font-medium text-[var(--steel-blue)] mb-2">Search Properties</label>
+            <label class="block text-sm font-medium text-medium-gray mb-2">Search Properties</label>
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search by title, address, or area..."
-              class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] text-[var(--royal-blue)] focus:border-[var(--royal-blue)] focus:outline-none"
+              class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)] focus:outline-none"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-[var(--steel-blue)] mb-2">Status</label>
-            <select v-model="statusFilter" class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)] text-[var(--royal-blue)]">
+            <label class="block text-sm font-medium text-medium-gray mb-2">Status</label>
+            <select v-model="statusFilter" class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)]">
               <option value="">All Status</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
@@ -49,8 +49,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-[var(--steel-blue)] mb-2">Property Type</label>
-            <select v-model="typeFilter" class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)] text-[var(--royal-blue)]">
+            <label class="block text-sm font-medium text-medium-gray mb-2">Property Type</label>
+            <select v-model="typeFilter" class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)]">
               <option value="">All Types</option>
               <option value="Apartment">Apartment</option>
               <option value="Duplex">Duplex</option>
@@ -63,13 +63,12 @@
       </div>
 
       <!-- Properties Table -->
-      <div class="bg-[var(--white)] rounded-3xl shadow-sm overflow-hidden">
+      <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
         <PropertiesTable 
           :properties="filteredProperties"
           @view="viewProperty"
           @approve="approveProperty"
           @reject="rejectProperty"
-          @refresh="fetchProperties"
         />
       </div>
     </div>
@@ -99,6 +98,7 @@ const statusFilter = ref('')
 const typeFilter = ref('')
 
 const adminProfile = ref({
+  full_name: 'State Admin',
   city: '',
   state: ''
 })
@@ -110,10 +110,9 @@ const stats = ref({
   rejected: 0
 })
 
-const properties = ref([])           // Raw data from database
+const properties = ref([])
 const selectedProperty = ref(null)
 
-// Fetch Properties
 const fetchProperties = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
@@ -126,53 +125,44 @@ const fetchProperties = async () => {
       .eq('id', user.id)
       .single()
 
-    if (profile) {
-      adminProfile.value = profile
-    }
+    if (profile) adminProfile.value = profile
 
-    // Simplified query - removed join temporarily
+    // Fetch properties for this admin's state
     const { data, error } = await supabase
       .from('properties')
-      .select(`
-        id, title, property_type, purpose, price, area, city, state, 
-        status, created_at, cover_image
-      `)
-      .eq('state', profile?.state)
+      .select('*')
+      .eq('state', adminProfile.value.state)
       .order('created_at', { ascending: false })
 
     if (error) {
       console.error('Error fetching properties:', error)
-      alert('Error: ' + error.message)   // Temporary alert to see exact error
     } else {
-      console.log('Properties loaded:', data?.length)
       properties.value = data || []
       calculateStats()
     }
   } catch (err) {
     console.error('Failed to fetch properties:', err)
   }
-}    // Fetch properties
-    
-
-const calculateStats = () => {
-  stats.value.total = properties.value.length
-  stats.value.pending = properties.value.filter(p => p.status === 'pending').length
-  stats.value.approved = properties.value.filter(p => p.status === 'approved').length
-  stats.value.rejected = properties.value.filter(p => p.status === 'rejected').length
 }
 
-// Filtered Properties (connected to search + filters)
+const calculateStats = () => {
+  const all = properties.value
+  stats.value.total = all.length
+  stats.value.pending = all.filter(p => p.status === 'pending').length
+  stats.value.approved = all.filter(p => p.status === 'approved').length
+  stats.value.rejected = all.filter(p => p.status === 'rejected').length
+}
+
 const filteredProperties = computed(() => {
   let result = [...properties.value]
 
-  // Search Filter
-  if (searchQuery.value?.trim()) {
-    const term = searchQuery.value.toLowerCase().trim()
+  // Search
+  if (searchQuery.value) {
+    const term = searchQuery.value.toLowerCase()
     result = result.filter(p => 
       p.title?.toLowerCase().includes(term) ||
-      (p.address && p.address.toLowerCase().includes(term)) ||
-      p.area?.toLowerCase().includes(term) ||
-      p.city?.toLowerCase().includes(term)
+      p.address?.toLowerCase().includes(term) ||
+      p.area?.toLowerCase().includes(term)
     )
   }
 
@@ -183,9 +173,7 @@ const filteredProperties = computed(() => {
 
   // Property Type Filter
   if (typeFilter.value) {
-    result = result.filter(p => 
-      p.property_type?.toLowerCase() === typeFilter.value.toLowerCase()
-    )
+    result = result.filter(p => p.property_type === typeFilter.value)
   }
 
   return result
@@ -196,34 +184,17 @@ const viewProperty = (property) => {
 }
 
 const approveProperty = async (id) => {
-  const { error } = await supabase
-    .from('properties')
-    .update({ status: 'approved' })
-    .eq('id', id)
-
-  if (!error) {
-    fetchProperties()
-  } else {
-    console.error('Approve failed:', error)
-  }
+  await supabase.from('properties').update({ status: 'approved' }).eq('id', id)
+  fetchProperties()
 }
 
 const rejectProperty = async (id) => {
-  const { error } = await supabase
-    .from('properties')
-    .update({ status: 'rejected' })
-    .eq('id', id)
-
-  if (!error) {
-    fetchProperties()
-  } else {
-    console.error('Reject failed:', error)
-  }
+  await supabase.from('properties').update({ status: 'rejected' }).eq('id', id)
+  fetchProperties()
 }
 
 const exportData = () => {
   alert(`Exporting ${filteredProperties.value.length} properties for ${adminProfile.value.state}...`)
-  // TODO: Implement actual CSV export
 }
 
 onMounted(() => {
