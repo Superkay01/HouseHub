@@ -132,7 +132,11 @@ const router = createRouter({
   children: [
     {
       path: 'dashboard',
-      component: () => import('../views/admin/Dashboard.vue')
+      component: () => import('../views/admin/dashboard.vue')
+    },
+    {
+      path: 'properties',
+      component: () => import('../views/admin/Properties.vue')
     }
     
   ]

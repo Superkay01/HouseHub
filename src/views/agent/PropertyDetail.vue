@@ -5,14 +5,14 @@
       <!-- Back Button -->
       <button 
         @click="$router.back()" 
-        class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 font-medium"
+        class="flex items-center gap-2 text-[var(--royal-blue)] hover:text-[var(--meduim-blue)] mb-8 font-medium"
       >
         ← Back to My Properties
       </button>
 
       <!-- Loading -->
       <div v-if="loading" class="flex justify-center py-32">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#0025cc]"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[var(--royal-blue)]"></div>
       </div>
 
       <!-- Error -->
@@ -20,7 +20,7 @@
         <p class="text-red-600 text-xl mb-4">{{ error }}</p>
         <button 
           @click="fetchProperty"
-          class="px-6 py-3 bg-gray-800 text-white rounded-2xl hover:bg-gray-700"
+          class="px-6 py-3 bg-[var(--royal-blue)] text-[var(--white)] rounded-2xl hover:bg-[var(--steel-blue)]"
         >
           Try Again
         </button>
@@ -31,7 +31,7 @@
         
         <!-- Images Section -->
         <div class="lg:col-span-7 space-y-6">
-          <div v-if="property.cover_image" class="rounded-3xl overflow-hidden shadow-2xl bg-white">
+          <div v-if="property.cover_image" class="rounded-3xl overflow-hidden shadow-2xl bg-[var(--white)]">
             <img 
               :src="property.cover_image" 
               class="w-full h-[520px] object-cover"
@@ -43,7 +43,7 @@
             <div 
               v-for="(url, index) in allImages" 
               :key="index"
-              class="rounded-3xl overflow-hidden border border-gray-100 aspect-video bg-white"
+              class="rounded-3xl overflow-hidden border border-[var(--periwinkle)] aspect-video bg-[var(--white)]"
             >
               <img 
                 :src="url" 
@@ -59,23 +59,23 @@
 
         <!-- Details Section -->
         <div class="lg:col-span-5">
-          <div class="bg-white rounded-3xl shadow-2xl p-8 sticky top-8">
+          <div class="bg-[var(--white)] rounded-3xl shadow-2xl p-8 sticky top-8">
             
             <div class="flex justify-between items-start mb-6">
               <span class="inline-block px-4 py-1.5 bg-green-100 text-green-700 text-sm font-medium rounded-2xl capitalize">
                 {{ property.status || 'pending' }}
               </span>
               <div class="text-right">
-                <p class="text-4xl font-bold text-[#0025cc]">
+                <p class="text-4xl font-bold text-[var(--royal-blue)]">
                   ₦{{ property.price?.toLocaleString() || '0' }}
                 </p>
-                <p class="text-sm text-gray-500">{{ property.purpose }}</p>
+                <p class="text-sm text-[var(--royal-blue)]">{{ property.purpose }}</p>
               </div>
             </div>
 
-            <h1 class="text-3xl font-bold leading-tight mb-2">{{ property.title }}</h1>
+            <h1 class="text-3xl font-bold leading-tight mb-2 text-[var(--royal-blue)]">{{ property.title }}</h1>
             
-            <p class="text-gray-600 flex items-center gap-2 mb-8">
+            <p class="text-[var(--royal-blue)] flex items-center gap-2 mb-8">
               <i class="fas fa-map-marker-alt"></i>
               {{ property.area }}, {{ property.city }}, {{ property.state }}
             </p>
@@ -83,29 +83,29 @@
             <div class="border-t border-b py-6 my-6 grid grid-cols-3 gap-4 text-center">
               <div>
                 <div class="text-2xl font-semibold">{{ property.bedrooms || 0 }}</div>
-                <div class="text-xs text-gray-500">BEDROOMS</div>
+                <div class="text-xs text-[var(--royal-blue)]">BEDROOMS</div>
               </div>
               <div>
                 <div class="text-2xl font-semibold">{{ property.bathrooms || 0 }}</div>
-                <div class="text-xs text-gray-500">BATHROOMS</div>
+                <div class="text-xs text-[var(--royal-blue)]">BATHROOMS</div>
               </div>
               <div>
-                <div class="text-2xl font-semibold">{{ property.parking_spaces || 0 }}</div>
-                <div class="text-xs text-gray-500">PARKING</div>
+                <div class="text-2xl font-semibold [var(--royal-blue)]">{{ property.parking_spaces || 0 }}</div>
+                <div class="text-xs text-[var(--royal-blue)]">PARKING</div>
               </div>
             </div>
 
             <div class="space-y-4 text-sm">
               <div class="flex justify-between">
-                <span class="text-gray-600">Property Type</span>
+                <span class="text-[var(--royal-blue)]">Property Type</span>
                 <strong>{{ property.property_type }}</strong>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Condition</span>
+                <span class="text-[var(--royal-blue)]">Condition</span>
                 <strong>{{ property.condition }}</strong>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Availability</span>
+                <span class="text-[var(--royal-blue)]">Availability</span>
                 <strong>{{ property.availability }}</strong>
               </div>
             </div>
@@ -116,23 +116,23 @@
                 <span 
                   v-for="amenity in property.amenities" 
                   :key="amenity"
-                  class="bg-gray-100 px-4 py-2 rounded-2xl text-sm"
+                  class="bg-[var(--hover-blue)] px-4 py-2 rounded-2xl text-sm"
                 >
                   {{ amenity }}
                 </span>
               </div>
             </div>
 
-            <div v-if="property.description" class="mt-10 pt-8 border-t">
+            <div v-if="property.description" class="mt-10 pt-8 border-t text-[var(--royal-blue)]">
               <h4 class="font-semibold mb-3">Description</h4>
-              <p class="leading-relaxed text-gray-700 whitespace-pre-wrap">
+              <p class="leading-relaxed text-[var(--royal-blue)] whitespace-pre-wrap">
                 {{ property.description }}
               </p>
             </div>
 
             <div class="mt-10 pt-8 border-t">
-              <button class="w-full bg-[#0025cc] hover:bg-[#001da3] text-white py-4 rounded-2xl font-semibold text-lg transition">
-                Contact Agent
+              <button class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] text-[var(--white)] py-4 rounded-2xl font-semibold text-lg transition">
+                Contact Admin
               </button>
             </div>
           </div>

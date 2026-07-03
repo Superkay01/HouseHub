@@ -1,0 +1,1 @@
+<template>PropertyDetailsDrawer.vue</template>
