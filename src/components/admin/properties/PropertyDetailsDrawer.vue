@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 z-50 flex items-center justify-end bg-black/70">
-    <div class="bg-white w-full max-w-3xl h-full overflow-y-auto shadow-2xl">
+    <div class="bg-white w-full max-w-6xl h-full overflow-y-auto shadow-2xl">
       <!-- Header -->
       <div class="sticky top-0 bg-white border-b px-8 py-5 flex items-center justify-between z-10">
         <div>
@@ -52,11 +52,11 @@
         <div class="flex justify-between items-start">
           <div>
             <h1 class="text-3xl font-bold text-[var(--royal-blue)]">{{ property.title }}</h1>
-            <p class="text-xl text-medium-gray">{{ property.property_type }} • {{ property.purpose }}</p>
+            <p class="text-xl text-[var(--royal-blue)]">{{ property.property_type }} • {{ property.purpose }}</p>
           </div>
           <div class="text-right">
             <p class="text-4xl font-bold text-[var(--royal-blue)]">₦{{ Number(property.price || 0).toLocaleString() }}</p>
-            <p class="text-sm text-medium-gray">{{ property.rent_duration || 'per year' }}</p>
+            <p class="text-sm text-[var(--royal-blue)]">{{ property.rent_duration || 'per year' }}</p>
           </div>
         </div>
 
@@ -68,29 +68,29 @@
         <!-- Location -->
         <div>
           <h3 class="font-semibold mb-2 text-[var(--royal-blue)]">Location</h3>
-          <p class="text-lg">📍 {{ property.address || property.area }}, {{ property.city }}, {{ property.state }}</p>
+          <p class="text-lg text-[var(--royal-blue)]">📍 {{ property.address || property.area }}, {{ property.city }}, {{ property.state }}</p>
         </div>
 
         <!-- Specs -->
         <div class="grid grid-cols-3 gap-6 py-6 border-t border-b">
           <div class="text-center">
-            <div class="text-3xl font-semibold">{{ property.bedrooms || 0 }}</div>
-            <div class="text-xs text-medium-gray">BEDROOMS</div>
+            <div class="text-3xl font-semibold text-[var(--royal-blue)]">{{ property.bedrooms || 0 }}</div>
+            <div class="text-xs text-[var(--royal-blue)]">BEDROOMS</div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-semibold">{{ property.bathrooms || 0 }}</div>
-            <div class="text-xs text-medium-gray">BATHROOMS</div>
+            <div class="text-3xl font-semibold text-[var(--royal-blue)]">{{ property.bathrooms || 0 }}</div>
+            <div class="text-xs text-[var(--royal-blue)]">BATHROOMS</div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-semibold">{{ property.toilets || 0 }}</div>
-            <div class="text-xs text-medium-gray">TOILETS</div>
+            <div class="text-3xl font-semibold text-[var(--royal-blue)]">{{ property.toilets || 0 }}</div>
+            <div class="text-xs text-[var(--royal-blue)]">TOILETS</div>
           </div>
         </div>
 
         <!-- Description -->
         <div>
           <h3 class="font-semibold mb-3 text-[var(--royal-blue)]">Description</h3>
-          <p class="text-medium-gray leading-relaxed whitespace-pre-wrap">
+          <p class="text-[var(--royal-blue)] leading-relaxed whitespace-pre-wrap">
             {{ property.description || 'No description provided.' }}
           </p>
         </div>

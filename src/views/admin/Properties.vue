@@ -9,11 +9,23 @@
             Managing properties in <span class="font-semibold">{{ adminProfile.city }}, {{ adminProfile.state }}</span>
           </p>
         </div>
-        <button 
-          @click="refreshAll"
-          class="px-6 py-3 bg-[var(--royal-blue)] text-white rounded-2xl hover:bg-[var(--medium-blue)] flex items-center gap-2">
-          Refresh All
-        </button>
+        <div class="flex items-center gap-3">
+          <button 
+            @click="exportCSV"
+            class="px-5 py-3 bg-white border border-[var(--light-blue)] rounded-2xl hover:bg-gray-50 flex items-center gap-2 text-sm">
+            📥 CSV
+          </button>
+          <button 
+            @click="exportPDF"
+            class="px-5 py-3 bg-white border border-[var(--light-blue)] rounded-2xl hover:bg-gray-50 flex items-center gap-2 text-sm">
+            📄 PDF
+          </button>
+          <button 
+            @click="refreshAll"
+            class="px-6 py-3 bg-[var(--royal-blue)] text-white rounded-2xl hover:bg-[var(--medium-blue)] flex items-center gap-2">
+            Refresh All
+          </button>
+        </div>
       </div>
 
       <!-- Stats Cards -->
@@ -86,12 +98,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/supabaseClient.js'
 import { Building2, Clock, CheckCircle, XCircle } from 'lucide-vue-next'
+import jsPDF from 'jspdf'
 
 import StatsCard from '@/components/admin/StatsCard.vue'
 import PropertiesTable from '@/components/admin/properties/PropertiesTable.vue'
 import PropertyDetailsDrawer from '@/components/admin/properties/PropertyDetailsDrawer.vue'
-
-
 
 const searchQuery = ref('')
 const statusFilter = ref('')
@@ -144,43 +155,43 @@ const fetchStats = async () => {
     const state = profile?.state || 'Kwara'
 
     // Total Properties
-    const { count: totalCount } = await supabase
+    const { count: total } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
       .eq('state', state)
-      
 
     // Pending
-    const { count: pendingCount } = await supabase
+    const { count: pending } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
       .eq('state', state)
       .eq('status', 'pending')
 
     // Approved
-    const { count: approvedCount } = await supabase
+    const { count: approved } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
       .eq('state', state)
       .eq('status', 'approved')
 
     // Rejected
-    const { count: rejectedCount } = await supabase
+    const { count: rejected } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
       .eq('state', state)
       .eq('status', 'rejected')
 
     stats.value = {
-      total: totalCount || 0,
-      pending: pendingCount || 0,
-      approved: approvedCount || 0,
-      rejected: rejectedCount || 0
+      total: total || 0,
+      pending: pending || 0,
+      approved: approved || 0,
+      rejected: rejected || 0
     }
   } catch (err) {
     console.error('Stats fetch error:', err)
   }
 }
+
 const fetchProperties = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
@@ -197,8 +208,6 @@ const fetchProperties = async () => {
       .select('*')
       .eq('state', profile?.state)
       .order('created_at', { ascending: false })
-
-      
 
     if (error) console.error(error)
     else properties.value = data || []
@@ -243,7 +252,7 @@ const approveProperty = async (id) => {
   if (!error) {
     alert('✅ Property approved successfully!')
     fetchProperties()
-    fetchStats() // ← Add this
+    fetchStats()
     selectedProperty.value = null
   } else {
     alert('❌ Failed to approve')
@@ -266,6 +275,52 @@ const rejectProperty = async (id) => {
   }
 }
 
+const exportCSV = () => {
+  const csvContent = "data:text/csv;charset=utf-8," 
+    + "Title,Price,State,City,Status,Created\n"
+    + properties.value.map(p => 
+        `"${p.title}",${p.price},"${p.state}","${p.city}","${p.status}","${p.created_at}"`
+      ).join("\n");
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `properties-${adminProfile.value.state}-${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+const exportPDF = () => {
+  import('jspdf').then(({ jsPDF }) => {
+    import('jspdf-autotable').then(({ default: autoTable }) => {
+      const doc = new jsPDF()
+      
+      doc.setFontSize(18)
+      doc.text(`Properties Report - ${adminProfile.value.state}`, 14, 22)
+      
+      doc.setFontSize(11)
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30)
+      doc.text(`State Admin: ${adminProfile.value.full_name}`, 14, 38)
+
+      autoTable(doc, {
+        startY: 50,
+        head: [['Title', 'Price', 'City', 'Status', 'Created']],
+        body: properties.value.map(p => [
+          p.title,
+          `₦${Number(p.price).toLocaleString()}`,
+          p.city,
+          p.status,
+          new Date(p.created_at).toLocaleDateString()
+        ]),
+        theme: 'grid',
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [0, 37, 204] }
+      })
+
+      doc.save(`properties-${adminProfile.value.state}-${new Date().toISOString().slice(0,10)}.pdf`)
+    })
+  })
+}
 const refreshAll = () => {
   fetchProperties()
   fetchStats()

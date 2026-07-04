@@ -122,7 +122,12 @@ const router = createRouter({
     {
       path: 'dashboard',
       component: () => import('../views/customer/Dashboard.vue')
-    }
+    },
+     {
+        path: 'browse',
+        name: 'customer-browse',
+        component: () => import('../views/customer/browse.vue')
+      },
     
   ]
 },
