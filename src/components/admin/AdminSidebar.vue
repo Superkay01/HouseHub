@@ -16,16 +16,27 @@
     ]"
   >
     <!-- Header -->
-    <div class="px-6 py-2 border-b border-[var(--white)] ">
-        <div class="flex items-center gap-0 flex flex-col">
+    <div class="px-6 py-0 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
         <img
           src="/Lodgenext_logo__3_-removebg-preview.png"
           alt="Lodgenext logo"
-          class="h-25 w-55 object-contain"
+          class="h-20 w-45 object-contain"
         />
-        <p class="text-xs text-[var(--white)]">Admin Portal</p>
-        </div>
+      </div>
+
+      <!-- Cancel Button -->
+      <button 
+        v-if="isMobile"
+        @click="closeSidebar"
+        class="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6h12v12" />
+        </svg>
+      </button>
     </div>
+    
 
     <!-- Admin Profile -->
     <div class="px-6 py-6 border-b border-[var(--white)]">

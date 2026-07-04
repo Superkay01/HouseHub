@@ -11,7 +11,23 @@
       </button>
     </div>
 
-    <div v-if="properties.length === 0" 
+    <!-- Agency Filter -->
+    <div class="px-10 mb-6">
+      <label class="block text-sm font-medium text-medium-gray mb-2">Filter by Agency</label>
+      <select 
+        v-model="agencyFilter" 
+        class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)]">
+        <option value="">All Agencies</option>
+        <option 
+          v-for="agency in uniqueAgencies" 
+          :key="agency"
+          :value="agency">
+          {{ agency }}
+        </option>
+      </select>
+    </div>
+
+    <div v-if="filteredProperties.length === 0" 
          class="text-center py-16 border border-dashed border-[var(--hover-blue)] rounded-3xl">
       <div class="text-6xl mb-4 ">
         <img
@@ -32,7 +48,7 @@
             <th class="py-4 px-4">Property</th>
             <th class="py-4 px-4">Price</th>
             <th class="py-4 px-4">Location</th>
-            <th class="py-4 px-4">Agent</th>
+            <th class="py-4 px-4">Agent / Agency</th>
             <th class="py-4 px-4">Status</th>
             <th class="py-4 px-4">Date Added</th>
             <th class="py-4 px-4 text-right">Actions</th>
@@ -40,7 +56,7 @@
         </thead>
         <tbody class="divide-y divide-[var(--hover-blue)]">
           <tr 
-            v-for="property in properties" 
+            v-for="property in filteredProperties" 
             :key="property.id"
             class="hover:bg-[var(--light-blue)] transition-colors"
           >
@@ -63,7 +79,10 @@
               📍 {{ property.city }}, {{ property.state }}
             </td>
             <td class="py-5 px-4 text-sm text-[var(--royal-blue)]">
-              {{ property.profiles?.full_name || 'N/A' }}
+              {{ property.agent_id || 'N/A' }} 
+              <!-- <span v-if="property.agent_id" class="text-xs text-medium-gray">
+                ({{ property.agent_id }})
+              </span> -->
             </td>
             <td class="py-5 px-4">
               <PropertyStatusBadge :status="property.status" />
@@ -100,7 +119,8 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { ref, computed, defineProps, defineEmits } from 'vue'
+import PropertyStatusBadge from './PropertyStatusBadge.vue'
 
 const props = defineProps({
   properties: {
@@ -111,6 +131,25 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['view', 'approve', 'reject', 'refresh'])
+
+const agencyFilter = ref('')
+
+const uniqueAgencies = computed(() => {
+  const agencies = props.properties
+    .map(p => p.profiles?.agency_name)
+    .filter(Boolean)
+  return [...new Set(agencies)]
+})
+
+const filteredProperties = computed(() => {
+  let result = [...props.properties]
+
+  if (agencyFilter.value) {
+    result = result.filter(p => p.profiles?.agency_name === agencyFilter.value)
+  }
+
+  return result
+})
 
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A'

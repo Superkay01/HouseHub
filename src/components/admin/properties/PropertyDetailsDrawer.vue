@@ -1,6 +1,6 @@
 <template>
-  <div class="fixed inset-0 z-50 flex items-center justify-end bg-black/60">
-    <div class="bg-white w-full max-w-2xl h-full overflow-y-auto shadow-2xl">
+  <div class="fixed inset-0 z-50 flex items-center justify-end bg-black/70">
+    <div class="bg-white w-full max-w-3xl h-full overflow-y-auto shadow-2xl">
       <!-- Header -->
       <div class="sticky top-0 bg-white border-b px-8 py-5 flex items-center justify-between z-10">
         <div>
@@ -14,22 +14,49 @@
         </button>
       </div>
 
-      <div class="p-8 space-y-8">
-        <!-- Cover Image -->
-        <img 
-          :src="property.cover_image || 'https://via.placeholder.com/800x400/0025cc/ffffff?text=No+Image'" 
-          class="w-full h-80 object-cover rounded-3xl"
-        />
+      <div class="p-8 space-y-10">
+        <!-- Main Image -->
+        <div class="rounded-3xl overflow-hidden shadow-2xl bg-black">
+          <img 
+            :src="mainImage" 
+            class="w-full h-[520px] object-cover cursor-pointer"
+            @click="showFullScreen(mainImage)"
+          />
+        </div>
 
-        <!-- Basic Info -->
+        <!-- Gallery -->
+        <div v-if="allImages.length > 1" class="space-y-4">
+          <h3 class="font-semibold text-[var(--royal-blue)]">Property Gallery</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div 
+              v-for="(url, index) in allImages" 
+              :key="index"
+              class="rounded-3xl overflow-hidden shadow-md aspect-video bg-gray-100 cursor-pointer hover:ring-2 hover:ring-[var(--royal-blue)] transition-all"
+              :class="{ 'ring-2 ring-[var(--royal-blue)]': url === mainImage }"
+              @click="setMainImage(url)"
+            >
+              <img :src="url" class="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Video -->
+        <div v-if="property.video_url" class="space-y-4">
+          <h3 class="font-semibold text-[var(--royal-blue)]">Property Video</h3>
+          <div class="rounded-3xl overflow-hidden shadow-xl bg-black">
+            <video :src="property.video_url" controls class="w-full aspect-video"></video>
+          </div>
+        </div>
+
+        <!-- Property Info -->
         <div class="flex justify-between items-start">
           <div>
-            <h1 class="text-3xl font-bold">{{ property.title }}</h1>
+            <h1 class="text-3xl font-bold text-[var(--royal-blue)]">{{ property.title }}</h1>
             <p class="text-xl text-medium-gray">{{ property.property_type }} • {{ property.purpose }}</p>
           </div>
           <div class="text-right">
-            <div class="text-3xl font-bold text-[var(--royal-blue)]">₦{{ Number(property.price || 0).toLocaleString() }}</div>
-            <div class="text-sm text-medium-gray">{{ property.rent_duration || 'per year' }}</div>
+            <p class="text-4xl font-bold text-[var(--royal-blue)]">₦{{ Number(property.price || 0).toLocaleString() }}</p>
+            <p class="text-sm text-medium-gray">{{ property.rent_duration || 'per year' }}</p>
           </div>
         </div>
 
@@ -40,49 +67,51 @@
 
         <!-- Location -->
         <div>
-          <h3 class="font-semibold mb-2">Location</h3>
+          <h3 class="font-semibold mb-2 text-[var(--royal-blue)]">Location</h3>
           <p class="text-lg">📍 {{ property.address || property.area }}, {{ property.city }}, {{ property.state }}</p>
+        </div>
+
+        <!-- Specs -->
+        <div class="grid grid-cols-3 gap-6 py-6 border-t border-b">
+          <div class="text-center">
+            <div class="text-3xl font-semibold">{{ property.bedrooms || 0 }}</div>
+            <div class="text-xs text-medium-gray">BEDROOMS</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-semibold">{{ property.bathrooms || 0 }}</div>
+            <div class="text-xs text-medium-gray">BATHROOMS</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-semibold">{{ property.toilets || 0 }}</div>
+            <div class="text-xs text-medium-gray">TOILETS</div>
+          </div>
         </div>
 
         <!-- Description -->
         <div>
-          <h3 class="font-semibold mb-2">Description</h3>
-          <p class="text-medium-gray leading-relaxed">{{ property.description || 'No description provided.' }}</p>
-        </div>
-
-        <!-- Specs -->
-        <div class="grid grid-cols-3 gap-6">
-          <div>
-            <div class="text-sm text-medium-gray">Bedrooms</div>
-            <div class="text-2xl font-semibold">{{ property.bedrooms || 0 }}</div>
-          </div>
-          <div>
-            <div class="text-sm text-medium-gray">Bathrooms</div>
-            <div class="text-2xl font-semibold">{{ property.bathrooms || 0 }}</div>
-          </div>
-          <div>
-            <div class="text-sm text-medium-gray">Toilets</div>
-            <div class="text-2xl font-semibold">{{ property.toilets || 0 }}</div>
-          </div>
+          <h3 class="font-semibold mb-3 text-[var(--royal-blue)]">Description</h3>
+          <p class="text-medium-gray leading-relaxed whitespace-pre-wrap">
+            {{ property.description || 'No description provided.' }}
+          </p>
         </div>
 
         <!-- Amenities -->
         <div v-if="property.amenities && property.amenities.length">
-          <h3 class="font-semibold mb-3">Amenities</h3>
+          <h3 class="font-semibold mb-4 text-[var(--royal-blue)]">Amenities</h3>
           <div class="flex flex-wrap gap-2">
             <span 
               v-for="(amenity, i) in property.amenities" 
               :key="i"
-              class="bg-gray-100 px-4 py-2 rounded-2xl text-sm"
+              class="bg-[var(--hover-blue)] text-[var(--royal-blue)] px-4 py-2 rounded-2xl text-sm"
             >
               {{ amenity }}
             </span>
           </div>
         </div>
 
-        <!-- Agent Info -->
+        <!-- Agent -->
         <div v-if="property.profiles" class="bg-gray-50 rounded-3xl p-6">
-          <h3 class="font-semibold mb-4">Listed by Agent</h3>
+          <h3 class="font-semibold mb-4 text-[var(--royal-blue)]">Listed by Agent</h3>
           <div class="flex items-center gap-4">
             <img 
               :src="property.profiles.avatar_url || `https://ui-avatars.com/api/?name=${property.profiles.full_name}`" 
@@ -105,14 +134,14 @@
         </button>
         <button 
           v-if="property.status !== 'approved'"
-          @click="approve"
-          class="flex-1 py-4 bg-green-600 text-white rounded-2xl font-medium hover:bg-green-700">
+          @click="handleApprove"
+          class="flex-1 py-4 bg-green-600 text-white rounded-2xl font-semibold hover:bg-green-700 transition">
           Approve Property
         </button>
         <button 
           v-if="property.status !== 'rejected'"
-          @click="reject"
-          class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-medium hover:bg-red-700">
+          @click="handleReject"
+          class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-semibold hover:bg-red-700 transition">
           Reject Property
         </button>
       </div>
@@ -121,7 +150,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, computed, ref } from 'vue'
 import PropertyStatusBadge from './PropertyStatusBadge.vue'
 
 const props = defineProps({
@@ -133,9 +162,39 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'approve', 'reject'])
 
+const mainImage = ref(props.property.cover_image)
+
+const allImages = computed(() => {
+  const images = []
+  if (props.property.cover_image) images.push(props.property.cover_image)
+  if (props.property.image_1) images.push(props.property.image_1)
+  if (props.property.image_2) images.push(props.property.image_2)
+  if (props.property.image_3) images.push(props.property.image_3)
+  if (props.property.image_4) images.push(props.property.image_4)
+  if (props.property.image_5) images.push(props.property.image_5)
+  return images
+})
+
+const setMainImage = (url) => {
+  mainImage.value = url
+}
+
+const showFullScreen = (url) => {
+  const win = window.open(url, '_blank')
+  if (win) win.focus()
+}
+
 const close = () => emit('close')
 
-const approve = () => emit('approve', props.property.id)
+const handleApprove = () => {
+  if (confirm('Approve this property?')) {
+    emit('approve', props.property.id)
+  }
+}
 
-const reject = () => emit('reject', props.property.id)
+const handleReject = () => {
+  if (confirm('Reject this property?')) {
+    emit('reject', props.property.id)
+  }
+}
 </script>
