@@ -20,12 +20,13 @@
         class="absolute top-4 right-4 w-9 h-9 bg-white/90 hover:bg-white rounded-2xl flex items-center justify-center shadow transition-all hover:scale-110"
       >
         <Heart 
-          :class="isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'"  
+          :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']" 
+          
         />
       </button>
 
       <!-- Purpose Badge -->
-      <div class="absolute bottom-4 left-4 bg-black/70 text-white text-xs px-3 py-1 rounded-xl">
+      <div class="absolute bottom-4 left-4 bg-[var(--light-blue)] text-[var(--royal-blue)] text-xs font-medium px-4 py-1.5 rounded-2xl">
         {{ property.purpose }}
       </div>
     </div>
@@ -33,16 +34,16 @@
     <!-- Content -->
     <div class="p-5 flex-1 flex flex-col">
       <div class="flex justify-between items-start mb-3">
-        <div>
-          <h3 class="font-semibold text-lg leading-tight text-gray-900 line-clamp-2">
+        <div class="flex-1">
+          <h3 class="font-semibold text-lg leading-tight text-gray-900 line-clamp-2 pr-2">
             {{ property.title }}
           </h3>
           <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-            <span>📍</span>
-            {{ property.area }}, {{ property.city }}
+            📍 {{ property.area }}, {{ property.city }}
           </p>
         </div>
-        <div class="text-right">
+
+        <div class="text-right flex-shrink-0">
           <p class="font-bold text-2xl text-[#0025cc]">
             ₦{{ property.price?.toLocaleString() }}
           </p>
@@ -50,8 +51,14 @@
         </div>
       </div>
 
+      <!-- Views -->
+      <div class="flex items-center gap-1.5 text-gray-500 text-sm mb-4">
+        <span class="text-base">👁️</span>
+        <span>{{ formatViews(property.view_count || 0) }} views</span>
+      </div>
+
       <!-- Features -->
-      <div class="flex gap-4 text-sm mb-5">
+      <div class="flex gap-5 text-sm mb-5">
         <div class="flex items-center gap-1">
           <span class="text-[#0025cc]">🛏️</span>
           <span class="font-medium">{{ property.bedrooms || 0 }}</span>
@@ -64,10 +71,6 @@
           <span class="text-[#0025cc]">🚽</span>
           <span class="font-medium">{{ property.toilets }}</span>
         </div>
-        <div v-if="property.parking_spaces" class="flex items-center gap-1">
-          <span class="text-[#0025cc]">🚗</span>
-          <span class="font-medium">{{ property.parking_spaces }}</span>
-        </div>
       </div>
 
       <!-- Amenities Preview -->
@@ -79,7 +82,7 @@
         >
           {{ amenity }}
         </span>
-        <span v-if="property.amenities.length > 3" class="text-xs text-gray-400">
+        <span v-if="property.amenities.length > 3" class="text-xs text-gray-400 self-center">
           +{{ property.amenities.length - 3 }}
         </span>
       </div>
@@ -88,13 +91,13 @@
       <div class="mt-auto pt-4 border-t flex items-center gap-3">
         <img
           :src="property.profiles?.avatar_url || 'https://via.placeholder.com/40'"
-          class="w-8 h-8 rounded-full object-cover border"
+          class="w-8 h-8 rounded-full object-cover border border-gray-200"
         />
-        <div class="flex-1">
-          <p class="text-sm font-medium text-gray-900">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-900 truncate">
             {{ property.profiles?.full_name || 'Agent' }}
           </p>
-          <p v-if="property.profiles?.agency_name" class="text-xs text-gray-500">
+          <p v-if="property.profiles?.agency_name" class="text-xs text-gray-500 truncate">
             {{ property.profiles.agency_name }}
           </p>
         </div>
@@ -111,22 +114,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref} from 'vue';
+import { ref } from 'vue';
 import { Heart } from 'lucide-vue-next';
-
 
 const props = defineProps<{
   property: any;
 }>();
 
-const emit = defineEmits(['view-details']);
+const emit = defineEmits<{
+  (e: 'view-details', id: string): void;
+}>();
 
-const isSaved = ref(false); // You can connect this to real saved logic later
+const isSaved = ref(false);
+
+const formatViews = (count: number) => {
+  if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M';
+  if (count >= 10000) return Math.floor(count / 1000) + 'K';
+  if (count >= 1000) return (count / 1000).toFixed(1) + 'K';
+  return count.toLocaleString();
+};
 
 const toggleSave = () => {
   isSaved.value = !isSaved.value;
-  // TODO: Call save API
-  console.log('Saved property:', props.property.id);
+  console.log('Toggled save for property:', props.property.id);
 };
 
 const viewDetails = () => {
