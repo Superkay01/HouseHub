@@ -128,6 +128,12 @@ const router = createRouter({
         name: 'customer-browse',
         component: () => import('../views/customer/browse.vue')
       },
+      {
+  path: '/customer/properties/:id',
+  name: 'CustomerPropertyDetail',
+  component: () => import('@/views/customer/PropertyDetail.vue')
+},
+      
     
   ]
 },

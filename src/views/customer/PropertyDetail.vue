@@ -85,6 +85,12 @@
               {{ property.area }}, {{ property.city }}, {{ property.state }}
             </p>
 
+            <!-- View Count from property_views -->
+            <div class="flex items-center gap-2 text-medium-gray text-sm mb-6">
+              <span class="text-base">👁️</span>
+              <span>{{ uniqueViewCount }} people viewed this property</span>
+            </div>
+
             <div class="border-t border-b py-6 my-6 grid grid-cols-3 gap-4 text-center">
               <div>
                 <div class="text-2xl font-semibold">{{ property.bedrooms || 0 }}</div>
@@ -170,6 +176,7 @@ const loading = ref(true)
 const error = ref<string>('')
 const mainImage = ref('')
 const showLightbox = ref(false)
+const uniqueViewCount = ref(0)
 
 const fetchProperty = async () => {
   const id = route.params.id as string
@@ -199,10 +206,42 @@ const fetchProperty = async () => {
   loading.value = false
 }
 
-// Watch for changes in route params
-watch(() => route.params.id, (newId) => {
-  if (newId) fetchProperty()
-}, { immediate: true })
+// Record Unique View and Get Count from property_views
+const recordUniqueView = async () => {
+  if (!property.value?.id) return
+
+  const propertyId = property.value.id
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return
+
+  // Check if already viewed
+  const { data: existing } = await supabase
+    .from('property_views')
+    .select('id')
+    .eq('property_id', propertyId)
+    .eq('user_id', user.id)
+    .limit(1)
+
+  if (!existing || existing.length === 0) {
+    // Record the view
+    await supabase
+      .from('property_views')
+      .insert({
+        property_id: propertyId,
+        user_id: user.id
+      })
+  }
+
+  // Get the total unique views from property_views
+  const { count } = await supabase
+    .from('property_views')
+    .select('*', { count: 'exact', head: true })
+    .eq('property_id', propertyId)
+
+  uniqueViewCount.value = count || 0
+}
 
 const allImages = computed(() => {
   const imgs: string[] = []
@@ -215,12 +254,14 @@ const allImages = computed(() => {
   return imgs
 })
 
-// Set initial main image
 watch(property, (newProp) => {
   if (newProp?.cover_image) mainImage.value = newProp.cover_image
 }, { immediate: true })
 
-onMounted(() => {
-  fetchProperty()
+onMounted(async () => {
+  await fetchProperty()
+  if (property.value) {
+    recordUniqueView()
+  }
 })
 </script>

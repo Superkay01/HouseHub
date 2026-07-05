@@ -21,7 +21,6 @@
       >
         <Heart 
           :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']" 
-          
         />
       </button>
 
@@ -54,7 +53,7 @@
       <!-- Views -->
       <div class="flex items-center gap-1.5 text-gray-500 text-sm mb-4">
         <span class="text-base">👁️</span>
-        <span>{{ formatViews(property.view_count || 0) }} views</span>
+        <span>{{ formatViews(viewCount) }} views</span>
       </div>
 
       <!-- Features -->
@@ -102,11 +101,12 @@
           </p>
         </div>
 
+        <!-- View Details Button -->
         <button
           @click.stop="viewDetails"
-          class="bg-[#0025cc] hover:bg-[#001fa3] text-white text-sm font-medium px-6 py-2.5 rounded-2xl transition-all"
+          class="bg-[#0025cc] hover:bg-[#001fa3] text-white text-sm font-medium px-6 py-2.5 rounded-2xl transition-all flex items-center gap-1"
         >
-          View Details
+          👁️ View Details
         </button>
       </div>
     </div>
@@ -114,17 +114,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Heart } from 'lucide-vue-next';
+import { useRouter } from 'vue-router';
+import { supabase } from '@/supabaseClient.js';
 
 const props = defineProps<{
   property: any;
 }>();
 
-const emit = defineEmits<{
-  (e: 'view-details', id: string): void;
-}>();
-
+const router = useRouter();
+const viewCount = ref(0);
 const isSaved = ref(false);
 
 const formatViews = (count: number) => {
@@ -139,7 +139,45 @@ const toggleSave = () => {
   console.log('Toggled save for property:', props.property.id);
 };
 
-const viewDetails = () => {
-  emit('view-details', props.property.id);
+const loadViewCount = async () => {
+  if (!props.property.id) return;
+
+  const { count } = await supabase
+    .from('property_views')
+    .select('*', { count: 'exact', head: true })
+    .eq('property_id', props.property.id);
+
+  viewCount.value = count || 0;
 };
+
+const viewDetails = async () => {
+  const propertyId = props.property.id;
+
+  // Record unique view
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: existing } = await supabase
+      .from('property_views')
+      .select('id')
+      .eq('property_id', propertyId)
+      .eq('user_id', user.id)
+      .limit(1);
+
+    if (!existing || existing.length === 0) {
+      await supabase
+        .from('property_views')
+        .insert({
+          property_id: propertyId,
+          user_id: user.id
+        });
+    }
+  }
+
+  router.push(`/customer/properties/${propertyId}`);
+};
+
+onMounted(() => {
+  loadViewCount();
+});
 </script>
