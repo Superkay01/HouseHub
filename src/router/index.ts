@@ -129,10 +129,42 @@ const router = createRouter({
         component: () => import('../views/customer/browse.vue')
       },
       {
-  path: '/customer/properties/:id',
-  name: 'CustomerPropertyDetail',
-  component: () => import('@/views/customer/PropertyDetail.vue')
+        path: '/customer/properties/:id',
+        name: 'CustomerPropertyDetail',
+        component: () => import('@/views/customer/PropertyDetail.vue')
+      },
+      {
+        path: '/customer/saved/SavedProperties',
+        name: 'CustomerSavedProperties',
+        component: () => import('@/views/customer/saved/SavedProperties.vue')
+      },
+    
+      {
+        path: '/customer/request',
+        name: 'CustomerRequest',
+        component: () => import('@/views/customer/request.vue')
+      },
+      {
+  path: '/customer/requests/:id',
+  name: 'RequestDetail',
+  component: () => import('@/views/customer/RequestDetail.vue')
 },
+      {
+        path: '/customer/inspections',
+        name: 'CustomerInspections',
+        component: () => import('@/views/customer/inspections.vue')
+      },
+      // {
+      //   path: '/properties/:id/request-inspection',
+      //   name: 'request-inspection',
+      //   component: () => import('@/views/RequestInspection.vue'),
+      //   meta: { requiresAuth: true } // optional
+      // },
+      {
+  path: '/customer/request-inspection/:id',
+  name: 'request-inspection',
+  component: () => import('@/views/customer/RequestInspection.vue')
+}
       
     
   ]
@@ -148,6 +180,14 @@ const router = createRouter({
     {
       path: 'properties',
       component: () => import('../views/admin/Properties.vue')
+    },
+    {
+      path: 'inspections',
+      component: () => import('../views/admin/Inspections.vue')
+    },
+    {
+      path: 'agents',
+      component: () => import('../views/admin/agent/AgentManagement.vue')
     }
     
   ]

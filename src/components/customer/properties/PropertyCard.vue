@@ -21,6 +21,7 @@
       >
         <Heart 
           :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']" 
+          class="w-5 h-5 transition-colors"
         />
       </button>
 
@@ -104,7 +105,7 @@
         <!-- View Details Button -->
         <button
           @click.stop="viewDetails"
-          class="bg-[#0025cc] hover:bg-[#001fa3] text-white text-sm font-medium px-6 py-2.5 rounded-2xl transition-all flex items-center gap-1"
+          class="bg-[#0025cc] hover:bg-[#001fa3] text-white text-xs font-medium px-6 py-2.5 rounded-2xl transition-all flex items-center gap-1"
         >
           👁️ View Details
         </button>
@@ -134,9 +135,38 @@ const formatViews = (count: number) => {
   return count.toLocaleString();
 };
 
-const toggleSave = () => {
-  isSaved.value = !isSaved.value;
-  console.log('Toggled save for property:', props.property.id);
+const toggleSave = async () => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      alert("Please log in to save properties");
+      return;
+    }
+
+    if (isSaved.value) {
+      // Remove from saved
+      const { error } = await supabase
+        .from('saved_properties')
+        .delete()
+        .eq('customer_id', user.id)
+        .eq('property_id', props.property.id);
+
+      if (!error) isSaved.value = false;
+    } else {
+      // Add to saved
+      const { error } = await supabase
+        .from('saved_properties')
+        .insert({
+          customer_id: user.id,
+          property_id: props.property.id
+        });
+
+      if (!error) isSaved.value = true;
+    }
+  } catch (err) {
+    console.error('Save error:', err);
+    alert('Failed to update saved status');
+  }
 };
 
 const loadViewCount = async () => {
@@ -150,34 +180,32 @@ const loadViewCount = async () => {
   viewCount.value = count || 0;
 };
 
-const viewDetails = async () => {
-  const propertyId = props.property.id;
+// const viewDetails = () => {
+//   router.push(`/customer/propertyDetails/${props.property.id}`);
+// };
 
-  // Record unique view
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (user) {
-    const { data: existing } = await supabase
-      .from('property_views')
-      .select('id')
-      .eq('property_id', propertyId)
-      .eq('user_id', user.id)
-      .limit(1);
-
-    if (!existing || existing.length === 0) {
-      await supabase
-        .from('property_views')
-        .insert({
-          property_id: propertyId,
-          user_id: user.id
-        });
-    }
-  }
-
-  router.push(`/customer/properties/${propertyId}`);
+const viewDetails = () => {
+  // FIXED: Match the route you defined
+  router.push({
+    name: 'CustomerPropertyDetail',
+    params: { id: props.property.id }
+  });
 };
 
-onMounted(() => {
-  loadViewCount();
+onMounted(async () => {
+  await loadViewCount();
+  
+  // Check if already saved
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data } = await supabase
+      .from('saved_properties')
+      .select('id')
+      .eq('customer_id', user.id)
+      .eq('property_id', props.property.id)
+      .limit(1);
+
+    isSaved.value = !!(data && data.length > 0);  // Fixed type
+  }
 });
 </script>

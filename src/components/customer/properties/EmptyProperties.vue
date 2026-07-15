@@ -1,15 +1,21 @@
 <template>
   <div class="flex flex-col items-center justify-center py-20 text-center">
     <!-- Icon -->
-    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-      <span class="text-5xl">🏠</span>
+    <div class="w-24 h-24  w-full flex items-center justify-center mb-6">
+      <span class="text-5xl">
+        <img
+          src="/Lodgenext_logo__2_-removebg-preview.png"
+          alt="Lodgenext logo"
+          class="h-30 w-55 object-contain"
+        />
+      </span>
     </div>
 
-    <h3 class="text-2xl font-semibold text-gray-900 mb-2">
+    <h3 class="text-2xl font-semibold text-[var(--royal-blue)] mb-2">
       No properties found
     </h3>
     
-    <p class="text-gray-500 max-w-xs mx-auto mb-8">
+    <p class="text-[var(--royal-blue)] max-w-xs mx-auto mb-8">
       We couldn't find any properties matching your current filters. 
       Try adjusting your search or filters.
     </p>

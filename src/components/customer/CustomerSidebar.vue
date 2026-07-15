@@ -55,13 +55,13 @@
         <SidebarLink 
           icon="heart" 
           label="Saved Properties" 
-          :to="'/customer/saved'"
+          :to="'/customer/saved/SavedProperties'"
           @click="closeSidebar"
         />
         <SidebarLink 
           icon="clipboard" 
           label="My Requests" 
-          :to="'/customer/requests'"
+          :to="'/customer/request'"
           @click="closeSidebar"
         />
         <SidebarLink 

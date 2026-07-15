@@ -1,5 +1,15 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-[var(--light-blue)]">
+    <!-- Navbar -->
+    <nav class="bg-white border-b sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="/Lodgenext_logo__2_-removebg-preview.png" alt="LodgeNext" class="h-10" />
+          <h1 class="text-2xl font-bold text-[var(--royal-blue)]">LodgeNext</h1>
+        </div>
+      </div>
+    </nav>
+
     <!-- Hero Section -->
     <div class="relative h-[520px] flex items-center justify-center overflow-hidden">
       <div class="absolute inset-0 bg-gradient-to-br from-[#0025cc] via-[#2e4cd5] to-[#546cdd]">
@@ -62,15 +72,18 @@
 
         <!-- Main Content -->
         <div class="flex-1">
-          <div class="flex items-center justify-between mb-6">
-            <p class="text-gray-600">
-              <span class="font-semibold text-gray-900">{{ properties.length }}</span> properties found
+          <div class="flex items-center justify-between mb-8">
+            <p class="text-2xl font-semibold text-gray-900 border border-[var(--steel-blue)] rounded-2xl px-6 py-3 focus:outline-none focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20 bg-white text-sm font-medium">
+              <span class="font-bold text-[var(--royal-blue)]">
+                {{ properties.length }}
+              </span> 
+              properties found
             </p>
 
             <select
               v-model="sortBy"
               @change="fetchProperties"
-              class="border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:border-[#0025cc]"
+              class="border border-gray-300 rounded-2xl px-6 py-3 focus:outline-none focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20 bg-white text-sm font-medium"
             >
               <option value="newest">Newest Listings</option>
               <option value="price-low">Lowest Price</option>
@@ -92,7 +105,18 @@
       </div>
     </div>
 
-    <MobileFiltersButton @open="showMobileFilters = true" />
+    <!-- Mobile Filter Button -->
+    <MobileFiltersButton 
+      :filters="filters"
+      @open="showMobileFilters = true"
+    />
+
+    <!-- Mobile Filter Modal -->
+    <MobilePropertyFilter 
+      v-if="showMobileFilters"
+      @close="showMobileFilters = false"
+      @apply="applyMobileFilters"
+    />
   </div>
 </template>
 
@@ -106,6 +130,7 @@ import PropertyFilters from '@/components/customer/properties/PropertyFilters.vu
 import PropertyGrid from '@/components/customer/properties/PropertyGrid.vue';
 import EmptyProperties from '@/components/customer/properties/EmptyProperties.vue';
 import MobileFiltersButton from '@/components/customer/properties/MobileFiltersButton.vue';
+import MobilePropertyFilter from '@/components/customer/properties/MobilePropertyFilter.vue';
 
 const router = useRouter();
 
@@ -132,7 +157,6 @@ const filters = ref({
 let timeout: ReturnType<typeof setTimeout>;
 let subscription: any = null;
 
-// ==================== NEW FETCH FUNCTION ====================
 const fetchProperties = async () => {
   loading.value = true;
 
@@ -140,8 +164,7 @@ const fetchProperties = async () => {
     let q = supabase
       .from('properties')
       .select('*')
-      .eq('status', 'approved')           // ← Only Approved
-      .order('created_at', { ascending: false });
+      .eq('status', 'approved');
 
     // Filters
     if (filters.value.state) q = q.eq('state', filters.value.state);
@@ -159,6 +182,15 @@ const fetchProperties = async () => {
       q = q.or(`title.ilike.%${term}%,area.ilike.%${term}%,address.ilike.%${term}%`);
     }
 
+    // Sorting
+    if (sortBy.value === 'newest') {
+      q = q.order('created_at', { ascending: false });
+    } else if (sortBy.value === 'price-low') {
+      q = q.order('price', { ascending: true });
+    } else if (sortBy.value === 'price-high') {
+      q = q.order('price', { ascending: false });
+    }
+
     const { data, error } = await q;
 
     if (error) {
@@ -174,7 +206,6 @@ const fetchProperties = async () => {
     loading.value = false;
   }
 };
-// ===========================================================
 
 const debouncedSearch = () => {
   if (timeout) clearTimeout(timeout);
@@ -197,8 +228,14 @@ const clearFilters = () => {
   fetchProperties();
 };
 
+const applyMobileFilters = (newFilters: typeof filters.value) => {
+  filters.value = { ...newFilters };
+  fetchProperties();
+  showMobileFilters.value = false;
+};
+
 const viewPropertyDetails = (id: string) => {
-  router.push(`/properties/${id}`);
+  router.push(`/customer/properties/${id}`);
 };
 
 // Real-time subscription

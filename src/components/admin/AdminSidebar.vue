@@ -56,13 +56,14 @@
     </div>
 
     <!-- Navigation -->
-    <div class="flex-1 overflow-auto py-6 px-3">
+    <div class="flex-1 overflow-auto py-3 px-3">
       <nav class="space-y-1">
         <SidebarMenuItem icon="dashboard" label="Dashboard" to="/admin/dashboard" />
         <SidebarMenuItem icon="properties" label="Properties" to="/admin/Properties" />
         <SidebarMenuItem icon="agents" label="Agents" to="/admin/agents" />
         <SidebarMenuItem icon="customers" label="Customers" to="/admin/customers" />
         <SidebarMenuItem icon="requests" label="Property Requests" to="/admin/requests" />
+         <SidebarMenuItem icon="requests" label="Customer Inspections" to="/admin/Inspections" />
         <SidebarMenuItem icon="verifications" label="Verifications" to="/admin/verifications" />
         <SidebarMenuItem icon="reports" label="Reports" to="/admin/reports" />
         <SidebarMenuItem icon="notifications" label="Notifications" to="/admin/notifications" />
