@@ -179,47 +179,70 @@ const signUpWithGoogle = async () => {
 
 const handleSubmit = async () => {
   emailError.value = ''
-
-  if (!form.value.email.toLowerCase().endsWith('@gmail.com')) {
-    emailError.value = "Only Gmail addresses (@gmail.com) are allowed"
-    return
-  }
-
-  if (form.value.password !== form.value.confirmPassword) {
-    alert("❌ Passwords do not match!")
-    return
-  }
-
-  if (form.value.password.length < 6) {
-    alert("❌ Password must be at least 6 characters")
-    return
-  }
-
   loading.value = true
 
   try {
-    const { error } = await supabase.auth.signUp({
+    // Validation
+    if (!form.value.email.toLowerCase().endsWith('@gmail.com')) {
+      emailError.value = "Only Gmail addresses (@gmail.com) are allowed"
+      return
+    }
+
+    if (form.value.password !== form.value.confirmPassword) {
+      alert("❌ Passwords do not match!")
+      return
+    }
+
+    if (form.value.password.length < 6) {
+      alert("❌ Password must be at least 6 characters")
+      return
+    }
+
+    // 1. Sign Up
+    const { data, error: authError } = await supabase.auth.signUp({
       email: form.value.email,
       password: form.value.password,
       options: {
         data: {
           full_name: form.value.fullName,
-          phone: form.value.phone,
-          role: props.role,
-          agency_name: props.role === 'agent' ? form.value.agencyName : null,
-          office_address: props.role === 'agent' ? form.value.officeAddress : null
+          role: props.role
         }
       }
     })
 
-    if (error) throw error
+    if (authError) {
+      console.error("Auth Error:", authError)
+      throw new Error(authError.message || "Failed to create account")
+    }
+
+    if (!data?.user) {
+      throw new Error("No user returned from signup")
+    }
+
+    // 2. Create Profile
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({
+        id: data.user.id,
+        full_name: form.value.fullName,
+        phone: form.value.phone,
+        role: props.role,
+        agency_name: props.role === 'agent' ? form.value.agencyName : null,
+        office_address: props.role === 'agent' ? form.value.officeAddress : null,
+      })
+
+    if (profileError) {
+      console.error("Profile Error Details:", profileError)
+      alert(`Profile creation issue: ${profileError.message || JSON.stringify(profileError)}`)
+      // We can still continue since auth user is created
+    }
 
     alert("✅ Account created successfully!\n\nPlease check your Gmail to verify your account.")
     router.push('/login')
 
-  } catch (error) {
-    console.error(error)
-    alert("❌ Error: " + error.message)
+  } catch (err) {
+    console.error("Full Error Object:", err)
+    alert("❌ Error: " + (err.message || JSON.stringify(err) || "Unknown error occurred"))
   } finally {
     loading.value = false
   }

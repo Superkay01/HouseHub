@@ -311,30 +311,61 @@ const handleDrop = async (e: any, type: 'government_id' | 'passport_photo' | 'pr
 const uploadToSupabase = async (file: File, type: 'government_id' | 'passport_photo' | 'proof_of_address') => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('User not found')
+    if (!user) throw new Error('User not authenticated')
 
-    const fileName = `${Date.now()}-${file.name}`
-    const filePath = `verification/${user.id}/${type}/${fileName}`
+    // Strong filename sanitization
+    const timestamp = Date.now()
+    const random = Math.floor(Math.random() * 10000)
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    
+    const cleanName = `doc-${timestamp}-${random}.${fileExt}`
+
+    const filePath = `verification/${user.id}/${type}/${cleanName}`
+
+    console.log("📤 Uploading to path:", filePath)
 
     const { error: uploadError } = await supabase.storage
       .from('agent-documents')
-      .upload(filePath, file, { upsert: true })
+      .upload(filePath, file, {
+        upsert: true,
+        contentType: file.type || 'application/octet-stream',
+        cacheControl: '3600'
+      })
 
-    if (uploadError) throw uploadError
+    if (uploadError) {
+      console.error("Upload Error Details:", uploadError)
+      throw new Error(uploadError.message || 'Upload failed')
+    }
 
-    const { data: urlData } = supabase.storage.from('agent-documents').getPublicUrl(filePath)
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('agent-documents')
+      .getPublicUrl(filePath)
 
-    const field = type === 'government_id' ? 'government_id_url' :
-                  type === 'passport_photo' ? 'passport_photo_url' : 'proof_of_address_url'
+    const fieldMap = {
+      government_id: 'government_id_url',
+      passport_photo: 'passport_photo_url',
+      proof_of_address: 'proof_of_address_url'
+    }
 
-    await supabase.from('agent_verifications').upsert({ 
-      user_id: user.id, 
-      [field]: urlData.publicUrl 
-    }, { onConflict: 'user_id' })
+    // Save URL to database
+    const { error: dbError } = await supabase
+      .from('agent_verifications')
+      .upsert({
+        user_id: user.id,
+        [fieldMap[type]]: urlData.publicUrl
+      }, { onConflict: 'user_id' })
+
+    if (dbError) console.warn("Failed to save URL to DB:", dbError)
+
+    alert(`✅ ${type.replace(/_/g, ' ')} uploaded successfully!`)
+    
+    // Optional: Refresh the component
+    uploadedFiles.value[type] = file
 
   } catch (err: any) {
-    console.error('Upload failed:', err)
-    alert(`Upload failed: ${err.message}`)
+    console.error("Full Upload Error:", err)
+    alert(`Upload failed: ${err.message || 'Unknown error'}`)
   }
 }
 </script>
