@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="bg-white rounded-3xl p-7 shadow-sm hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-100 group">
     <div class="flex items-start justify-between">
       <div 
@@ -50,90 +50,70 @@ const iconComponent = computed(() => {
 
 const fetchStats = async () => {
   loading.value = true
+  console.log(`🚀 Fetching stats for: ${props.type}`)
+
   try {
     const { data: { user } } = await supabase.auth.getUser()
+    console.log("User:", user?.id)
 
-    // Get admin's assigned state
     const { data: admin } = await supabase
       .from('admin_profiles')
-      .select('assigned_state')
+      .select('state')
       .eq('id', user.id)
       .single()
 
-    const state = admin?.assigned_state
+    console.log("Admin State:", admin?.state)
 
+    const state = admin?.state
     if (!state) {
-      console.warn("No assigned state found for admin")
+      console.warn("No state found")
       return
     }
 
     let result = 0
 
     switch (props.type) {
-      case 'total':
-        const { count } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'agent')
-          .eq('state', state)
-        result = count || 0
-        break
+  case 'total':
+    const { count } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'agent')
+      .or(`state.eq.${state},state.eq.${state.replace(' State', '')}`)
+    result = count || 0
+    break
 
-      case 'verified':
-        const { count: verifiedCount } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'agent')
-          .eq('state', state)
-          .eq('verification_status', 'verified')   // Adjust if your column name is different
-        result = verifiedCount || 0
-        break
+  case 'verified':
+    const { count: vCount } = await supabase
+      .from('agent_verifications')
+      .select('*', { count: 'exact', head: true })
+      .or(`state.eq.${state},state.eq.${state.replace(' State', '')}`)
+      .eq('verification_status', 'approved')
+    result = vCount || 0
+    break
 
-      case 'pending':
-        const { count: pendingCount } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'agent')
-          .eq('state', state)
-          .eq('verification_status', 'pending')
-        result = pendingCount || 0
-        break
+  case 'pending':
+    const { count: pCount } = await supabase
+      .from('agent_verifications')
+      .select('*', { count: 'exact', head: true })
+      .or(`state.eq.${state},state.eq.${state.replace(' State', '')}`)
+      .eq('verification_status', 'pending')
+    result = pCount || 0
+    break
 
-      case 'suspended':
-        const { count: suspendedCount } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'agent')
-          .eq('state', state)
-          .eq('verification_status', 'suspended')
-        result = suspendedCount || 0
-        break
-
-      case 'listings':
-        const { count: listingsCount } = await supabase
-          .from('properties')
-          .select('*', { count: 'exact', head: true })
-        result = listingsCount || 0
-        break
-
-      case 'new':
-        const firstDayOfMonth = new Date()
-        firstDayOfMonth.setDate(1)
-        firstDayOfMonth.setHours(0, 0, 0, 0)
-
-        const { count: newCount } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'agent')
-          .eq('state', state)
-          .gte('created_at', firstDayOfMonth.toISOString())
-        result = newCount || 0
-        break
-    }
+  case 'listings':
+    const { count: lCount } = await supabase
+      .from('properties')
+      .select('*', { count: 'exact', head: true })
+      .or(`state.eq.${state},state.eq.${state.replace(' State', '')}`)
+    result = lCount || 0
+    break
+}
 
     value.value = result
+    console.log(`✅ ${props.type} = ${result}`)
+
   } catch (error) {
-    console.error(`Error fetching ${props.type} stats:`, error)
+    console.error("❌ Stats Error:", error)
   } finally {
     loading.value = false
   }
@@ -141,5 +121,69 @@ const fetchStats = async () => {
 
 const formattedValue = computed(() => value.value.toLocaleString())
 
-onMounted(fetchStats)
+onMounted(() => {
+  console.log(`Component mounted - Type: ${props.type}`)
+  fetchStats()
+})
+</script> -->
+
+<template>
+  <div class="bg-white rounded-3xl p-7 shadow-sm hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-100 group">
+    <div class="flex items-start justify-between">
+      <div 
+        :class="[
+          'w-14 h-14 rounded-3xl flex items-center justify-center transition-all group-hover:scale-110',
+          colorClasses
+        ]"
+      >
+        <component :is="iconComponent" class="w-7 h-7" />
+      </div>
+
+      <div class="text-right">
+        <p class="text-4xl font-bold text-dark-gray tracking-tighter">{{ formattedValue }}</p>
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <p class="text-medium-gray font-medium">{{ label }}</p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { Users, CheckCircle, Clock, Ban, Home, Calendar } from 'lucide-vue-next'
+
+const props = defineProps({
+  icon: { type: String, required: true },
+  value: { type: [Number, String], default: 0 },
+  label: { type: String, required: true },
+  color: { type: String, default: 'blue' }
+})
+
+const iconComponent = computed(() => {
+  switch (props.icon) {
+    case 'Users': return Users
+    case 'CheckCircle': return CheckCircle
+    case 'Clock': return Clock
+    case 'Ban': return Ban
+    case 'Home': return Home
+    case 'Calendar': return Calendar
+    default: return Users
+  }
+})
+
+const colorClasses = computed(() => {
+  const map = {
+    blue: 'bg-blue-100 text-blue-600',
+    green: 'bg-green-100 text-green-600',
+    amber: 'bg-amber-100 text-amber-600',
+    red: 'bg-red-100 text-red-600',
+    royal: 'bg-indigo-100 text-indigo-600',
+    purple: 'bg-purple-100 text-purple-600'
+  }
+  return map[props.color] || map.blue
+})
+
+const formattedValue = computed(() => Number(props.value).toLocaleString())
 </script>

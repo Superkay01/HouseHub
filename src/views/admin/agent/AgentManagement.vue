@@ -131,75 +131,137 @@ const showDrawer = ref(false)
 const selectedAgent = ref(null)
 const loading = ref(true)
 const agents = ref([])
+const currentPage = ref(1)
+const totalPages = ref(1)
 
-// Real-time
 let subscription = null
 
 const stats = ref([
-  { label: 'Total Agents', value: 85, icon: 'Users', color: 'blue' },
-  { label: 'Verified', value: 70, icon: 'CheckCircle', color: 'green' },
-  { label: 'Pending', value: 10, icon: 'Clock', color: 'amber' },
-  { label: 'Suspended', value: 3, icon: 'Ban', color: 'red' },
-  { label: 'Active Listings', value: 235, icon: 'Home', color: 'royal' },
-  { label: 'Joined This Month', value: 12, icon: 'Calendar', color: 'purple' }
+  { label: 'Total Agents', value: 0, icon: 'Users', color: 'blue' },
+  { label: 'Verified', value: 0, icon: 'CheckCircle', color: 'green' },
+  { label: 'Pending', value: 0, icon: 'Clock', color: 'amber' },
+  { label: 'Suspended', value: 0, icon: 'Ban', color: 'red' },
+  { label: 'Active Listings', value: 0, icon: 'Home', color: 'royal' },
+  { label: 'Joined This Month', value: 0, icon: 'Calendar', color: 'purple' }
 ])
 
-const fetchAgents = async () => {
-  loading.value = true
+const fetchStats = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const { data: adminProfile } = await supabase
+    const { data: admin } = await supabase
       .from('admin_profiles')
       .select('state')
       .eq('id', user.id)
       .single()
 
-    if (!adminProfile?.state) return
-
-    // Fetch Profiles
-    // const { data: profilesData } = await supabase
-    //   .from('profiles')
-    //   .select('*, properties:properties!agent_id(count)')
-    //   .eq('role', 'agent')
-    //   .order('created_at', { ascending: false })
-
-    const {
-  data: profilesData,
-  error: profilesError
-} = await supabase
-  .from('profiles')
-  .select(`
-    *,
-    properties(count)
-  `)
-  .eq('role', 'agent')
-  .order('created_at', { ascending: false })
-
-console.log('Profiles Error:', profilesError)
-console.log('Profiles Data:', profilesData)
-
-    // Fetch Verifications
-    const userIds = profilesData?.map(p => p.id) || []
-    let verificationsData = []
-    if (userIds.length > 0) {
-      const { data } = await supabase
-        .from('agent_verifications')
-        .select('*')
-        .in('user_id', userIds)
-      verificationsData = data || []
+    const state = admin?.state
+    if (!state) {
+      console.warn('No state found for admin')
+      return
     }
 
-    // Merge
-    agents.value = (profilesData || []).map(profile => ({
-      ...profile,
-      agent_verifications: verificationsData.filter(v => v.user_id === profile.id)
-    }))
+    // Total Agents
+    const { count: total } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'agent')
+      .eq('state', state)
 
-    console.log(`Loaded ${agents.value.length} agents`)
-  } catch (error) {
-    console.error('Error fetching agents:', error)
+    // Verified
+    const { count: verified } = await supabase
+      .from('agent_verifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('state', state)
+      .eq('verification_status', 'approved')
+
+    // Pending
+    const { count: pending } = await supabase
+      .from('agent_verifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('state', state)
+      .eq('verification_status', 'pending')
+
+    // Suspended (using verified = false as example)
+    const { count: suspended } = await supabase
+  .from('profiles')
+  .select('*', { count: 'exact', head: true })
+  .eq('role', 'agent')
+  .eq('state', state)
+  .eq('status', 'suspended')
+
+    // Active Listings
+    const { count: listings } = await supabase
+      .from('properties')
+      .select('*', { count: 'exact', head: true })
+      .eq('state', state)
+      .eq('status', 'approved')
+
+    // Joined This Month
+    const startOfMonth = new Date()
+    startOfMonth.setDate(1)
+    startOfMonth.setHours(0, 0, 0, 0)
+
+    const { count: joinedThisMonth } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'agent')
+      .eq('state', state)
+      .gte('created_at', startOfMonth.toISOString())
+
+    stats.value = [
+      { label: 'Total Agents', value: total || 0, icon: 'Users', color: 'blue' },
+      { label: 'Verified', value: verified || 0, icon: 'CheckCircle', color: 'green' },
+      { label: 'Pending', value: pending || 0, icon: 'Clock', color: 'amber' },
+      { label: 'Suspended', value: suspended || 0, icon: 'Ban', color: 'red' },
+      { label: 'Active Listings', value: listings || 0, icon: 'Home', color: 'royal' },
+      { label: 'Joined This Month', value: joinedThisMonth || 0, icon: 'Calendar', color: 'purple' }
+    ]
+  } catch (err) {
+    console.error('Stats error:', err)
+  }
+}
+
+const fetchAgents = async () => {
+  loading.value = true
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      console.error('No user logged in')
+      return
+    }
+
+    const { data: adminProfile } = await supabase
+      .from('admin_profiles')
+      .select('state, full_name')
+      .eq('id', user.id)
+      .single()
+
+    console.log('Logged in Admin:', adminProfile)
+
+    if (!adminProfile?.state) {
+      console.warn('No state assigned to this admin')
+      return
+    }
+
+    console.log(`Searching for agents in state: ${adminProfile.state}`)
+
+    const { data: profilesData, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'agent')
+      .eq('state', adminProfile.state)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Query Error:', error)
+    }
+
+    agents.value = profilesData || []
+    console.log(`Agents found: ${agents.value.length}`)
+  } catch (err) {
+    console.error('Catch Error:', err)
   } finally {
     loading.value = false
   }
@@ -210,8 +272,14 @@ const setupRealtime = () => {
 
   subscription = supabase
     .channel('agents-realtime')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, fetchAgents)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'agent_verifications' }, fetchAgents)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+      fetchAgents()
+      fetchStats()
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'agent_verifications' }, () => {
+      fetchAgents()
+      fetchStats()
+    })
     .subscribe()
 }
 
@@ -220,7 +288,7 @@ const filteredAgents = computed(() => {
 
   if (searchQuery.value) {
     const term = searchQuery.value.toLowerCase()
-    result = result.filter(agent => 
+    result = result.filter(agent =>
       agent.full_name?.toLowerCase().includes(term) ||
       agent.agency_name?.toLowerCase().includes(term) ||
       agent.phone?.includes(term)
@@ -228,13 +296,15 @@ const filteredAgents = computed(() => {
   }
 
   if (cityFilter.value) {
-    result = result.filter(a => a.agent_verifications?.[0]?.city === cityFilter.value)
+    result = result.filter(a => a.city === cityFilter.value)
   }
 
   if (statusFilter.value) {
-    result = result.filter(a => 
-      (a.agent_verifications?.[0]?.verification_status || 'pending') === statusFilter.value
-    )
+    // Adjust this depending on how you store status
+    result = result.filter(a => {
+      const status = a.verified ? 'verified' : 'pending'
+      return status === statusFilter.value
+    })
   }
 
   return result
@@ -245,12 +315,15 @@ const openAgentDrawer = (agent) => {
   showDrawer.value = true
 }
 
-const openAddAgentModal = () => alert("Add New Agent Modal - To be implemented")
-const bulkApprove = () => alert("Bulk Approve")
-const bulkSuspend = () => alert("Bulk Suspend")
-const bulkDelete = () => alert("Bulk Delete")
-const exportData = () => alert("Export Menu")
-const changePage = (page) => { currentPage.value = page }
+const openAddAgentModal = () => alert('Add New Agent Modal - To be implemented')
+const bulkApprove = () => alert('Bulk Approve')
+const bulkSuspend = () => alert('Bulk Suspend')
+const bulkDelete = () => alert('Bulk Delete')
+const exportData = () => alert('Export Menu')
+const editAgent = () => alert('Edit Agent')
+const changePage = (page) => {
+  currentPage.value = page
+}
 
 onUnmounted(() => {
   if (subscription) supabase.removeChannel(subscription)
@@ -258,6 +331,7 @@ onUnmounted(() => {
 
 onMounted(() => {
   fetchAgents()
+  fetchStats()
   setupRealtime()
 })
 </script>

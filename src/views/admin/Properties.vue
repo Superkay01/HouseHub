@@ -94,11 +94,11 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/supabaseClient.js'
 import { Building2, Clock, CheckCircle, XCircle } from 'lucide-vue-next'
-import jsPDF from 'jspdf'
 
 import StatsCard from '@/components/admin/StatsCard.vue'
 import PropertiesTable from '@/components/admin/properties/PropertiesTable.vue'
@@ -109,7 +109,7 @@ const statusFilter = ref('')
 const typeFilter = ref('')
 
 const adminProfile = ref({
-  full_name: 'State Admin',
+  full_name: 'Admin',
   city: '',
   state: ''
 })
@@ -124,18 +124,20 @@ const stats = ref({
 const properties = ref([])
 const selectedProperty = ref(null)
 
+// ==================== FETCH LIKE DASHBOARD ====================
+
 const fetchAdminProfile = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const { data: profile } = await supabase
+    const { data } = await supabase
       .from('admin_profiles')
-      .select('full_name, state, city')
+      .select('full_name, city, state')
       .eq('id', user.id)
       .single()
 
-    if (profile) adminProfile.value = profile
+    if (data) adminProfile.value = data
   } catch (err) {
     console.error(err)
   }
@@ -143,79 +145,54 @@ const fetchAdminProfile = async () => {
 
 const fetchStats = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { data: profile } = await supabase
-      .from('admin_profiles')
-      .select('state')
-      .eq('id', user.id)
-      .single()
-
-    const state = profile?.state || 'Kwara'
-
     // Total Properties
     const { count: total } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
-      .eq('state', state)
 
     // Pending
     const { count: pending } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
-      .eq('state', state)
       .eq('status', 'pending')
 
     // Approved
     const { count: approved } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
-      .eq('state', state)
       .eq('status', 'approved')
 
     // Rejected
     const { count: rejected } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
-      .eq('state', state)
       .eq('status', 'rejected')
 
-    stats.value = {
-      total: total || 0,
-      pending: pending || 0,
-      approved: approved || 0,
-      rejected: rejected || 0
-    }
+    stats.value = { total: total || 0, pending: pending || 0, approved: approved || 0, rejected: rejected || 0 }
   } catch (err) {
-    console.error('Stats fetch error:', err)
+    console.error('Stats error:', err)
   }
 }
 
 const fetchProperties = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { data: profile } = await supabase
-      .from('admin_profiles')
-      .select('state')
-      .eq('id', user.id)
-      .single()
-
     const { data, error } = await supabase
       .from('properties')
-      .select('*')
-      .eq('state', profile?.state)
+      .select(`
+        *,
+        agent:profiles!agent_id (full_name, agency_name, phone)
+      `)
       .order('created_at', { ascending: false })
 
-    if (error) console.error(error)
-    else properties.value = data || []
+    if (error) throw error
+
+    properties.value = data || []
   } catch (err) {
-    console.error(err)
+    console.error('Failed to fetch properties:', err)
   }
 }
 
+// Filters
 const filteredProperties = computed(() => {
   let result = [...properties.value]
 
@@ -239,10 +216,6 @@ const filteredProperties = computed(() => {
   return result
 })
 
-const viewProperty = (property) => {
-  selectedProperty.value = property
-}
-
 const approveProperty = async (id) => {
   const { error } = await supabase
     .from('properties')
@@ -250,12 +223,9 @@ const approveProperty = async (id) => {
     .eq('id', id)
 
   if (!error) {
-    alert('✅ Property approved successfully!')
+    alert('✅ Property Approved')
     fetchProperties()
     fetchStats()
-    selectedProperty.value = null
-  } else {
-    alert('❌ Failed to approve')
   }
 }
 
@@ -266,61 +236,12 @@ const rejectProperty = async (id) => {
     .eq('id', id)
 
   if (!error) {
-    alert('✅ Property rejected.')
+    alert('✅ Property Rejected')
     fetchProperties()
     fetchStats()
-    selectedProperty.value = null
-  } else {
-    alert('❌ Failed to reject')
   }
 }
 
-const exportCSV = () => {
-  const csvContent = "data:text/csv;charset=utf-8," 
-    + "Title,Price,State,City,Status,Created\n"
-    + properties.value.map(p => 
-        `"${p.title}",${p.price},"${p.state}","${p.city}","${p.status}","${p.created_at}"`
-      ).join("\n");
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `properties-${adminProfile.value.state}-${new Date().toISOString().slice(0,10)}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-const exportPDF = () => {
-  import('jspdf').then(({ jsPDF }) => {
-    import('jspdf-autotable').then(({ default: autoTable }) => {
-      const doc = new jsPDF()
-      
-      doc.setFontSize(18)
-      doc.text(`Properties Report - ${adminProfile.value.state}`, 14, 22)
-      
-      doc.setFontSize(11)
-      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30)
-      doc.text(`State Admin: ${adminProfile.value.full_name}`, 14, 38)
-
-      autoTable(doc, {
-        startY: 50,
-        head: [['Title', 'Price', 'City', 'Status', 'Created']],
-        body: properties.value.map(p => [
-          p.title,
-          `₦${Number(p.price).toLocaleString()}`,
-          p.city,
-          p.status,
-          new Date(p.created_at).toLocaleDateString()
-        ]),
-        theme: 'grid',
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [0, 37, 204] }
-      })
-
-      doc.save(`properties-${adminProfile.value.state}-${new Date().toISOString().slice(0,10)}.pdf`)
-    })
-  })
-}
 const refreshAll = () => {
   fetchProperties()
   fetchStats()

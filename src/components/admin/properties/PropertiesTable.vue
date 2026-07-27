@@ -13,11 +13,11 @@
 
     <!-- Agency Filter -->
     <div class="px-10 mb-6">
-      <label class="block text-sm font-medium text-medium-gray mb-2">Filter by Agency</label>
+      <label class="block text-sm font-medium text-[var(--royal-blue)] mb-2">Filter by Agency</label>
       <select 
         v-model="agencyFilter" 
         class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)]">
-        <option value="">All Agencies</option>
+        <option value="" class="text-[var(--royal-blue)]">All Agencies</option>
         <option 
           v-for="agency in uniqueAgencies" 
           :key="agency"
