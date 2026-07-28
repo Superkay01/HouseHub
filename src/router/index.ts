@@ -192,6 +192,10 @@ const router = createRouter({
     {
       path: 'verifications',
       component: () => import('../views/admin/AgentVerification.vue')
+    },
+    {
+      path: 'customers',
+      component: () => import('../views/admin/customers.vue')
     }
     
   ]
