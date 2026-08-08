@@ -149,7 +149,7 @@ const properties = ref([
     beds: 4,
     baths: 5,
     parking: 3,
-    image: "https://picsum.photos/id/1015/800/600",
+    image: "/House1.jpg",
     verified: true,
     type: "Duplex"
   },
@@ -162,7 +162,7 @@ const properties = ref([
     beds: 2,
     baths: 2,
     parking: 1,
-    image: "https://picsum.photos/id/201/800/600",
+    image: "/House2.jpg",
     verified: true,
     type: "Flat"
   },
@@ -175,7 +175,7 @@ const properties = ref([
     beds: 3,
     baths: 3,
     parking: 2,
-    image: "https://picsum.photos/id/133/800/600",
+    image: "/House3.jpg",
     verified: true,
     type: "Apartment"
   }
