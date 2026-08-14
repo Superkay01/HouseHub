@@ -5,9 +5,9 @@
       <!-- Back Button -->
       <button 
         @click="$router.back()" 
-        class="flex items-center gap-2 text-[var(--royal-blue)] hover:text-[var(--meduim-blue)] mb-8 font-medium"
+        class="flex items-center gap-2 text-[var(--royal-blue)] hover:text-[var(--medium-blue)] mb-8 font-medium"
       >
-        ← Back to My Properties
+        ← Back
       </button>
 
       <!-- Loading -->
@@ -20,28 +20,38 @@
         <p class="text-red-600 text-xl mb-4">{{ error }}</p>
         <button 
           @click="fetchProperty"
-          class="px-6 py-3 bg-[var(--royal-blue)] text-[var(--white)] rounded-2xl hover:bg-[var(--steel-blue)]"
+          class="px-6 py-3 bg-[var(--royal-blue)] text-white rounded-2xl"
         >
           Try Again
         </button>
       </div>
 
-      <!-- Success Content -->
+      <!-- Content -->
       <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        <!-- Images Section -->
+        <!-- Images -->
         <div class="lg:col-span-7 space-y-6">
-          <!-- Main Image -->
-          <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-[var(--white)] cursor-pointer" 
+          <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-white cursor-pointer" 
                @click="showLightbox = true">
             <img 
               :src="mainImage" 
               class="w-full h-[520px] object-cover"
               alt="Main Image"
             />
+
+            <!-- Heart Button -->
+            <button
+              @click.stop="toggleSave"
+              class="absolute top-5 right-5 w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
+              :title="isSaved ? 'Unsave property' : 'Save property'"
+            >
+              <span class="text-2xl">
+                {{ isSaved ? '❤️' : '🤍' }}
+              </span>
+            </button>
           </div>
 
-          <!-- Thumbnail Gallery -->
+          <!-- Thumbnails -->
           <div v-if="allImages.length > 1" class="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div 
               v-for="(url, index) in allImages" 
@@ -50,10 +60,7 @@
               :class="{ 'border-[var(--royal-blue)] ring-2 ring-offset-2 ring-[var(--royal-blue)]': mainImage === url }"
               @click="mainImage = url"
             >
-              <img 
-                :src="url" 
-                class="w-full h-full object-cover"
-              />
+              <img :src="url" class="w-full h-28 object-cover" />
             </div>
           </div>
 
@@ -62,9 +69,9 @@
           </div>
         </div>
 
-        <!-- Details Section -->
+        <!-- Details -->
         <div class="lg:col-span-5">
-          <div class="bg-[var(--white)] rounded-3xl shadow-2xl p-8 sticky top-8">
+          <div class="bg-white rounded-3xl shadow-2xl p-8 sticky top-8">
             
             <div class="flex justify-between items-start mb-6">
               <span class="inline-block px-4 py-1.5 bg-green-100 text-green-700 text-sm font-medium rounded-2xl capitalize">
@@ -72,24 +79,36 @@
               </span>
               <div class="text-right">
                 <p class="text-4xl font-bold text-[var(--royal-blue)]">
-                  ₦{{ property.price?.toLocaleString() || '0' }}
+                  ₦{{ Number(property.price || 0).toLocaleString() }}
                 </p>
                 <p class="text-sm text-[var(--royal-blue)]">{{ property.purpose }}</p>
               </div>
             </div>
 
-            <h1 class="text-3xl font-bold leading-tight mb-2 text-[var(--royal-blue)]">{{ property.title }}</h1>
+            <h1 class="text-3xl font-bold leading-tight mb-2 text-[var(--royal-blue)]">
+              {{ property.title }}
+            </h1>
             
-            <p class="text-[var(--royal-blue)] flex items-center gap-2 mb-8">
-              <i class="fas fa-map-marker-alt"></i>
-              {{ property.area }}, {{ property.city }}, {{ property.state }}
+            <p class="text-[var(--royal-blue)] mb-6">
+              📍 {{ property.area }}, {{ property.city }}, {{ property.state }}
             </p>
 
-            <!-- View Count from property_views -->
+            <!-- Unique View Count -->
             <div class="flex items-center gap-2 text-medium-gray text-sm mb-6">
-              <span class="text-base">👁️</span>
-              <span>{{ uniqueViewCount }} people viewed this property</span>
+              <span>👁️</span>
+              <span>{{ uniqueViewCount }} {{ uniqueViewCount === 1 ? 'person' : 'people' }} viewed this property</span>
             </div>
+
+            <!-- Save Button (also here) -->
+            <button
+              @click="toggleSave"
+              class="w-full mb-6 py-3.5 rounded-2xl font-medium transition flex items-center justify-center gap-2"
+              :class="isSaved 
+                ? 'bg-red-50 text-red-600 border border-red-200' 
+                : 'bg-[var(--light-blue)] text-[var(--royal-blue)] border border-[var(--light-blue)]'"
+            >
+              <span>{{ isSaved ? '❤️ Saved' : '🤍 Save Property' }}</span>
+            </button>
 
             <div class="border-t border-b py-6 my-6 grid grid-cols-3 gap-4 text-center">
               <div>
@@ -101,7 +120,7 @@
                 <div class="text-xs text-[var(--royal-blue)]">BATHROOMS</div>
               </div>
               <div>
-                <div class="text-2xl font-semibold [var(--royal-blue)]">{{ property.parking_spaces || 0 }}</div>
+                <div class="text-2xl font-semibold">{{ property.parking_spaces || 0 }}</div>
                 <div class="text-xs text-[var(--royal-blue)]">PARKING</div>
               </div>
             </div>
@@ -134,7 +153,7 @@
               </div>
             </div>
 
-            <div v-if="property.description" class="mt-10 pt-8 border-t text-[var(--royal-blue)]">
+            <div v-if="property.description" class="mt-10 pt-8 border-t">
               <h4 class="font-semibold mb-3">Description</h4>
               <p class="leading-relaxed text-[var(--royal-blue)] whitespace-pre-wrap">
                 {{ property.description }}
@@ -142,7 +161,7 @@
             </div>
 
             <div class="mt-10 pt-8 border-t">
-              <button class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] text-[var(--white)] py-4 rounded-2xl font-semibold text-lg transition">
+              <button class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] text-white py-4 rounded-2xl font-semibold text-lg transition">
                 Contact Admin
               </button>
             </div>
@@ -151,13 +170,13 @@
       </div>
     </div>
 
-    <!-- Fullscreen Lightbox -->
+    <!-- Lightbox -->
     <div v-if="showLightbox" 
          class="fixed inset-0 z-[100] bg-black flex items-center justify-center" 
          @click.self="showLightbox = false">
       <div class="relative max-w-6xl w-full p-8">
         <img :src="mainImage" class="max-h-[90vh] mx-auto rounded-3xl shadow-2xl" />
-        <button @click="showLightbox = false" class="absolute top-8 right-8 text-white text-5xl hover:text-gray-300 transition">
+        <button @click="showLightbox = false" class="absolute top-8 right-8 text-white text-5xl">
           ×
         </button>
       </div>
@@ -173,16 +192,18 @@ import { supabase } from '@/supabaseClient'
 const route = useRoute()
 const property = ref<any>({})
 const loading = ref(true)
-const error = ref<string>('')
+const error = ref('')
 const mainImage = ref('')
 const showLightbox = ref(false)
+
 const uniqueViewCount = ref(0)
+const isSaved = ref(false)
+const saving = ref(false)
 
 const fetchProperty = async () => {
   const id = route.params.id as string
-
   if (!id) {
-    error.value = "No Property ID found in URL"
+    error.value = 'No Property ID found in URL'
     loading.value = false
     return
   }
@@ -198,7 +219,7 @@ const fetchProperty = async () => {
 
   if (fetchError) {
     console.error(fetchError)
-    error.value = "Property not found or access denied"
+    error.value = 'Property not found or access denied'
   } else {
     property.value = data || {}
   }
@@ -206,43 +227,108 @@ const fetchProperty = async () => {
   loading.value = false
 }
 
-// Record Unique View and Get Count from property_views
+// Unique view tracking (like Facebook)
 const recordUniqueView = async () => {
   if (!property.value?.id) return
 
-  const propertyId = property.value.id
-
   const { data: { user } } = await supabase.auth.getUser()
-
   if (!user) return
 
-  // Check if already viewed
-  const { data: existing } = await supabase
+  // Record unique view
+  const { error: insertError } = await supabase
     .from('property_views')
-    .select('id')
-    .eq('property_id', propertyId)
-    .eq('user_id', user.id)
-    .limit(1)
-
-  if (!existing || existing.length === 0) {
-    // Record the view
-    await supabase
-      .from('property_views')
-      .insert({
-        property_id: propertyId,
+    .upsert(
+      {
+        property_id: property.value.id,
         user_id: user.id
-      })
+      },
+      {
+        onConflict: 'property_id,user_id',
+        ignoreDuplicates: true
+      }
+    )
+
+  if (insertError) {
+    console.error('View insert error:', insertError)
   }
 
-  // Get the total unique views from property_views
-  const { count } = await supabase
+  // Count unique viewers
+  const { count, error: countError } = await supabase
     .from('property_views')
     .select('*', { count: 'exact', head: true })
-    .eq('property_id', propertyId)
+    .eq('property_id', property.value.id)
+
+  if (countError) {
+    console.error('View count error:', countError)
+    return
+  }
 
   uniqueViewCount.value = count || 0
 }
 
+// Check if already saved
+const checkIfSaved = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || !property.value?.id) {
+    isSaved.value = false
+    return
+  }
+
+  const { data, error } = await supabase
+    .from('saved_properties')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('property_id', property.value.id)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Check saved error:', error)
+    return
+  }
+
+  isSaved.value = !!data
+}
+// Toggle save / unsave
+const toggleSave = async () => {
+  if (saving.value) return
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    alert('Please login to save properties')
+    return
+  }
+
+  if (!property.value?.id) return
+
+  saving.value = true
+  try {
+    if (isSaved.value) {
+      const { error } = await supabase
+        .from('saved_properties')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('property_id', property.value.id)
+
+      if (error) throw error
+      isSaved.value = false
+    } else {
+      const { error } = await supabase
+        .from('saved_properties')
+        .insert({
+          user_id: user.id,
+          property_id: property.value.id
+        })
+
+      if (error) throw error
+      isSaved.value = true
+    }
+  } catch (err: any) {
+    console.error('Save error:', err)
+    alert(err.message || 'Failed to save property')
+  } finally {
+    saving.value = false
+  }
+}
 const allImages = computed(() => {
   const imgs: string[] = []
   if (property.value.cover_image) imgs.push(property.value.cover_image)
@@ -260,8 +346,11 @@ watch(property, (newProp) => {
 
 onMounted(async () => {
   await fetchProperty()
-  if (property.value) {
-    recordUniqueView()
+  if (property.value?.id) {
+    await Promise.all([
+      recordUniqueView(),
+      checkIfSaved()
+    ])
   }
 })
 </script>

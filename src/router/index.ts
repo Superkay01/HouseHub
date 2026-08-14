@@ -67,6 +67,7 @@ const router = createRouter({
       name: 'admin-login',
       component: () => import('../views/auth/AdminLogin.vue')
     },
+    
     // {
     //   path: '/customer/dashboard',
     //   name: 'Customer Dashboard',
@@ -112,6 +113,16 @@ const router = createRouter({
         path: '/properties/edit/:id',
         name: 'PropertyEdit',
         component: () => import('@/views/agent/PropertyEdit.vue')
+      },
+      {
+        path: '/agent/requests',
+        name: 'AgentRequests',
+        component: () => import('@/views/agent/Requests.vue')
+      },
+      {
+        path: '/agent/inspections',
+        name: 'AgentInspections',
+        component: () => import('@/views/agent/Inspections.vue')
       }
   ]
 },
@@ -182,7 +193,7 @@ const router = createRouter({
       component: () => import('../views/admin/Properties.vue')
     },
     {
-      path: 'inspections',
+      path: 'Inspections',
       component: () => import('../views/admin/Inspections.vue')
     },
     {
@@ -196,7 +207,16 @@ const router = createRouter({
     {
       path: 'customers',
       component: () => import('../views/admin/customers.vue')
-    }
+    },
+    {
+      path: 'requests',
+      component: () => import('../views/admin/requests.vue')
+    },
+    {
+      path: 'notifications',
+      name: 'AdminNotifications',
+      component: () => import('../views/admin/notifications.vue')
+    },
     
   ]
 }

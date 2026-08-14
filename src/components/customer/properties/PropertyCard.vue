@@ -9,18 +9,21 @@
       />
 
       <!-- Verified Badge -->
-      <div v-if="property.profiles?.is_verified" 
-           class="absolute top-4 left-4 bg-white/95 text-[#0025cc] text-xs font-semibold px-3 py-1 rounded-2xl flex items-center gap-1 shadow">
+      <div
+        v-if="property.profiles?.is_verified"
+        class="absolute top-4 left-4 bg-white/95 text-[#0025cc] text-xs font-semibold px-3 py-1 rounded-2xl flex items-center gap-1 shadow"
+      >
         <span class="text-green-500">✓</span> Verified
       </div>
 
       <!-- Save Button -->
       <button
         @click.stop="toggleSave"
-        class="absolute top-4 right-4 w-9 h-9 bg-white/90 hover:bg-white rounded-2xl flex items-center justify-center shadow transition-all hover:scale-110"
+        :disabled="saving"
+        class="absolute top-4 right-4 w-9 h-9 bg-white/90 hover:bg-white rounded-2xl flex items-center justify-center shadow transition-all hover:scale-110 disabled:opacity-50"
       >
-        <Heart 
-          :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']" 
+        <Heart
+          :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']"
           class="w-5 h-5 transition-colors"
         />
       </button>
@@ -102,7 +105,6 @@
           </p>
         </div>
 
-        <!-- View Details Button -->
         <button
           @click.stop="viewDetails"
           class="bg-[#0025cc] hover:bg-[#001fa3] text-white text-xs font-medium px-6 py-2.5 rounded-2xl transition-all flex items-center gap-1"
@@ -115,97 +117,130 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Heart } from 'lucide-vue-next';
-import { useRouter } from 'vue-router';
-import { supabase } from '@/supabaseClient.js';
+import { ref, onMounted } from 'vue'
+import { Heart } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
+import { supabase } from '@/supabaseClient.js'
 
 const props = defineProps<{
-  property: any;
-}>();
+  property: any
+}>()
 
-const router = useRouter();
-const viewCount = ref(0);
-const isSaved = ref(false);
+const router = useRouter()
+const viewCount = ref(0)
+const isSaved = ref(false)
+const saving = ref(false)
 
 const formatViews = (count: number) => {
-  if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M';
-  if (count >= 10000) return Math.floor(count / 1000) + 'K';
-  if (count >= 1000) return (count / 1000).toFixed(1) + 'K';
-  return count.toLocaleString();
-};
+  if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M'
+  if (count >= 10000) return Math.floor(count / 1000) + 'K'
+  if (count >= 1000) return (count / 1000).toFixed(1) + 'K'
+  return count.toLocaleString()
+}
 
+// ❤️ Save / Unsave (persists after refresh)
 const toggleSave = async () => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      alert("Please log in to save properties");
-      return;
-    }
+  if (saving.value) return
 
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    alert('Please login to save properties')
+    return
+  }
+
+  if (!props.property?.id) return
+
+  saving.value = true
+  try {
     if (isSaved.value) {
-      // Remove from saved
+      // Unsave
       const { error } = await supabase
         .from('saved_properties')
         .delete()
-        .eq('customer_id', user.id)
-        .eq('property_id', props.property.id);
+        .eq('user_id', user.id)
+        .eq('property_id', props.property.id)
 
-      if (!error) isSaved.value = false;
+      if (error) throw error
+      isSaved.value = false
     } else {
-      // Add to saved
+      // Save
       const { error } = await supabase
         .from('saved_properties')
         .insert({
-          customer_id: user.id,
+          user_id: user.id,
           property_id: props.property.id
-        });
+        })
 
-      if (!error) isSaved.value = true;
+      if (error) throw error
+      isSaved.value = true
     }
-  } catch (err) {
-    console.error('Save error:', err);
-    alert('Failed to update saved status');
+  } catch (err: any) {
+    console.error('Save error:', err)
+    alert(err.message || 'Failed to save property')
+  } finally {
+    saving.value = false
   }
-};
+}
 
+// 👁️ Load total unique views
 const loadViewCount = async () => {
-  if (!props.property.id) return;
+  if (!props.property?.id) return
 
-  const { count } = await supabase
+  const { count, error } = await supabase
     .from('property_views')
     .select('*', { count: 'exact', head: true })
-    .eq('property_id', props.property.id);
+    .eq('property_id', props.property.id)
 
-  viewCount.value = count || 0;
-};
+  if (!error) {
+    viewCount.value = count || 0
+  }
+}
 
-// const viewDetails = () => {
-//   router.push(`/customer/propertyDetails/${props.property.id}`);
-// };
+// Check if current user already saved this property
+const checkIfSaved = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || !props.property?.id) return
 
-const viewDetails = () => {
-  // FIXED: Match the route you defined
+  const { data } = await supabase
+    .from('saved_properties')
+    .select('id')
+    .eq('user_id', user.id)          // ✅ correct column
+    .eq('property_id', props.property.id)
+    .limit(1)
+
+  isSaved.value = !!(data && data.length > 0)
+}
+
+// Record a view (unique per user) then navigate
+const viewDetails = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user && props.property?.id) {
+    // Upsert so same user is only counted once
+    await supabase
+      .from('property_views')
+      .upsert(
+        {
+          property_id: props.property.id,
+          user_id: user.id
+        },
+        { onConflict: 'property_id,user_id' }
+      )
+
+    // Refresh count after recording
+    await loadViewCount()
+  }
+
   router.push({
     name: 'CustomerPropertyDetail',
     params: { id: props.property.id }
-  });
-};
+  })
+}
 
 onMounted(async () => {
-  await loadViewCount();
-  
-  // Check if already saved
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
-    const { data } = await supabase
-      .from('saved_properties')
-      .select('id')
-      .eq('customer_id', user.id)
-      .eq('property_id', props.property.id)
-      .limit(1);
-
-    isSaved.value = !!(data && data.length > 0);  // Fixed type
-  }
-});
+  await Promise.all([
+    loadViewCount(),
+    checkIfSaved()
+  ])
+})
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 z-50 flex items-center justify-end bg-black/70">
-    <div class="bg-white w-full max-w-6xl h-full overflow-y-auto shadow-2xl">
+    <div class="bg-white w-[75%] max-w-6xl h-full overflow-y-auto shadow-2xl">
       <!-- Header -->
       <div class="sticky top-0 bg-white border-b px-8 py-5 flex items-center justify-between z-10">
         <div>

@@ -93,10 +93,10 @@
             <td class="py-5 px-4 text-right">
               <div class="flex gap-2 justify-end">
                 <button
-                  @click="$emit('view', property)"
-                  class="px-3 py-1 text-xs bg-[var(--light-blue)] hover:bg-[var(--hover-blue)] rounded-xl">
-                  View
-                </button>
+  @click="handleView(property)"
+  class="px-3 py-1 text-xs bg-[var(--light-blue)] hover:bg-[var(--hover-blue)] rounded-xl">
+  View
+</button>
                 <button
                   v-if="property.status === 'pending'"
                   @click="$emit('approve', property.id)"
@@ -119,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ref, computed } from 'vue'
 import PropertyStatusBadge from './PropertyStatusBadge.vue'
 
 const props = defineProps({
@@ -157,5 +157,10 @@ const formatDate = (dateString) => {
     month: 'short',
     day: 'numeric'
   })
+}
+
+const handleView = (property) => {
+  console.log('View button clicked:', property)
+  emit('view', property)
 }
 </script>

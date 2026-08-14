@@ -226,6 +226,7 @@ const handleSubmit = async () => {
         id: data.user.id,
         full_name: form.value.fullName,
         phone: form.value.phone,
+        email: form.value.email,  
         role: props.role,
         agency_name: props.role === 'agent' ? form.value.agencyName : null,
         office_address: props.role === 'agent' ? form.value.officeAddress : null,

@@ -11,82 +11,100 @@
           <a href="/properties" class="font-medium text-medium-gray hover:text-[var(--royal-blue)] transition">Browse</a>
           <a href="/my-inspections" class="font-medium text-[var(--royal-blue)]">Inspections</a>
           <a href="/saved" class="font-medium text-medium-gray hover:text-[var(--royal-blue)] transition">Saved</a>
-          <button class="px-6 py-3 bg-[var(--royal-blue)] text-white rounded-2xl font-medium hover:bg-[var(--mediumBlue)] transition">
-            Post a Property
-          </button>
         </div>
       </div>
     </nav>
 
     <div class="max-w-7xl mx-auto px-6 py-10">
       <!-- Header -->
-      <div class="flex justify-between items-end mb-10">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
         <div>
           <h1 class="text-4xl font-bold text-[var(--royal-blue)]">My Inspections</h1>
-          <p class="text-medium-gray mt-2">Track and manage all your scheduled property inspections</p>
+          <p class="text-medium-gray mt-2">
+            Track and manage all your scheduled property inspections
+          </p>
         </div>
-        <button class="px-8 py-4 bg-[var(--royal-blue)] text-white rounded-3xl font-medium flex items-center gap-2 hover:bg-[var(--mediumBlue)] transition">
-          <span>📅</span> Schedule New Inspection
-        </button>
       </div>
 
       <!-- Summary Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
         <div class="bg-white p-6 rounded-3xl shadow-sm">
-          <div class="text-4xl mb-3">📅</div>
-          <div class="text-4xl font-bold">{{ upcomingInspections.length }}</div>
-          <div class="text-medium-gray">Upcoming Inspections</div>
+          <div class="text-3xl mb-3">📅</div>
+          <div class="text-4xl font-bold text-[var(--royal-blue)]">{{ upcomingCount }}</div>
+          <div class="text-medium-gray">Upcoming</div>
         </div>
+
         <div class="bg-white p-6 rounded-3xl shadow-sm">
-          <div class="text-4xl mb-3">✅</div>
-          <div class="text-4xl font-bold">{{ completedInspections.length }}</div>
+          <div class="text-3xl mb-3">✅</div>
+          <div class="text-4xl font-bold text-[var(--royal-blue)]">{{ completedCount }}</div>
           <div class="text-medium-gray">Completed</div>
         </div>
+
         <div class="bg-white p-6 rounded-3xl shadow-sm">
-          <div class="text-4xl mb-3">⏳</div>
-          <div class="text-4xl font-bold">{{ pendingInspections.length }}</div>
-          <div class="text-medium-gray">Awaiting Confirmation</div>
+          <div class="text-3xl mb-3">⏳</div>
+          <div class="text-4xl font-bold text-[var(--royal-blue)]">{{ pendingCount }}</div>
+          <div class="text-medium-gray">Pending / Scheduled</div>
         </div>
+
         <div class="bg-white p-6 rounded-3xl shadow-sm">
-          <div class="text-4xl mb-3">⭐</div>
-          <div class="text-4xl font-bold">18</div>
-          <div class="text-medium-gray">Saved Properties</div>
+          <div class="text-3xl mb-3">❌</div>
+          <div class="text-4xl font-bold text-[var(--royal-blue)]">{{ cancelledCount }}</div>
+          <div class="text-medium-gray">Cancelled</div>
         </div>
       </div>
 
-      <!-- Upcoming Inspection -->
-      <div v-if="upcomingInspections.length" class="mb-12">
-        <h3 class="font-semibold text-xl mb-6">Next Inspection</h3>
-        <UpcomingInspectionCard 
-          :inspection="upcomingInspections[0]" 
-        />
+      <!-- Next Inspection -->
+      <div v-if="nextInspection" class="mb-12">
+        <h3 class="font-semibold text-xl mb-6 text-[var(--royal-blue)]">Next Inspection</h3>
+        <UpcomingInspectionCard :inspection="nextInspection" />
       </div>
 
-      <!-- All Inspections -->
-      <div>
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="font-semibold text-xl">All Inspections</h3>
-          <select v-model="filterStatus" class="px-6 py-3 rounded-2xl border border-gray-200">
-            <option value="">All Inspections</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Awaiting Confirmation</option>
-          </select>
-        </div>
+      <!-- Filters -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <h3 class="font-semibold text-xl text-[var(--royal-blue)]">All Inspections</h3>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div v-for="inspection in filteredInspections" 
-               :key="inspection.id"
-               class="flex flex-col gap-4">
-            
-            <InspectionCard 
-              :inspection="inspection"
-            />
-            
-            <InspectionCountdown 
-              :targetDate="inspection.inspection_date" 
-            />
-          </div>
+        <select
+          v-model="filterStatus"
+          class="px-6 py-3 rounded-2xl border border-gray-200 bg-white"
+        >
+          <option value="">All Inspections</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="pending">Pending</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <!-- Loading -->
+      <div v-if="loading" class="text-center py-16 text-medium-gray">
+        Loading inspections...
+      </div>
+
+      <!-- Empty -->
+      <div
+        v-else-if="filteredInspections.length === 0"
+        class="bg-white rounded-3xl p-12 text-center text-medium-gray"
+      >
+        <p class="text-lg font-medium text-[var(--royal-blue)]">No inspections found</p>
+        <p class="mt-2">You don’t have any inspections in this category yet.</p>
+      </div>
+
+      <!-- List -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          v-for="inspection in filteredInspections"
+          :key="inspection.id"
+          class="flex flex-col gap-4"
+        >
+          <InspectionCard :inspection="inspection" @updated="fetchInspections" />
+
+          <InspectionCountdown
+            v-if="['scheduled', 'confirmed', 'rescheduled'].includes(inspection.status)"
+            :targetDate="inspection.inspection_date"
+            :targetTime="inspection.inspection_time"
+          />
         </div>
       </div>
     </div>
@@ -103,58 +121,97 @@ import InspectionCountdown from '@/components/customer/inspection/InspectionCoun
 
 const inspections = ref([])
 const filterStatus = ref('')
+const loading = ref(true)
 
 const fetchInspections = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  loading.value = true
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
 
-  const { data, error } = await supabase
-    .from('property_requests')
-    .select(`
-      id,
-      inspection_date,
-      status,
-      notes,
-      properties (
+    const { data, error } = await supabase
+      .from('inspections')
+      .select(`
         id,
-        title,
-        cover_image,
-        area,
-        city,
-        state,
-        price
-      )
-    `)
-    .eq('customer_id', user.id)
-    .order('inspection_date', { ascending: true })
+        inspection_code,
+        inspection_date,
+        inspection_time,
+        status,
+        meeting_location,
+        admin_notes,
+        completion_notes,
+        customer_interest,
+        cancellation_reason,
+        created_at,
+        property:properties (
+          id,
+          title,
+          cover_image,
+          area,
+          city,
+          state,
+          price,
+          property_type
+        ),
+        agent:profiles!agent_id (
+          id,
+          full_name,
+          agency_name,
+          phone,
+          avatar_url
+        )
+      `)
+      .eq('customer_id', user.id)
+      .order('inspection_date', { ascending: true })
 
-  if (error) {
-    console.error("Error fetching inspections:", error)
-  } else {
+    if (error) throw error
     inspections.value = data || []
+  } catch (err) {
+    console.error('Error fetching inspections:', err)
+  } finally {
+    loading.value = false
   }
 }
 
-const upcomingInspections = computed(() => 
-  inspections.value.filter(i => 
-    i.status === 'inspection_scheduled' || i.status === 'confirmed'
+const upcomingInspections = computed(() =>
+  inspections.value.filter(i =>
+    ['scheduled', 'confirmed', 'rescheduled'].includes(i.status)
   )
 )
 
-const completedInspections = computed(() => 
-  inspections.value.filter(i => i.status === 'completed')
+const nextInspection = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  return upcomingInspections.value.find(i => {
+    if (!i.inspection_date) return false
+    return new Date(i.inspection_date) >= today
+  }) || upcomingInspections.value[0] || null
+})
+
+const upcomingCount = computed(() => upcomingInspections.value.length)
+
+const completedCount = computed(() =>
+  inspections.value.filter(i => i.status === 'completed').length
 )
 
-const pendingInspections = computed(() => 
-  inspections.value.filter(i => i.status === 'pending')
+const pendingCount = computed(() =>
+  inspections.value.filter(i => ['pending', 'scheduled'].includes(i.status)).length
+)
+
+const cancelledCount = computed(() =>
+  inspections.value.filter(i => i.status === 'cancelled').length
 )
 
 const filteredInspections = computed(() => {
   if (!filterStatus.value) return inspections.value
+
+  if (filterStatus.value === 'upcoming') {
+    return upcomingInspections.value
+  }
+
   return inspections.value.filter(i => i.status === filterStatus.value)
 })
 
-onMounted(() => {
-  fetchInspections()
-})
+onMounted(fetchInspections)
 </script>

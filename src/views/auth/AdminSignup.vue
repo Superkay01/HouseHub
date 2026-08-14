@@ -102,9 +102,9 @@
               <select v-model="form.state" required 
                       class="w-full px-3 py-3 rounded-2xl border md:text-sm text-xs border-[var(--light-blue)] text-[var(--royal-blue)] focus:border-[var(--royal-blue)] focus:outline-none transition-colors">
                 <option value="">Select State</option>
-                <option value="Kwara">Kwara</option>
-                <option value="Ogun">Ogun</option>
-                <option value="Lagos">Lagos</option>
+                <option value="Kwara">Kwara State</option>
+                <option value="Ogun">Ogun State</option>
+                <option value="Lagos">Lagos State</option>
                 <option value="Abuja">Federal Capital Territory</option>
               </select>
             </div>

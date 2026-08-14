@@ -133,7 +133,6 @@ const fetchProperty = async () => {
     if (error) throw error
 
     property.value = data
-    console.log('✅ Property loaded:', property.value)
   } catch (error) {
     console.error('Error fetching property:', error)
     alert('Failed to load property details. Please try again.')
@@ -144,6 +143,11 @@ const fetchProperty = async () => {
 const submitRequest = async () => {
   if (!form.value.inspection_date || !form.value.inspection_time) {
     alert("Please select both date and time")
+    return
+  }
+
+  if (!property.value) {
+    alert("Property not loaded yet")
     return
   }
 
@@ -158,17 +162,24 @@ const submitRequest = async () => {
       return
     }
 
+    const payload = {
+      customer_id: user.id,
+      property_id: property.value.id,
+      agent_id: property.value.agent_id,
+      request_type: 'inspection',
+      inspection_date: form.value.inspection_date,
+      inspection_time: form.value.inspection_time,
+      message: form.value.message || null,
+      state: property.value.state,
+      city: property.value.city,
+      status: 'pending'
+    }
+
+    console.log('Submitting:', payload)
+
     const { error } = await supabase
       .from('property_requests')
-      .insert({
-        customer_id: user.id,
-        property_id: route.params.id,
-        agent_id: property.value.agent_id,
-        request_type: 'inspection',
-        inspection_date: form.value.inspection_date,
-        inspection_time: form.value.inspection_time,
-        message: form.value.message
-      })
+      .insert(payload)
 
     if (error) throw error
 

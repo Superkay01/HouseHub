@@ -129,24 +129,59 @@ const fetchSavedProperties = async () => {
   const { data, error } = await supabase
     .from('saved_properties')
     .select(`
-      *,
-      properties (*)
+      id,
+      created_at,
+      property_id,
+      properties (
+        id,
+        title,
+        property_type,
+        purpose,
+        price,
+        area,
+        city,
+        state,
+        bedrooms,
+        bathrooms,
+        toilets,
+        amenities,
+        cover_image,
+        image_1,
+        status,
+        profiles (
+          full_name,
+          avatar_url,
+          agency_name,
+          verified
+        )
+      )
     `)
-    .eq('customer_id', user.id)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
-  if (error) console.error(error)
-  else savedProperties.value = data || []
+  if (error) {
+    console.error('Error fetching saved properties:', error)
+  } else {
+    savedProperties.value = data || []
+  }
 }
 
 const loadRecentlyViewed = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
   const { data } = await supabase
-    .from('properties')
-    .select('*')
-    .order('updated_at', { ascending: false })
+    .from('property_views')
+    .select(`
+      property_id,
+      viewed_at,
+      properties (*)
+    `)
+    .eq('user_id', user.id)
+    .order('viewed_at', { ascending: false })
     .limit(4)
 
-  recentlyViewedProperties.value = data || []
+  recentlyViewedProperties.value = data?.map(item => item.properties) || []
 }
 
 const loadRecommendations = async () => {
@@ -164,24 +199,24 @@ const filteredSaved = computed(() => {
 
   if (searchQuery.value) {
     const term = searchQuery.value.toLowerCase()
-    result = result.filter(item => 
-      item.properties.title?.toLowerCase().includes(term) ||
-      item.properties.area?.toLowerCase().includes(term) ||
-      item.properties.city?.toLowerCase().includes(term)
+    result = result.filter(item =>
+      item.properties?.title?.toLowerCase().includes(term) ||
+      item.properties?.area?.toLowerCase().includes(term) ||
+      item.properties?.city?.toLowerCase().includes(term)
     )
   }
 
   if (sortBy.value === 'price-low') {
-    result.sort((a, b) => a.properties.price - b.properties.price)
+    result.sort((a, b) => (a.properties?.price || 0) - (b.properties?.price || 0))
   } else if (sortBy.value === 'price-high') {
-    result.sort((a, b) => b.properties.price - a.properties.price)
+    result.sort((a, b) => (b.properties?.price || 0) - (a.properties?.price || 0))
   }
 
   return result
 })
 
 const availableSaved = computed(() => {
-  return savedProperties.value.filter(item => item.properties.status === 'approved').length
+  return savedProperties.value.filter(item => item.properties?.status === 'approved').length
 })
 
 const recentSaved = computed(() => {
@@ -190,13 +225,25 @@ const recentSaved = computed(() => {
 
 const removeSaved = async (id) => {
   if (confirm('Remove from saved properties?')) {
-    await supabase.from('saved_properties').delete().eq('id', id)
-    fetchSavedProperties()
+    const { error } = await supabase
+      .from('saved_properties')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error(error)
+      alert('Failed to remove property')
+    } else {
+      fetchSavedProperties()
+    }
   }
 }
 
 const viewProperty = (id) => {
-  router.push(`/customer/propertyDetails/${id}`)
+  router.push({
+    name: 'CustomerPropertyDetail',
+    params: { id }
+  })
 }
 
 const goToBrowse = () => {

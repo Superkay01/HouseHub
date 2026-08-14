@@ -79,7 +79,9 @@
           @view="viewProperty"
           @approve="approveProperty"
           @reject="rejectProperty"
+          
         />
+        
       </div>
     </div>
 
@@ -227,6 +229,10 @@ const approveProperty = async (id) => {
     fetchProperties()
     fetchStats()
   }
+}
+const viewProperty = (property) => {
+  console.log('Viewing property:', property)
+  selectedProperty.value = property
 }
 
 const rejectProperty = async (id) => {
