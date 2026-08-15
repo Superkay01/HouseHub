@@ -6,7 +6,7 @@
         <div>
           <h1 class="text-3xl md:text-4xl font-bold text-[var(--royal-blue)]">My Inspections</h1>
           <p class="text-medium-gray mt-2">
-            Manage your upcoming, scheduled and completed property inspections.
+            Manage assignments, confirmations, check-ins, and inspection reports.
           </p>
           <p class="mt-2 text-sm font-medium text-[var(--royal-blue)]">
             📍 {{ agentProfile.city || '—' }}, {{ agentProfile.state || '—' }}
@@ -28,8 +28,8 @@
           <p class="text-3xl md:text-4xl font-bold mt-2">{{ stats.total }}</p>
         </div>
         <div class="bg-white rounded-3xl p-5 shadow-sm">
-          <p class="text-sm text-medium-gray">Upcoming</p>
-          <p class="text-3xl md:text-4xl font-bold text-blue-600 mt-2">{{ stats.upcoming }}</p>
+          <p class="text-sm text-medium-gray">Action Required</p>
+          <p class="text-3xl md:text-4xl font-bold text-red-600 mt-2">{{ stats.actionRequired }}</p>
         </div>
         <div class="bg-white rounded-3xl p-5 shadow-sm">
           <p class="text-sm text-medium-gray">Today</p>
@@ -41,6 +41,102 @@
         </div>
       </div>
 
+      <!-- ACTION REQUIRED SECTION -->
+      <div v-if="actionRequiredList.length" class="mb-10">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold tracking-wide">
+            ACTION REQUIRED
+          </span>
+          <h2 class="text-xl font-semibold text-[var(--royal-blue)]">
+            New Assignments & Responses
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div
+            v-for="item in actionRequiredList"
+            :key="item.id"
+            class="bg-white rounded-3xl p-5 shadow-sm border-2 border-red-100"
+          >
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <p class="text-xs font-bold text-red-600 tracking-wide">
+                  {{ actionBadge(item) }}
+                </p>
+                <p class="font-semibold text-lg mt-1 line-clamp-1">
+                  {{ item.property?.title || 'Property' }}
+                </p>
+              </div>
+              <span class="text-xs px-3 py-1 rounded-2xl font-medium capitalize" :class="statusClass(item.status)">
+                {{ displayStatus(item.status) }}
+              </span>
+            </div>
+
+            <p class="text-sm text-medium-gray">Customer: {{ maskName(item.customer?.full_name) }}</p>
+            <p class="text-sm mt-1">
+              📅 {{ formatDate(item.inspection_date) }} · ⏰ {{ item.inspection_time || 'TBD' }}
+            </p>
+            <p class="text-sm text-medium-gray mt-1">
+              📍 {{ item.property?.area || item.city }}, {{ item.city || item.state }}
+            </p>
+
+            <div class="flex flex-wrap gap-2 mt-4">
+              <template v-if="item.status === 'pending'">
+                <button
+                  type="button"
+                  @click="acceptInspection(item)"
+                  class="flex-1 py-2.5 bg-[var(--royal-blue)] text-white rounded-2xl text-sm font-semibold"
+                >
+                  Accept Inspection
+                </button>
+                <button
+                  type="button"
+                  @click="openDecline(item)"
+                  class="flex-1 py-2.5 bg-red-50 text-red-700 rounded-2xl text-sm font-semibold"
+                >
+                  Decline
+                </button>
+              </template>
+
+              <template v-else-if="item.status === 'scheduled'">
+                <button
+                  type="button"
+                  @click="confirmInspection(item)"
+                  class="flex-1 py-2.5 bg-green-600 text-white rounded-2xl text-sm font-semibold"
+                >
+                  Confirm Inspection
+                </button>
+                <button
+                  type="button"
+                  @click="openReschedule(item)"
+                  class="flex-1 py-2.5 border rounded-2xl text-sm font-medium"
+                >
+                  Request Reschedule
+                </button>
+              </template>
+
+              <template v-else-if="item.status === 'in_progress' && hasIncompleteReport(item)">
+                <button
+                  type="button"
+                  @click="openDrawer(item)"
+                  class="w-full py-2.5 bg-amber-500 text-white rounded-2xl text-sm font-semibold"
+                >
+                  Continue Report
+                </button>
+              </template>
+
+              <button
+                type="button"
+                @click="openDrawer(item)"
+                class="w-full py-2.5 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl text-sm font-medium"
+              >
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Tabs -->
       <div class="flex flex-wrap gap-2 mb-6">
         <button
@@ -49,13 +145,19 @@
           type="button"
           @click="activeTab = tab.value"
           :class="[
-            'px-5 py-2.5 rounded-2xl text-sm font-medium transition',
+            'px-5 py-2.5 rounded-2xl text-sm font-medium transition relative',
             activeTab === tab.value
               ? 'bg-[var(--royal-blue)] text-white'
               : 'bg-white text-medium-gray hover:bg-gray-50'
           ]"
         >
           {{ tab.label }}
+          <span
+            v-if="tab.value === 'action' && stats.actionRequired"
+            class="ml-2 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-red-500 text-white text-[10px]"
+          >
+            {{ stats.actionRequired }}
+          </span>
         </button>
       </div>
 
@@ -73,12 +175,16 @@
             class="px-5 py-3.5 rounded-2xl border border-gray-200 focus:border-[var(--royal-blue)] outline-none"
           >
             <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
             <option value="scheduled">Scheduled</option>
             <option value="confirmed">Confirmed</option>
+            <option value="reschedule_requested">Reschedule Requested</option>
             <option value="in_progress">In Progress</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
             <option value="no_show">No Show</option>
+            <option value="declined">Declined</option>
           </select>
           <select
             v-model="dateFilter"
@@ -99,75 +205,35 @@
         <div v-for="n in 3" :key="n" class="bg-white rounded-3xl h-32 animate-pulse" />
       </div>
 
-      <!-- Empty -->
+      <!-- Empty states -->
       <div v-else-if="inspections.length === 0" class="bg-white rounded-3xl p-16 text-center shadow-sm">
         <div class="text-6xl mb-4">🏠</div>
-        <h3 class="text-2xl font-semibold text-[var(--royal-blue)]">No Inspections Yet</h3>
+        <h3 class="text-2xl font-semibold text-[var(--royal-blue)]">No Inspections Assigned</h3>
         <p class="text-medium-gray mt-2 max-w-md mx-auto">
-          You don't have any scheduled property inspections at the moment.
-          New inspections assigned by your State Admin will appear here automatically.
+          You have no inspections assigned. New assignments from your State Admin will appear here automatically.
         </p>
-        <button
-          type="button"
-          @click="$router.push('/agent/requests')"
-          class="mt-6 px-8 py-3 bg-[var(--royal-blue)] text-white rounded-2xl"
-        >
-          View Requests
-        </button>
+      </div>
+
+      <div
+        v-else-if="filteredInspections.length === 0"
+        class="bg-white rounded-3xl p-12 text-center shadow-sm"
+      >
+        <h3 class="text-xl font-semibold text-[var(--royal-blue)]">{{ emptyTitle }}</h3>
+        <p class="text-medium-gray mt-2">{{ emptyMessage }}</p>
       </div>
 
       <template v-else>
-        <!-- Upcoming cards -->
-        <div v-if="upcomingPreview.length" class="mb-10">
-          <h2 class="text-xl font-semibold mb-4">Upcoming Inspections</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div
-              v-for="item in upcomingPreview"
-              :key="item.id"
-              class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100"
-            >
-              <img
-                :src="item.properties?.cover_image || placeholderImg"
-                class="w-full h-36 object-cover rounded-2xl mb-4"
-              />
-              <p class="font-semibold line-clamp-1">{{ item.properties?.title }}</p>
-              <p class="text-sm text-medium-gray mt-1">
-                {{ item.properties?.property_type }} · {{ item.properties?.area || item.city }}, {{ item.city }}
-              </p>
-              <p class="text-sm mt-2">Customer: {{ maskName(item.customer?.full_name) }}</p>
-              <p class="text-sm mt-1">
-                📅 {{ formatDate(item.inspection_date || item.scheduled_date) }}
-                · ⏰ {{ item.inspection_time || item.scheduled_time || '—' }}
-              </p>
-              <span
-                class="inline-block mt-3 text-xs px-3 py-1 rounded-2xl font-medium capitalize"
-                :class="statusClass(item.status)"
-              >
-                {{ displayStatus(item.status) }}
-              </span>
-              <button
-                type="button"
-                @click="openDrawer(item)"
-                class="w-full mt-4 py-3 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl text-sm font-medium"
-              >
-                View Inspection
-              </button>
-            </div>
-          </div>
-        </div>
-
         <!-- Desktop table -->
         <div class="hidden lg:block bg-white rounded-3xl shadow-sm overflow-hidden">
           <table class="w-full">
             <thead>
               <tr class="border-b text-left text-sm text-medium-gray">
-                <th class="py-4 px-6">Inspection ID</th>
+                <th class="py-4 px-6">Inspection</th>
                 <th class="py-4 px-6">Property</th>
                 <th class="py-4 px-6">Customer</th>
-                <th class="py-4 px-6">Location</th>
-                <th class="py-4 px-6">Date</th>
-                <th class="py-4 px-6">Time</th>
+                <th class="py-4 px-6">Schedule</th>
                 <th class="py-4 px-6">Status</th>
+                <th class="py-4 px-6">Badge</th>
                 <th class="py-4 px-6 text-right">Actions</th>
               </tr>
             </thead>
@@ -178,36 +244,37 @@
                 class="hover:bg-gray-50 transition"
               >
                 <td class="py-5 px-6 font-medium text-sm">
-                  {{ item.request_code || item.id.slice(0, 8) }}
+                  {{ item.inspection_code || item.id.slice(0, 8) }}
                 </td>
                 <td class="py-5 px-6">
                   <div class="flex items-center gap-3">
                     <img
-                      :src="item.properties?.cover_image || placeholderImg"
+                      :src="item.property?.cover_image || placeholderImg"
                       class="w-12 h-12 rounded-xl object-cover"
                     />
-                    <span class="font-medium line-clamp-1">{{ item.properties?.title }}</span>
+                    <span class="font-medium line-clamp-1">{{ item.property?.title }}</span>
                   </div>
                 </td>
                 <td class="py-5 px-6 text-sm">{{ maskName(item.customer?.full_name) }}</td>
-                <td class="py-5 px-6 text-sm text-medium-gray">
-                  {{ item.properties?.area || item.city }}, {{ item.city }}
-                </td>
                 <td class="py-5 px-6 text-sm">
-                  {{ formatDate(item.inspection_date || item.scheduled_date) }}
-                </td>
-                <td class="py-5 px-6 text-sm">
-                  {{ item.inspection_time || item.scheduled_time || '—' }}
+                  {{ formatDate(item.inspection_date) }}<br />
+                  <span class="text-medium-gray">{{ item.inspection_time || '—' }}</span>
                 </td>
                 <td class="py-5 px-6">
-                  <span
-                    class="text-xs px-3 py-1.5 rounded-2xl font-medium capitalize"
-                    :class="statusClass(item.status)"
-                  >
+                  <span class="text-xs px-3 py-1.5 rounded-2xl font-medium capitalize" :class="statusClass(item.status)">
                     {{ displayStatus(item.status) }}
                   </span>
                 </td>
-                <td class="py-5 px-6 text-right space-x-2">
+                <td class="py-5 px-6">
+                  <span
+                    v-if="rowBadge(item)"
+                    class="text-[10px] px-2 py-1 rounded-full font-bold tracking-wide"
+                    :class="rowBadgeClass(item)"
+                  >
+                    {{ rowBadge(item) }}
+                  </span>
+                </td>
+                <td class="py-5 px-6 text-right">
                   <button
                     type="button"
                     @click="openDrawer(item)"
@@ -219,13 +286,9 @@
               </tr>
             </tbody>
           </table>
-
-          <div v-if="filteredInspections.length === 0" class="p-10 text-center text-medium-gray">
-            No inspections match your filters.
-          </div>
         </div>
 
-        <!-- Mobile / tablet cards -->
+        <!-- Mobile cards -->
         <div class="lg:hidden space-y-4">
           <div
             v-for="item in filteredInspections"
@@ -234,23 +297,23 @@
           >
             <div class="flex gap-4">
               <img
-                :src="item.properties?.cover_image || placeholderImg"
+                :src="item.property?.cover_image || placeholderImg"
                 class="w-20 h-20 rounded-2xl object-cover"
               />
               <div class="flex-1 min-w-0">
-                <p class="font-semibold line-clamp-1">{{ item.properties?.title }}</p>
-                <p class="text-sm text-medium-gray mt-1">
-                  {{ item.properties?.area || item.city }}, {{ item.city }}
-                </p>
+                <p class="font-semibold line-clamp-1">{{ item.property?.title }}</p>
                 <p class="text-sm mt-1">
-                  {{ formatDate(item.inspection_date || item.scheduled_date) }}
-                  · {{ item.inspection_time || item.scheduled_time || '—' }}
+                  {{ formatDate(item.inspection_date) }} · {{ item.inspection_time || '—' }}
                 </p>
-                <span
-                  class="inline-block mt-2 text-xs px-3 py-1 rounded-2xl font-medium capitalize"
-                  :class="statusClass(item.status)"
-                >
+                <span class="inline-block mt-2 text-xs px-3 py-1 rounded-2xl font-medium capitalize" :class="statusClass(item.status)">
                   {{ displayStatus(item.status) }}
+                </span>
+                <span
+                  v-if="rowBadge(item)"
+                  class="ml-2 inline-block text-[10px] px-2 py-1 rounded-full font-bold"
+                  :class="rowBadgeClass(item)"
+                >
+                  {{ rowBadge(item) }}
                 </span>
               </div>
             </div>
@@ -266,7 +329,7 @@
       </template>
     </div>
 
-    <!-- Details Drawer -->
+    <!-- ===================== DRAWER ===================== -->
     <div
       v-if="selected"
       class="fixed inset-0 z-50 bg-black/50 flex justify-end"
@@ -276,101 +339,165 @@
         <div class="sticky top-0 bg-white border-b px-6 py-5 flex items-center justify-between z-10">
           <div>
             <h2 class="text-xl font-bold text-[var(--royal-blue)]">Inspection Details</h2>
-            <p class="text-sm text-medium-gray">{{ selected.request_code || selected.id.slice(0, 8) }}</p>
+            <p class="text-sm text-medium-gray">
+              {{ selected.inspection_code || selected.id.slice(0, 8) }}
+            </p>
           </div>
           <button type="button" @click="selected = null" class="text-3xl text-gray-400">×</button>
         </div>
 
         <div class="p-6 space-y-8">
+          <!-- Status helper -->
+          <div class="rounded-2xl p-4 bg-blue-50 border border-blue-100">
+            <p class="text-sm font-semibold text-[var(--royal-blue)]">{{ statusMessage(selected).title }}</p>
+            <p class="text-sm text-medium-gray mt-1">{{ statusMessage(selected).body }}</p>
+            <p v-if="countdownText(selected)" class="mt-2 text-sm font-medium text-amber-700">
+              {{ countdownText(selected) }}
+            </p>
+          </div>
+
           <!-- Property -->
           <div>
             <img
-              :src="selected.properties?.cover_image || placeholderImg"
+              :src="selected.property?.cover_image || placeholderImg"
               class="w-full h-48 object-cover rounded-3xl mb-4"
             />
-            <h3 class="text-2xl font-semibold">{{ selected.properties?.title }}</h3>
+            <h3 class="text-2xl font-semibold">{{ selected.property?.title }}</h3>
             <p class="text-medium-gray mt-1">
-              {{ selected.properties?.property_type }} ·
-              {{ selected.properties?.area }}, {{ selected.city }}, {{ selected.state }}
+              {{ selected.property?.property_type }} ·
+              {{ selected.property?.area }}, {{ selected.city }}, {{ selected.state }}
             </p>
             <p class="text-2xl font-bold text-green-600 mt-3">
-              ₦{{ Number(selected.properties?.price || 0).toLocaleString() }}
-              <span class="text-sm font-normal text-medium-gray">/ year</span>
-            </p>
-            <div class="flex gap-6 mt-3 text-sm">
-              <span>🛏️ {{ selected.properties?.bedrooms || 0 }}</span>
-              <span>🚿 {{ selected.properties?.bathrooms || 0 }}</span>
-            </div>
-            <p v-if="selected.properties?.address" class="text-sm text-medium-gray mt-3">
-              {{ selected.properties.address }}
+              ₦{{ Number(selected.property?.price || 0).toLocaleString() }}
             </p>
           </div>
+
+          <!-- Preparation -->
+          <section class="bg-gray-50 rounded-3xl p-5 space-y-3">
+            <h4 class="font-semibold text-[var(--royal-blue)]">Inspection Preparation</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div><span class="text-medium-gray">Type</span><p class="font-medium">{{ selected.property?.property_type || '—' }}</p></div>
+              <div><span class="text-medium-gray">Beds / Baths</span><p class="font-medium">{{ selected.property?.bedrooms || 0 }} / {{ selected.property?.bathrooms || 0 }}</p></div>
+              <div class="col-span-2"><span class="text-medium-gray">Address</span><p class="font-medium">{{ fullAddress(selected) }}</p></div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-2">
+              <button type="button" @click="openMaps(selected)" class="px-4 py-2 bg-[var(--royal-blue)] text-white rounded-2xl text-sm">
+                📍 Get Directions
+              </button>
+              <button type="button" @click="copyAddress(selected)" class="px-4 py-2 border rounded-2xl text-sm">
+                Copy Address
+              </button>
+            </div>
+
+            <div v-if="selected.admin_notes" class="mt-3 p-3 bg-amber-50 rounded-2xl text-sm">
+              <p class="font-semibold text-amber-800">Admin Instructions</p>
+              <p class="mt-1 text-amber-900">{{ selected.admin_notes }}</p>
+            </div>
+          </section>
 
           <!-- Customer -->
-          <div class="bg-gray-50 rounded-3xl p-5">
+          <section class="bg-gray-50 rounded-3xl p-5">
             <p class="text-sm text-medium-gray">Customer</p>
             <p class="font-semibold mt-1">{{ maskName(selected.customer?.full_name) }}</p>
-            <p class="text-sm text-medium-gray mt-2">Managed by State Admin</p>
-          </div>
-
-          <!-- Inspection details -->
-          <div class="bg-gray-50 rounded-3xl p-5 space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-medium-gray">Status</span>
-              <span class="font-medium capitalize">{{ displayStatus(selected.status) }}</span>
+            <p class="text-sm mt-2">
+              Customer Confirmation:
+              <span class="font-medium">
+                {{ customerConfirmationLabel(selected) }}
+              </span>
+            </p>
+            <div v-if="canContactCustomer" class="flex flex-wrap gap-2 mt-3">
+              <a
+                v-if="selected.customer?.phone"
+                :href="`tel:${selected.customer.phone}`"
+                class="px-4 py-2 bg-green-600 text-white rounded-2xl text-sm"
+              >Call</a>
+              <a
+                v-if="selected.customer?.phone"
+                :href="`https://wa.me/${normalizePhone(selected.customer.phone)}`"
+                target="_blank"
+                class="px-4 py-2 bg-[#25D366] text-white rounded-2xl text-sm"
+              >WhatsApp</a>
+              <button
+                v-if="selected.customer?.phone"
+                type="button"
+                @click="copyText(selected.customer.phone, 'Phone copied')"
+                class="px-4 py-2 border rounded-2xl text-sm"
+              >Copy phone</button>
             </div>
-            <div class="flex justify-between">
-              <span class="text-medium-gray">Date</span>
-              <span class="font-medium">{{ formatDate(selected.inspection_date || selected.scheduled_date) }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-medium-gray">Time</span>
-              <span class="font-medium">{{ selected.inspection_time || selected.scheduled_time || '—' }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-medium-gray">State Admin</span>
-              <span class="font-medium">{{ selected.state }} Admin</span>
-            </div>
-            <div v-if="selected.inspection_started_at" class="flex justify-between">
-              <span class="text-medium-gray">Started</span>
-              <span class="font-medium">{{ formatDateTime(selected.inspection_started_at) }}</span>
-            </div>
-          </div>
+          </section>
 
           <!-- Timeline -->
-          <div>
-            <h4 class="font-semibold mb-4">Inspection Progress</h4>
+          <section>
+            <h4 class="font-semibold mb-4">Inspection Timeline</h4>
             <div class="space-y-3">
               <div
-                v-for="(step, i) in timelineSteps"
+                v-for="(step, i) in buildTimeline(selected)"
                 :key="i"
-                class="flex items-center gap-3 text-sm"
+                class="flex gap-3 text-sm"
               >
                 <div
                   :class="[
-                    'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold',
-                    isStepDone(step.key)
-                      ? 'bg-green-500 text-white'
-                      : isStepCurrent(step.key)
-                        ? 'bg-[var(--royal-blue)] text-white'
-                        : 'bg-gray-200 text-gray-500'
+                    'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
+                    step.done ? 'bg-green-500 text-white' : step.current ? 'bg-[var(--royal-blue)] text-white' : 'bg-gray-200 text-gray-500'
                   ]"
                 >
-                  {{ isStepDone(step.key) ? '✓' : i + 1 }}
+                  {{ step.done ? '✓' : i + 1 }}
                 </div>
-                <span :class="isStepDone(step.key) || isStepCurrent(step.key) ? 'font-medium' : 'text-medium-gray'">
-                  {{ step.label }}
-                </span>
+                <div>
+                  <p :class="step.done || step.current ? 'font-medium' : 'text-medium-gray'">{{ step.label }}</p>
+                  <p v-if="step.at" class="text-xs text-medium-gray">{{ formatDateTime(step.at) }}</p>
+                  <p v-if="step.note" class="text-xs text-medium-gray">{{ step.note }}</p>
+                </div>
               </div>
             </div>
-          </div>
+          </section>
 
           <!-- Actions -->
           <div class="space-y-3 pt-2">
+            <template v-if="selected.status === 'pending'">
+              <button type="button" @click="acceptInspection(selected)" class="w-full py-4 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold">
+                Accept Inspection
+              </button>
+              <button type="button" @click="openDecline(selected)" class="w-full py-4 bg-red-50 text-red-700 rounded-2xl font-semibold">
+                Decline Inspection
+              </button>
+            </template>
+
             <button
-              v-if="canStart(selected.status)"
+              v-if="selected.status === 'scheduled'"
               type="button"
-              @click="startInspection"
+              @click="confirmInspection(selected)"
+              class="w-full py-4 bg-green-600 text-white rounded-2xl font-semibold"
+            >
+              Confirm Inspection
+            </button>
+
+            <button
+              v-if="['accepted','scheduled','confirmed'].includes(selected.status)"
+              type="button"
+              @click="openReschedule(selected)"
+              class="w-full py-4 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl font-semibold"
+            >
+              Request Reschedule
+            </button>
+
+            <button
+              v-if="['confirmed','scheduled'].includes(selected.status) && !selected.checked_in_at"
+              type="button"
+              @click="checkIn(selected)"
+              class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-semibold"
+            >
+              Check In at Property
+            </button>
+            <p v-if="selected.checked_in_at" class="text-sm text-green-700 font-medium">
+              ✓ Checked in at {{ formatDateTime(selected.checked_in_at) }}
+            </p>
+
+            <button
+              v-if="canStart(selected)"
+              type="button"
+              @click="openStartConfirm(selected)"
               class="w-full py-4 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold"
             >
               Start Inspection
@@ -379,28 +506,36 @@
             <button
               v-if="selected.status === 'in_progress'"
               type="button"
-              @click="showCompleteModal = true"
+              @click="openReport(selected)"
               class="w-full py-4 bg-green-600 text-white rounded-2xl font-semibold"
             >
-              Complete Inspection
+              {{ hasIncompleteReport(selected) ? 'Continue / Submit Report' : 'Complete Inspection Report' }}
             </button>
 
             <button
-              v-if="['scheduled', 'confirmed', 'in_progress'].includes(selected.status)"
+              v-if="['scheduled','confirmed','in_progress'].includes(selected.status)"
               type="button"
-              @click="markNoShow"
+              @click="openNoShow(selected)"
               class="w-full py-4 bg-amber-50 text-amber-800 rounded-2xl font-semibold"
             >
-              Customer No Show
+              Report Customer No-Show
             </button>
 
             <button
-              v-if="['scheduled', 'confirmed'].includes(selected.status)"
+              v-if="['scheduled','confirmed','accepted'].includes(selected.status)"
               type="button"
-              @click="showCancelModal = true"
+              @click="openCancel(selected)"
               class="w-full py-4 bg-red-50 text-red-700 rounded-2xl font-semibold"
             >
               Cancel Inspection
+            </button>
+
+            <button
+              type="button"
+              @click="openIssue(selected)"
+              class="w-full py-4 border rounded-2xl font-medium"
+            >
+              Report an Issue
             </button>
 
             <button
@@ -415,60 +550,115 @@
       </div>
     </div>
 
-    <!-- Complete Modal -->
-    <div
-      v-if="showCompleteModal"
-      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
-    >
+    <!-- ===================== MODALS ===================== -->
+
+    <!-- Decline -->
+    <div v-if="showDeclineModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
       <div class="bg-white rounded-3xl w-full max-w-lg p-6">
-        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Complete Inspection</h3>
-
-        <label class="block text-sm font-medium mb-2">Inspection Outcome</label>
-        <select v-model="completeForm.outcome" class="w-full px-4 py-3 rounded-2xl border mb-4">
-          <option value="property_inspected">Property inspected</option>
-          <option value="customer_attended">Customer attended</option>
-          <option value="customer_did_not_attend">Customer did not attend</option>
-          <option value="property_unavailable">Property unavailable</option>
-          <option value="other">Other</option>
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Decline Inspection</h3>
+        <label class="block text-sm font-medium mb-2">Reason</label>
+        <select v-model="declineForm.reason" class="w-full px-4 py-3 rounded-2xl border mb-4">
+          <option value="">Select reason</option>
+          <option value="Scheduling conflict">Scheduling conflict</option>
+          <option value="Too far from location">Too far from location</option>
+          <option value="Unavailable">Unavailable</option>
+          <option value="Property issue">Property issue</option>
+          <option value="Customer issue">Customer issue</option>
+          <option value="Emergency">Emergency</option>
+          <option value="Other">Other</option>
         </select>
-
-        <label class="block text-sm font-medium mb-2">Inspection Notes</label>
         <textarea
-          v-model="completeForm.notes"
-          rows="4"
+          v-if="declineForm.reason === 'Other'"
+          v-model="declineForm.notes"
+          rows="3"
           class="w-full px-4 py-3 rounded-2xl border mb-4"
-          placeholder="Describe what happened during the inspection..."
+          placeholder="Please explain..."
         />
-
         <div class="flex gap-3">
+          <button type="button" @click="showDeclineModal = false" class="flex-1 py-3 border rounded-2xl">Back</button>
           <button
             type="button"
-            @click="showCompleteModal = false"
-            class="flex-1 py-3 border rounded-2xl"
+            :disabled="!declineForm.reason || saving"
+            @click="declineInspection"
+            class="flex-1 py-3 bg-red-600 text-white rounded-2xl disabled:opacity-50"
           >
-            Cancel
-          </button>
-          <button
-            type="button"
-            :disabled="completing"
-            @click="completeInspection"
-            class="flex-1 py-3 bg-green-600 text-white rounded-2xl disabled:opacity-50"
-          >
-            {{ completing ? 'Saving...' : 'Submit' }}
+            {{ saving ? 'Saving...' : 'Confirm Decline' }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Cancel Modal -->
-    <div
-      v-if="showCancelModal"
-      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
-    >
-      <div class="bg-white rounded-3xl w-full max-w-lg p-6">
-        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Cancel Inspection</h3>
+    <!-- Reschedule request -->
+    <div v-if="showRescheduleModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Request Reschedule</h3>
+        <p class="text-sm text-medium-gray mb-4">
+          Current: {{ formatDate(modalTarget?.inspection_date) }} · {{ modalTarget?.inspection_time || '—' }}
+        </p>
+        <label class="block text-sm font-medium mb-1">Proposed date</label>
+        <input v-model="rescheduleForm.date" type="date" class="w-full px-4 py-3 rounded-2xl border mb-3" />
+        <label class="block text-sm font-medium mb-1">Proposed time</label>
+        <input v-model="rescheduleForm.time" type="time" class="w-full px-4 py-3 rounded-2xl border mb-3" />
+        <label class="block text-sm font-medium mb-1">Reason</label>
+        <input v-model="rescheduleForm.reason" type="text" class="w-full px-4 py-3 rounded-2xl border mb-3" placeholder="Why do you need to reschedule?" />
+        <label class="block text-sm font-medium mb-1">Notes (optional)</label>
+        <textarea v-model="rescheduleForm.notes" rows="3" class="w-full px-4 py-3 rounded-2xl border mb-4" />
+        <div class="flex gap-3">
+          <button type="button" @click="showRescheduleModal = false" class="flex-1 py-3 border rounded-2xl">Cancel</button>
+          <button
+            type="button"
+            :disabled="!rescheduleForm.date || !rescheduleForm.time || !rescheduleForm.reason || saving"
+            @click="submitReschedule"
+            class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl disabled:opacity-50"
+          >
+            {{ saving ? 'Submitting...' : 'Submit Request' }}
+          </button>
+        </div>
+      </div>
+    </div>
 
-        <label class="block text-sm font-medium mb-2">Reason</label>
+    <!-- Start confirm -->
+    <div v-if="showStartModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Ready to Start?</h3>
+        <div class="space-y-2 text-sm mb-6">
+          <p><span class="text-medium-gray">Property:</span> {{ modalTarget?.property?.title }}</p>
+          <p><span class="text-medium-gray">Customer:</span> {{ maskName(modalTarget?.customer?.full_name) }}</p>
+          <p><span class="text-medium-gray">Scheduled:</span> {{ formatDate(modalTarget?.inspection_date) }} · {{ modalTarget?.inspection_time }}</p>
+          <p><span class="text-medium-gray">Location:</span> {{ fullAddress(modalTarget) }}</p>
+        </div>
+        <div class="flex gap-3">
+          <button type="button" @click="showStartModal = false" class="flex-1 py-3 border rounded-2xl">Back</button>
+          <button type="button" :disabled="saving" @click="startInspection" class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl">
+            {{ saving ? 'Starting...' : 'Start Inspection' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No-show -->
+    <div v-if="showNoShowModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Report Customer No-Show</h3>
+        <label class="block text-sm font-medium mb-1">Minutes waited</label>
+        <input v-model.number="noShowForm.waited" type="number" min="0" class="w-full px-4 py-3 rounded-2xl border mb-3" />
+        <label class="block text-sm font-medium mb-1">Note</label>
+        <textarea v-model="noShowForm.note" rows="3" class="w-full px-4 py-3 rounded-2xl border mb-4" placeholder="Customer did not arrive after waiting..." />
+        <div class="flex gap-3">
+          <button type="button" @click="showNoShowModal = false" class="flex-1 py-3 border rounded-2xl">Back</button>
+          <button type="button" :disabled="saving" @click="submitNoShow" class="flex-1 py-3 bg-amber-600 text-white rounded-2xl">
+            {{ saving ? 'Saving...' : 'Submit No-Show' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancel -->
+    <div v-if="showCancelModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-2">Cancel Inspection</h3>
+        <p v-if="cancelWarning" class="text-sm text-amber-700 bg-amber-50 rounded-2xl p-3 mb-4">{{ cancelWarning }}</p>
+        <label class="block text-sm font-medium mb-1">Reason</label>
         <select v-model="cancelReason" class="w-full px-4 py-3 rounded-2xl border mb-4">
           <option value="">Select reason</option>
           <option value="Scheduling conflict">Scheduling conflict</option>
@@ -477,25 +667,186 @@
           <option value="Emergency">Emergency</option>
           <option value="Other">Other</option>
         </select>
-
         <div class="flex gap-3">
+          <button type="button" @click="showCancelModal = false" class="flex-1 py-3 border rounded-2xl">Back</button>
           <button
             type="button"
-            @click="showCancelModal = false"
-            class="flex-1 py-3 border rounded-2xl"
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            :disabled="!cancelReason || cancelling"
+            :disabled="!cancelReason || saving || cancelBlocked"
             @click="cancelInspection"
             class="flex-1 py-3 bg-red-600 text-white rounded-2xl disabled:opacity-50"
           >
-            {{ cancelling ? 'Cancelling...' : 'Confirm Cancel' }}
+            {{ saving ? 'Cancelling...' : 'Confirm Cancel' }}
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Issue -->
+    <div v-if="showIssueModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Report an Issue</h3>
+        <select v-model="issueForm.type" class="w-full px-4 py-3 rounded-2xl border mb-3">
+          <option value="">Select issue</option>
+          <option value="Property unavailable">Property unavailable</option>
+          <option value="Wrong address">Wrong address</option>
+          <option value="Customer issue">Customer issue</option>
+          <option value="Safety concern">Safety concern</option>
+          <option value="Property owner unavailable">Property owner unavailable</option>
+          <option value="Access problem">Access problem</option>
+          <option value="Technical issue">Technical issue</option>
+          <option value="Other">Other</option>
+        </select>
+        <textarea v-model="issueForm.note" rows="3" class="w-full px-4 py-3 rounded-2xl border mb-4" placeholder="Details..." />
+        <div class="flex gap-3">
+          <button type="button" @click="showIssueModal = false" class="flex-1 py-3 border rounded-2xl">Back</button>
+          <button type="button" :disabled="!issueForm.type || saving" @click="submitIssue" class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl disabled:opacity-50">
+            {{ saving ? 'Sending...' : 'Submit Issue' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Inspection Report -->
+    <div v-if="showReportModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-2xl p-6 max-h-[92vh] overflow-y-auto">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-1">Inspection Report</h3>
+        <p v-if="reportForm.draftSavedAt" class="text-xs text-medium-gray mb-4">
+          Draft saved at {{ formatDateTime(reportForm.draftSavedAt) }}
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium">Inspection Outcome</label>
+            <select v-model="reportForm.outcome" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option value="property_inspected">Property inspected</option>
+              <option value="partial_inspection">Partial inspection</option>
+              <option value="could_not_access">Could not access property</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">General Condition</label>
+            <select v-model="reportForm.generalCondition" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option value="">Select</option>
+              <option value="excellent">Excellent</option>
+              <option value="good">Good</option>
+              <option value="fair">Fair</option>
+              <option value="poor">Poor</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Property Accessibility</label>
+            <select v-model="reportForm.accessibility" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option value="">Select</option>
+              <option value="accessible">Property accessible</option>
+              <option value="locked">Property locked</option>
+              <option value="no_access">Agent could not access property</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Customer Attendance</label>
+            <select v-model="reportForm.customerAttended" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option :value="true">Customer attended</option>
+              <option :value="false">Customer did not attend</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div v-for="field in conditionFields" :key="field.key">
+              <label class="text-xs font-medium">{{ field.label }}</label>
+              <select v-model="reportForm.conditions[field.key]" class="w-full px-3 py-2 rounded-xl border mt-1 text-sm">
+                <option value="">Not inspected</option>
+                <option value="good">Good</option>
+                <option value="fair">Fair</option>
+                <option value="poor">Poor</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Inspection Notes</label>
+            <textarea v-model="reportForm.notes" rows="3" class="w-full px-4 py-3 rounded-2xl border mt-1" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Agent Recommendation</label>
+            <select v-model="reportForm.recommendation" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option value="">Select</option>
+              <option value="highly_recommended">Highly Recommended</option>
+              <option value="recommended">Recommended</option>
+              <option value="neutral">Neutral</option>
+              <option value="not_recommended">Not Recommended</option>
+            </select>
+            <textarea v-model="reportForm.recommendationNotes" rows="2" class="w-full px-4 py-3 rounded-2xl border mt-2" placeholder="Recommendation notes..." />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-sm font-medium">Customer interested?</label>
+              <select v-model="reportForm.feedback.interested" class="w-full px-4 py-3 rounded-2xl border mt-1">
+                <option value="">—</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+                <option value="maybe">Maybe</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-medium">Another viewing?</label>
+              <select v-model="reportForm.feedback.anotherViewing" class="w-full px-4 py-3 rounded-2xl border mt-1">
+                <option value="">—</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+          </div>
+          <textarea v-model="reportForm.feedback.comments" rows="2" class="w-full px-4 py-3 rounded-2xl border" placeholder="Customer comments..." />
+
+          <!-- Photos -->
+          <div>
+            <label class="text-sm font-medium">Inspection Photos</label>
+            <input type="file" accept="image/*" multiple class="mt-2 block w-full text-sm" @change="onPhotosSelected" />
+            <div class="flex flex-wrap gap-2 mt-3">
+              <div v-for="(p, idx) in reportForm.photos" :key="idx" class="relative">
+                <img :src="p.preview || p.url" class="w-20 h-20 object-cover rounded-xl" />
+                <button type="button" class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs" @click="removePhoto(Number(idx))">×</button>
+              </div>
+            </div>
+            <p v-if="uploadProgress" class="text-xs text-medium-gray mt-2">{{ uploadProgress }}</p>
+          </div>
+
+          <!-- Video -->
+          <div>
+            <label class="text-sm font-medium">Inspection Video (optional)</label>
+            <input type="file" accept="video/*" class="mt-2 block w-full text-sm" @change="onVideoSelected" />
+            <div v-if="reportForm.video" class="mt-2 flex items-center gap-3">
+              <span class="text-sm truncate">{{ reportForm.video.name || 'Video attached' }}</span>
+              <button type="button" class="text-red-600 text-sm" @click="reportForm.video = null">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 mt-6">
+          <button type="button" @click="showReportModal = false" class="flex-1 py-3 border rounded-2xl">Close</button>
+          <button type="button" :disabled="saving" @click="saveDraftReport" class="flex-1 py-3 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl">
+            {{ saving ? 'Saving...' : 'Save Draft' }}
+          </button>
+          <button type="button" :disabled="saving || !canSubmitReport" @click="submitReport" class="flex-1 py-3 bg-green-600 text-white rounded-2xl disabled:opacity-50">
+            {{ saving ? 'Submitting...' : 'Submit Report' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div
+      v-if="toast"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] px-5 py-3 rounded-2xl shadow-lg text-sm font-medium"
+      :class="toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-900 text-white'"
+    >
+      {{ toast.message }}
     </div>
   </div>
 </template>
@@ -506,18 +857,12 @@ import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 
 type InspectionStatus =
-  | 'scheduled'
-  | 'confirmed'
-  | 'in_progress'
-  | 'completed'
-  | 'cancelled'
-  | 'no_show'
-  | 'approved'
-  | 'assigned'
+  | 'pending' | 'accepted' | 'declined' | 'scheduled' | 'confirmed'
+  | 'reschedule_requested' | 'in_progress' | 'completed' | 'cancelled' | 'no_show'
 
 interface InspectionRow {
   id: string
-  request_code?: string
+  inspection_code?: string
   status: InspectionStatus
   agent_id?: string
   customer_id?: string
@@ -525,67 +870,111 @@ interface InspectionRow {
   state?: string
   city?: string
   inspection_date?: string
-  scheduled_date?: string
   inspection_time?: string
-  scheduled_time?: string
+  general_condition?: string;
+  admin_notes?: string
+  agent_notes?: string
+  completion_notes?: string
+  agent_accepted_at?: string
+  agent_confirmed_at?: string
+  agent_declined_at?: string
+  agent_decline_reason?: string
+  reschedule_requested_at?: string
+  reschedule_reason?: string
+  proposed_inspection_date?: string
+  proposed_inspection_time?: string
+  checked_in_at?: string
   inspection_started_at?: string
   inspection_completed_at?: string
-  agent_notes?: string
-  admin_notes?: string
-  message?: string
-  properties?: any
-  customer?: { id: string; full_name?: string } | null
+  customer_confirmation_status?: string
+  customer_confirmed_at?: string
+  cancelled_by?: string
+  cancellation_reason?: string
+  report_draft?: any
+  report_draft_saved_at?: string
+  issue_reports?: any[]
+  property?: any
+  customer?: { id: string; full_name?: string; phone?: string } | null
 }
 
 const router = useRouter()
 const placeholderImg = 'https://via.placeholder.com/400x250?text=Property'
+const canContactCustomer = true // set from permissions if you have them
 
 const agentProfile = ref<{ city?: string; state?: string; id?: string }>({})
 const inspections = ref<InspectionRow[]>([])
 const selected = ref<InspectionRow | null>(null)
+const modalTarget = ref<InspectionRow | null>(null)
 const loading = ref(true)
+const saving = ref(false)
 const searchQuery = ref('')
 const statusFilter = ref('')
 const dateFilter = ref('')
 const activeTab = ref('all')
+const toast = ref<{ message: string; type: 'success' | 'error' } | null>(null)
+const uploadProgress = ref('')
 
-const showCompleteModal = ref(false)
+const showDeclineModal = ref(false)
+const showRescheduleModal = ref(false)
+const showStartModal = ref(false)
+const showNoShowModal = ref(false)
 const showCancelModal = ref(false)
-const completing = ref(false)
-const cancelling = ref(false)
+const showIssueModal = ref(false)
+const showReportModal = ref(false)
+
+const declineForm = ref({ reason: '', notes: '' })
+const rescheduleForm = ref({ date: '', time: '', reason: '', notes: '' })
+const noShowForm = ref({ waited: 20, note: '' })
 const cancelReason = ref('')
-const completeForm = ref({
+const issueForm = ref({ type: '', note: '' })
+
+const conditionFields = [
+  { key: 'exterior', label: 'Exterior' },
+  { key: 'interior', label: 'Interior' },
+  { key: 'living', label: 'Living area' },
+  { key: 'bedrooms', label: 'Bedrooms' },
+  { key: 'bathrooms', label: 'Bathrooms' },
+  { key: 'kitchen', label: 'Kitchen' },
+  { key: 'utilities', label: 'Utilities' },
+  { key: 'security', label: 'Security' },
+  { key: 'surroundings', label: 'Surroundings' }
+]
+
+const reportForm = ref<any>({
   outcome: 'property_inspected',
-  notes: ''
+  generalCondition: '',
+  accessibility: '',
+  customerAttended: true,
+  conditions: {},
+  notes: '',
+  recommendation: '',
+  recommendationNotes: '',
+  feedback: { interested: '', anotherViewing: '', comments: '' },
+  photos: [] as any[],
+  video: null as any,
+  draftSavedAt: null as string | null
 })
 
 let channel: ReturnType<typeof supabase.channel> | null = null
 
 const tabs = [
   { label: 'All', value: 'all' },
+  { label: 'Action Required', value: 'action' },
   { label: 'Upcoming', value: 'upcoming' },
   { label: 'Today', value: 'today' },
+  { label: 'In Progress', value: 'in_progress' },
   { label: 'Completed', value: 'completed' },
   { label: 'Cancelled', value: 'cancelled' }
 ]
 
-const inspectionStatuses = ['scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show', 'approved']
-
-const timelineSteps = [
-  { key: 'requested', label: 'Customer Request' },
-  { key: 'approved', label: 'Approved by State Admin' },
-  { key: 'assigned', label: 'Assigned to Agent' },
-  { key: 'scheduled', label: 'Inspection Scheduled' },
-  { key: 'confirmed', label: 'Confirmed' },
-  { key: 'in_progress', label: 'In Progress' },
-  { key: 'completed', label: 'Completed' }
-]
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  toast.value = { message, type }
+  setTimeout(() => { toast.value = null }, 3200)
+}
 
 const isToday = (d?: string) => {
   if (!d) return false
-  const date = new Date(d)
-  const now = new Date()
-  return date.toDateString() === now.toDateString()
+  return new Date(d).toDateString() === new Date().toDateString()
 }
 
 const isUpcomingDate = (d?: string) => {
@@ -596,75 +985,73 @@ const isUpcomingDate = (d?: string) => {
   return date >= now
 }
 
+const needsAction = (i: InspectionRow) => {
+  if (i.status === 'pending') return true
+  if (i.status === 'scheduled') return true
+  if (i.status === 'in_progress' && hasIncompleteReport(i)) return true
+  return false
+}
+
+const hasIncompleteReport = (i: InspectionRow) => {
+  if (i.status !== 'in_progress') return false
+  return !i.inspection_completed_at
+}
+
+const actionRequiredList = computed(() =>
+  inspections.value.filter(needsAction).slice(0, 6)
+)
+
 const stats = computed(() => {
   const list = inspections.value
   return {
     total: list.length,
-    upcoming: list.filter(i =>
-      isUpcomingDate(i.inspection_date || i.scheduled_date) &&
-      ['scheduled', 'confirmed', 'approved', 'in_progress'].includes(i.status)
-    ).length,
-    today: list.filter(i => isToday(i.inspection_date || i.scheduled_date)).length,
+    actionRequired: list.filter(needsAction).length,
+    today: list.filter(i => isToday(i.inspection_date)).length,
     completed: list.filter(i => i.status === 'completed').length
   }
 })
 
-const upcomingPreview = computed(() =>
-  inspections.value
-    .filter(i =>
-      isUpcomingDate(i.inspection_date || i.scheduled_date) &&
-      ['scheduled', 'confirmed', 'approved'].includes(i.status)
-    )
-    .slice(0, 3)
-)
-
 const filteredInspections = computed(() => {
   let result = [...inspections.value]
 
-  if (activeTab.value === 'upcoming') {
+  if (activeTab.value === 'action') result = result.filter(needsAction)
+  else if (activeTab.value === 'upcoming') {
     result = result.filter(i =>
-      isUpcomingDate(i.inspection_date || i.scheduled_date) &&
-      !['completed', 'cancelled', 'no_show'].includes(i.status)
+      isUpcomingDate(i.inspection_date) &&
+      !['completed', 'cancelled', 'no_show', 'declined'].includes(i.status)
     )
-  } else if (activeTab.value === 'today') {
-    result = result.filter(i => isToday(i.inspection_date || i.scheduled_date))
-  } else if (activeTab.value === 'completed') {
-    result = result.filter(i => i.status === 'completed')
-  } else if (activeTab.value === 'cancelled') {
-    result = result.filter(i => i.status === 'cancelled' || i.status === 'no_show')
+  } else if (activeTab.value === 'today') result = result.filter(i => isToday(i.inspection_date))
+  else if (activeTab.value === 'in_progress') result = result.filter(i => i.status === 'in_progress')
+  else if (activeTab.value === 'completed') result = result.filter(i => i.status === 'completed')
+  else if (activeTab.value === 'cancelled') {
+    result = result.filter(i => ['cancelled', 'no_show', 'declined'].includes(i.status))
   }
 
   if (searchQuery.value) {
     const term = searchQuery.value.toLowerCase()
     result = result.filter(i =>
-      i.properties?.title?.toLowerCase().includes(term) ||
-      i.request_code?.toLowerCase().includes(term) ||
+      i.property?.title?.toLowerCase().includes(term) ||
+      i.inspection_code?.toLowerCase().includes(term) ||
       i.city?.toLowerCase().includes(term) ||
-      i.properties?.area?.toLowerCase().includes(term) ||
+      i.property?.area?.toLowerCase().includes(term) ||
       i.customer?.full_name?.toLowerCase().includes(term)
     )
   }
 
-  if (statusFilter.value) {
-    result = result.filter(i => i.status === statusFilter.value)
-  }
+  if (statusFilter.value) result = result.filter(i => i.status === statusFilter.value)
 
   if (dateFilter.value) {
     const now = new Date()
     result = result.filter(i => {
-      const raw = i.inspection_date || i.scheduled_date
-      if (!raw) return false
-      const date = new Date(raw)
-
-      if (dateFilter.value === 'today') return isToday(raw)
+      if (!i.inspection_date) return false
+      const date = new Date(i.inspection_date)
+      if (dateFilter.value === 'today') return isToday(i.inspection_date)
       if (dateFilter.value === 'tomorrow') {
-        const t = new Date(now)
-        t.setDate(t.getDate() + 1)
+        const t = new Date(now); t.setDate(t.getDate() + 1)
         return date.toDateString() === t.toDateString()
       }
       if (dateFilter.value === 'week') {
-        const week = new Date(now)
-        week.setDate(week.getDate() + 7)
+        const week = new Date(now); week.setDate(week.getDate() + 7)
         return date >= now && date <= week
       }
       if (dateFilter.value === 'month') {
@@ -678,11 +1065,27 @@ const filteredInspections = computed(() => {
   return result
 })
 
+const emptyTitle = computed(() => {
+  if (searchQuery.value || statusFilter.value || dateFilter.value) return 'No inspections match your search'
+  if (activeTab.value === 'action') return "You're all caught up"
+  if (activeTab.value === 'upcoming') return 'No upcoming inspections'
+  if (activeTab.value === 'completed') return 'No completed inspections'
+  return 'No inspections found'
+})
+
+const emptyMessage = computed(() => {
+  if (activeTab.value === 'action') return 'No assignments need your attention right now.'
+  return 'Try adjusting filters or check back later.'
+})
+
 const statusClass = (status: string) => {
   const map: Record<string, string> = {
+    pending: 'bg-red-100 text-red-700',
+    accepted: 'bg-cyan-100 text-cyan-700',
+    declined: 'bg-gray-200 text-gray-700',
     scheduled: 'bg-purple-100 text-purple-700',
     confirmed: 'bg-green-100 text-green-700',
-    approved: 'bg-blue-100 text-blue-700',
+    reschedule_requested: 'bg-indigo-100 text-indigo-700',
     in_progress: 'bg-amber-100 text-amber-700',
     completed: 'bg-emerald-100 text-emerald-700',
     cancelled: 'bg-red-100 text-red-700',
@@ -691,73 +1094,230 @@ const statusClass = (status: string) => {
   return map[status] || 'bg-gray-100 text-gray-600'
 }
 
-const displayStatus = (status: string) => status?.replace('_', ' ') || '—'
+const displayStatus = (status: string) => status?.replace(/_/g, ' ') || '—'
+
+const actionBadge = (item: InspectionRow) => {
+  if (item.status === 'pending') return 'NEW ASSIGNMENT'
+  if (item.status === 'scheduled') return 'AWAITING CONFIRMATION'
+  if (item.status === 'in_progress') return 'REPORT INCOMPLETE'
+  return 'ACTION REQUIRED'
+}
+
+const rowBadge = (item: InspectionRow) => {
+  if (item.status === 'pending') return 'NEW ASSIGNMENT'
+  if (item.status === 'scheduled') return 'AWAITING CONFIRMATION'
+  if (item.status === 'confirmed' && item.customer_confirmation_status === 'confirmed') return 'CUSTOMER CONFIRMED'
+  if (item.status === 'reschedule_requested') return 'RESCHEDULE REQUESTED'
+  if (item.status === 'in_progress' && hasIncompleteReport(item)) return 'REPORT INCOMPLETE'
+  if (canStart(item)) return 'START NOW'
+  if (item.status === 'cancelled') {
+    if (item.cancelled_by === 'admin') return 'CANCELLED BY ADMIN'
+    if (item.cancelled_by === 'customer') return 'CANCELLED BY CUSTOMER'
+    if (item.cancelled_by === 'agent') return 'CANCELLED BY AGENT'
+  }
+  return ''
+}
+
+const rowBadgeClass = (item: InspectionRow) => {
+  const b = rowBadge(item)
+  if (b.includes('NEW') || b.includes('ACTION')) return 'bg-red-100 text-red-700'
+  if (b.includes('AWAITING')) return 'bg-purple-100 text-purple-700'
+  if (b.includes('CUSTOMER')) return 'bg-green-100 text-green-700'
+  if (b.includes('START')) return 'bg-blue-100 text-blue-700'
+  if (b.includes('REPORT')) return 'bg-amber-100 text-amber-700'
+  return 'bg-gray-100 text-gray-600'
+}
 
 const formatDate = (d?: string) => {
   if (!d) return '—'
-  return new Date(d).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  })
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 const formatDateTime = (d?: string) => {
   if (!d) return '—'
   return new Date(d).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
   })
 }
 
 const maskName = (name?: string): string => {
-  if (!name?.trim()) return 'Customer'
+  const trimmed = name?.trim()
 
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return 'Customer'
+  if (!trimmed) return 'Customer'
 
-  const first = parts[0] ?? ''
+  const parts = trimmed.split(/\s+/).filter(Boolean)
+
+  const firstName = parts[0] ?? 'Customer'
+
   if (parts.length === 1) {
-    return `${first.charAt(0)}.`
+    return `${firstName.charAt(0)}.`
   }
 
-  const last = parts[parts.length - 1] ?? ''
-  return `${first} ${last.charAt(0)}.`
+  const lastName = parts[parts.length - 1] ?? ''
+
+  return `${firstName} ${lastName.charAt(0)}.`
 }
 
-const canStart = (status: string) => ['confirmed', 'scheduled', 'approved'].includes(status)
-
-const statusOrder = ['requested', 'approved', 'assigned', 'scheduled', 'confirmed', 'in_progress', 'completed']
-
-const isStepDone = (key: string) => {
-  if (!selected.value) return false
-  const current = selected.value.status
-  if (current === 'completed') return true
-  if (current === 'cancelled' || current === 'no_show') return false
-  const currentIdx = statusOrder.indexOf(current)
-  const stepIdx = statusOrder.indexOf(key)
-  return stepIdx >= 0 && currentIdx > stepIdx
+const fullAddress = (item?: InspectionRow | null) => {
+  if (!item) return '—'
+  return [
+    item.property?.address,
+    item.property?.area,
+    item.city || item.property?.city,
+    item.state || item.property?.state
+  ].filter(Boolean).join(', ') || '—'
 }
 
-const isStepCurrent = (key: string) => selected.value?.status === key
+const normalizePhone = (phone: string) => phone.replace(/[^\d]/g, '').replace(/^0/, '234')
 
+const getInspectionDateTime = (item: InspectionRow) => {
+  if (!item.inspection_date) return null
+  const time = item.inspection_time || '09:00'
+  return new Date(`${item.inspection_date}T${time.length === 5 ? time + ':00' : time}`)
+}
+
+const countdownText = (item: InspectionRow) => {
+  const dt = getInspectionDateTime(item)
+  if (!dt || !['scheduled', 'confirmed'].includes(item.status)) return ''
+  const now = new Date()
+  const diff = dt.getTime() - now.getTime()
+  if (diff <= 0 && Math.abs(diff) < 2 * 60 * 60 * 1000) return 'Inspection Now'
+  if (isToday(item.inspection_date) && diff > 0) {
+    const mins = Math.floor(diff / 60000)
+    if (mins < 60) return `Inspection Today · Starts in ${mins} minutes`
+    const hrs = Math.floor(mins / 60)
+    return `Inspection Today · Starts in ${hrs} hr ${mins % 60} min`
+  }
+  if (diff > 0) {
+    const days = Math.floor(diff / 86400000)
+    const hrs = Math.floor((diff % 86400000) / 3600000)
+    const mins = Math.floor((diff % 3600000) / 60000)
+    return `Inspection starts in ${days}d ${hrs}h ${mins}m`
+  }
+  return ''
+}
+
+const statusMessage = (item: InspectionRow) => {
+  const map: Record<string, { title: string; body: string }> = {
+    pending: {
+      title: 'New Assignment',
+      body: 'Admin assigned this inspection to you. Accept or decline.'
+    },
+    accepted: {
+      title: 'Accepted',
+      body: 'You accepted this inspection. Waiting for final schedule confirmation if needed.'
+    },
+    scheduled: {
+      title: 'Scheduled',
+      body: 'Inspection has been scheduled. Please confirm your availability.'
+    },
+    confirmed: {
+      title: 'Confirmed',
+      body: 'You confirmed this inspection. Please attend at the scheduled date and time.'
+    },
+    reschedule_requested: {
+      title: 'Reschedule Requested',
+      body: 'Your reschedule request is with admin for review.'
+    },
+    in_progress: {
+      title: 'In Progress',
+      body: 'Inspection started. Complete and submit your report.'
+    },
+    completed: {
+      title: 'Completed',
+      body: 'Inspection report submitted.'
+    },
+    cancelled: {
+      title: item.cancelled_by === 'admin' ? 'Cancelled by Admin' :
+        item.cancelled_by === 'customer' ? 'Cancelled by Customer' : 'Cancelled by Agent',
+      body: item.cancellation_reason || 'This inspection was cancelled.'
+    },
+    no_show: {
+      title: 'Customer No-Show',
+      body: 'Customer did not attend the inspection.'
+    },
+    declined: {
+      title: 'Declined',
+      body: item.agent_decline_reason || 'You declined this assignment.'
+    }
+  }
+  return map[item.status] || { title: displayStatus(item.status), body: '' }
+}
+
+const customerConfirmationLabel = (item: InspectionRow) => {
+  if (item.customer_confirmation_status === 'confirmed') return '✓ Customer Confirmed'
+  if (item.customer_confirmation_status === 'cancelled') return '✕ Customer Cancelled'
+  return '⏳ Awaiting Customer Confirmation'
+}
+
+const canStart = (item: InspectionRow) => {
+  if (!['confirmed', 'scheduled'].includes(item.status)) return false
+  if (item.status === 'cancelled' || item.status === 'completed') return false
+  // soft window: allow same day or within 2h before
+  const dt = getInspectionDateTime(item)
+  if (!dt) return false
+  const now = new Date()
+  const earliest = new Date(dt.getTime() - 2 * 60 * 60 * 1000)
+  return now >= earliest || isToday(item.inspection_date)
+}
+
+const cancelWarning = computed(() => {
+  const item = modalTarget.value
+  if (!item) return ''
+  const dt = getInspectionDateTime(item)
+  if (!dt) return ''
+  const hours = (dt.getTime() - Date.now()) / 3600000
+  if (hours < 0) return 'Inspection time has passed. Cancellation may require State Admin approval.'
+  if (hours < 6) return 'Cancelling this inspection close to the scheduled time may require State Admin approval.'
+  return ''
+})
+
+const cancelBlocked = computed(() => {
+  const item = modalTarget.value
+  if (!item) return false
+  return item.status === 'in_progress'
+})
+
+const canSubmitReport = computed(() => {
+  return !!(
+    reportForm.value.outcome &&
+    reportForm.value.generalCondition &&
+    reportForm.value.accessibility &&
+    reportForm.value.notes
+  )
+})
+
+const buildTimeline = (item: InspectionRow) => {
+  const steps = [
+    { key: 'created', label: 'Inspection Assigned', at: (item as any).created_at, done: true, note: 'Inspection has been assigned to an agent.' },
+    { key: 'accepted', label: 'Agent Accepted', at: item.agent_accepted_at, done: !!item.agent_accepted_at, note: 'The assigned agent has accepted the inspection.' },
+    { key: 'scheduled', label: 'Inspection Scheduled', at: item.inspection_date, done: ['scheduled','confirmed','reschedule_requested','in_progress','completed'].includes(item.status), note: 'The inspection has been scheduled.' },
+    { key: 'confirmed', label: 'Agent Confirmed', at: item.agent_confirmed_at, done: !!item.agent_confirmed_at, note: 'The assigned agent has confirmed the inspection.' },
+    { key: 'customer', label: 'Customer Confirmed', at: item.customer_confirmed_at, done: item.customer_confirmation_status === 'confirmed', note: 'The customer has confirmed the inspection.' },
+    { key: 'checkin', label: 'Agent Checked In', at: item.checked_in_at, done: !!item.checked_in_at, note: 'The agent has checked in at the inspection location.' },
+    { key: 'started', label: 'Inspection Started', at: item.inspection_started_at, done: !!item.inspection_started_at, note: 'The inspection is currently underway.' },
+    { key: 'completed', label: 'Report Submitted', at: item.inspection_completed_at, done: item.status === 'completed', note: 'The inspection report has been submitted.' }
+  ]
+  return steps.map(s => ({
+    ...s,
+    current: !s.done && (
+      (s.key === 'accepted' && item.status === 'pending') ||
+      (s.key === 'confirmed' && item.status === 'scheduled') ||
+      (s.key === 'started' && item.status === 'confirmed') ||
+      (s.key === 'completed' && item.status === 'in_progress')
+    )
+  }))
+}
+
+/* ---------- data ---------- */
 const fetchAgentProfile = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
-
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('profiles')
     .select('id, full_name, city, state, role')
     .eq('id', user.id)
     .single()
-
-  if (error) {
-    console.error('Agent profile error:', error)
-    return user
-  }
-
   agentProfile.value = data || {}
   return user
 }
@@ -772,39 +1332,25 @@ const fetchInspections = async () => {
     }
 
     const { data, error } = await supabase
-      .from('property_requests')
+      .from('inspections')
       .select(`
         *,
-        properties (
+        property:properties (
           id, title, cover_image, area, city, state, address,
           price, bedrooms, bathrooms, property_type, status
+        ),
+        customer:profiles!customer_id (
+          id, full_name, phone
         )
       `)
       .eq('agent_id', user.id)
-      .in('status', inspectionStatuses)
       .order('inspection_date', { ascending: true, nullsFirst: false })
 
     if (error) throw error
-
-    const enriched: InspectionRow[] = await Promise.all(
-      (data || []).map(async (row: any) => {
-        let customer = null
-        if (row.customer_id) {
-          const { data: c } = await supabase
-            .from('profiles')
-            .select('id, full_name')
-            .eq('id', row.customer_id)
-            .maybeSingle()
-          customer = c
-        }
-        return { ...row, customer }
-      })
-    )
-
-    inspections.value = enriched
+    inspections.value = (data || []) as InspectionRow[]
   } catch (err: any) {
-    console.error('Failed to fetch inspections:', err)
-    alert(err.message || 'Failed to load inspections')
+    console.error(err)
+    showToast(err.message || 'Failed to load inspections', 'error')
   } finally {
     loading.value = false
   }
@@ -813,130 +1359,486 @@ const fetchInspections = async () => {
 const refreshData = async () => {
   await fetchInspections()
   if (selected.value) {
-    const updated = inspections.value.find(i => i.id === selected.value!.id)
-    if (updated) selected.value = updated
-    else selected.value = null
+    selected.value = inspections.value.find(i => i.id === selected.value!.id) || null
   }
 }
 
-const openDrawer = (item: InspectionRow) => {
-  selected.value = item
-}
+const openDrawer = (item: InspectionRow) => { selected.value = item }
 
 const updateInspection = async (id: string, payload: Record<string, any>) => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
   const { data, error } = await supabase
-    .from('property_requests')
-    .update({
-      ...payload,
-      updated_at: new Date().toISOString()
-    })
+    .from('inspections')
+    .update({ ...payload, updated_at: new Date().toISOString() })
     .eq('id', id)
     .eq('agent_id', user.id)
-    .select()
+    .select(`
+      *,
+      property:properties (
+        id, title, cover_image, area, city, state, address,
+        price, bedrooms, bathrooms, property_type, status
+      ),
+      customer:profiles!customer_id (id, full_name, phone)
+    `)
     .maybeSingle()
 
   if (error) throw error
-  return data
+  return data as InspectionRow
+}
+
+const applyLocalUpdate = (data: InspectionRow | null) => {
+  if (!data) return
+  const idx = inspections.value.findIndex(i => i.id === data.id)
+  if (idx !== -1) inspections.value[idx] = { ...inspections.value[idx], ...data }
+  if (selected.value?.id === data.id) selected.value = { ...selected.value, ...data }
+}
+
+const notify = async (userId: string | undefined, title: string, body: string, relatedId: string) => {
+  if (!userId) return
+  try {
+    await supabase.from('notifications').insert({
+      user_id: userId,
+      title,
+      body,
+      type: 'inspection',
+      related_id: relatedId,
+      related_table: 'inspections'
+    })
+  } catch (e) {
+    console.warn('Notification skipped', e)
+  }
+}
+
+/* ---------- actions ---------- */
+const acceptInspection = async (item: InspectionRow) => {
+  saving.value = true
+  try {
+    const data = await updateInspection(item.id, {
+      status: 'accepted',
+      agent_accepted_at: new Date().toISOString(),
+      agent_response_at: new Date().toISOString()
+    })
+    applyLocalUpdate(data)
+    showToast('Inspection accepted successfully.')
+    await fetchInspections()
+  } catch (e: any) {
+    showToast(e.message || 'Failed to accept', 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+const openDecline = (item: InspectionRow) => {
+  modalTarget.value = item
+  declineForm.value = { reason: '', notes: '' }
+  showDeclineModal.value = true
+}
+
+const declineInspection = async () => {
+  if (!modalTarget.value || !declineForm.value.reason) return
+  saving.value = true
+  try {
+    const reason = declineForm.value.reason === 'Other'
+      ? declineForm.value.notes || 'Other'
+      : declineForm.value.reason
+
+    const data = await updateInspection(modalTarget.value.id, {
+      status: 'declined',
+      agent_declined_at: new Date().toISOString(),
+      agent_response_at: new Date().toISOString(),
+      agent_decline_reason: reason
+    })
+    applyLocalUpdate(data)
+    showDeclineModal.value = false
+    showToast('Inspection declined. Admin has been notified.')
+    await fetchInspections()
+  } catch (e: any) {
+    showToast(e.message || 'Failed to decline', 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+const confirmInspection = async (item: InspectionRow) => {
+  saving.value = true
+  try {
+    const data = await updateInspection(item.id, {
+      status: 'confirmed',
+      agent_confirmed_at: new Date().toISOString()
+    })
+    applyLocalUpdate(data)
+    showToast('Inspection confirmed. Customer and admin have been notified.')
+    await fetchInspections()
+  } catch (e: any) {
+    showToast(e.message || 'Failed to confirm', 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+const openReschedule = (item: InspectionRow) => {
+  modalTarget.value = item
+  rescheduleForm.value = { date: '', time: '', reason: '', notes: '' }
+  showRescheduleModal.value = true
+}
+
+const submitReschedule = async () => {
+  if (!modalTarget.value) return
+  saving.value = true
+  try {
+    const data = await updateInspection(modalTarget.value.id, {
+      status: 'reschedule_requested',
+      reschedule_requested_at: new Date().toISOString(),
+      reschedule_reason: rescheduleForm.value.reason,
+      proposed_inspection_date: rescheduleForm.value.date,
+      proposed_inspection_time: rescheduleForm.value.time,
+      reschedule_notes: rescheduleForm.value.notes
+    })
+    applyLocalUpdate(data)
+    showRescheduleModal.value = false
+    showToast('Reschedule request submitted to admin.')
+    await fetchInspections()
+  } catch (e: any) {
+    showToast(e.message || 'Failed to request reschedule', 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+const checkIn = async (item: InspectionRow) => {
+  saving.value = true
+  try {
+    let lat: number | null = null
+    let lng: number | null = null
+    if (navigator.geolocation) {
+      try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 })
+        )
+        lat = pos.coords.latitude
+        lng = pos.coords.longitude
+      } catch { /* optional */ }
+    }
+    const data = await updateInspection(item.id, {
+      checked_in_at: new Date().toISOString(),
+      check_in_latitude: lat,
+      check_in_longitude: lng
+    })
+    applyLocalUpdate(data)
+    showToast('Checked in at property.')
+  } catch (e: any) {
+    showToast(e.message || 'Check-in failed', 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+const openStartConfirm = (item: InspectionRow) => {
+  modalTarget.value = item
+  showStartModal.value = true
 }
 
 const startInspection = async () => {
-  if (!selected.value) return
-  if (!confirm('Start this inspection now?')) return
-
+  if (!modalTarget.value) return
+  saving.value = true
   try {
-    const data = await updateInspection(selected.value.id, {
+    const data = await updateInspection(modalTarget.value.id, {
       status: 'in_progress',
       inspection_started_at: new Date().toISOString()
     })
-    if (data) selected.value = { ...selected.value, ...data }
+    applyLocalUpdate(data)
+    showStartModal.value = false
+    showToast('Inspection started')
     await fetchInspections()
-    alert('Inspection started')
-  } catch (err: any) {
-    console.error(err)
-    alert(err.message || 'Failed to start inspection')
-  }
-}
-
-const completeInspection = async () => {
-  if (!selected.value) return
-  completing.value = true
-  try {
-    const notes = [
-      `Outcome: ${completeForm.value.outcome}`,
-      completeForm.value.notes ? `Notes: ${completeForm.value.notes}` : ''
-    ].filter(Boolean).join('\n')
-
-    const data = await updateInspection(selected.value.id, {
-      status: 'completed',
-      inspection_completed_at: new Date().toISOString(),
-      agent_notes: notes
-    })
-
-    if (data) selected.value = { ...selected.value, ...data }
-    showCompleteModal.value = false
-    completeForm.value = { outcome: 'property_inspected', notes: '' }
-    await fetchInspections()
-    alert('Inspection completed successfully.')
-  } catch (err: any) {
-    console.error(err)
-    alert(err.message || 'Failed to complete inspection')
+  } catch (e: any) {
+    showToast(e.message || 'Failed to start', 'error')
   } finally {
-    completing.value = false
+    saving.value = false
   }
 }
 
-const markNoShow = async () => {
-  if (!selected.value) return
-  if (!confirm('Mark this inspection as Customer No Show?')) return
-  const note = prompt('Optional note:') || 'Customer did not attend'
+const openNoShow = (item: InspectionRow) => {
+  modalTarget.value = item
+  noShowForm.value = { waited: 20, note: '' }
+  showNoShowModal.value = true
+}
 
+const submitNoShow = async () => {
+  if (!modalTarget.value) return
+  saving.value = true
   try {
-    const data = await updateInspection(selected.value.id, {
+    const data = await updateInspection(modalTarget.value.id, {
       status: 'no_show',
-      agent_notes: note
+      no_show_at: new Date().toISOString(),
+      waiting_duration_minutes: noShowForm.value.waited,
+      no_show_reason: noShowForm.value.note || `Customer did not arrive after waiting ${noShowForm.value.waited} minutes.`,
+      agent_notes: noShowForm.value.note
     })
-    if (data) selected.value = { ...selected.value, ...data }
+    applyLocalUpdate(data)
+    showNoShowModal.value = false
+    showToast('No-show reported. Admin notified.')
     await fetchInspections()
-    alert('Marked as No Show')
-  } catch (err: any) {
-    console.error(err)
-    alert(err.message || 'Failed to update status')
+  } catch (e: any) {
+    showToast(e.message || 'Failed', 'error')
+  } finally {
+    saving.value = false
   }
+}
+
+const openCancel = (item: InspectionRow) => {
+  modalTarget.value = item
+  cancelReason.value = ''
+  showCancelModal.value = true
 }
 
 const cancelInspection = async () => {
-  if (!selected.value || !cancelReason.value) return
-  cancelling.value = true
+  if (!modalTarget.value || !cancelReason.value || cancelBlocked.value) return
+  saving.value = true
   try {
-    const data = await updateInspection(selected.value.id, {
+    const data = await updateInspection(modalTarget.value.id, {
       status: 'cancelled',
-      admin_notes: `Agent cancelled: ${cancelReason.value}`
+      cancelled_by: 'agent',
+      cancellation_reason: cancelReason.value,
+      cancelled_at: new Date().toISOString()
     })
-    if (data) selected.value = { ...selected.value, ...data }
+    applyLocalUpdate(data)
     showCancelModal.value = false
-    cancelReason.value = ''
+    showToast('Inspection cancelled')
     await fetchInspections()
-    alert('Inspection cancelled')
-  } catch (err: any) {
-    console.error(err)
-    alert(err.message || 'Failed to cancel inspection')
+  } catch (e: any) {
+    showToast(e.message || 'Failed to cancel', 'error')
   } finally {
-    cancelling.value = false
+    saving.value = false
   }
 }
 
+const openIssue = (item: InspectionRow) => {
+  modalTarget.value = item
+  issueForm.value = { type: '', note: '' }
+  showIssueModal.value = true
+}
+
+const submitIssue = async () => {
+  if (!modalTarget.value || !issueForm.value.type) return
+  saving.value = true
+  try {
+    const existing = modalTarget.value.issue_reports || []
+    const report = {
+      type: issueForm.value.type,
+      note: issueForm.value.note,
+      at: new Date().toISOString()
+    }
+    const data = await updateInspection(modalTarget.value.id, {
+      issue_reports: [...existing, report]
+    })
+    applyLocalUpdate(data)
+    showIssueModal.value = false
+    showToast('Issue reported to admin.')
+  } catch (e: any) {
+    showToast(e.message || 'Failed to report issue', 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+/* report */
+const openReport = (item: InspectionRow) => {
+  modalTarget.value = item
+  const draft = item.report_draft || {}
+  reportForm.value = {
+    outcome: draft.outcome || 'property_inspected',
+    generalCondition: draft.generalCondition || item.general_condition || '',
+    accessibility: draft.accessibility || '',
+    customerAttended: draft.customerAttended ?? true,
+    conditions: draft.conditions || {},
+    notes: draft.notes || '',
+    recommendation: draft.recommendation || '',
+    recommendationNotes: draft.recommendationNotes || '',
+    feedback: draft.feedback || { interested: '', anotherViewing: '', comments: '' },
+    photos: draft.photos || [],
+    video: draft.video || null,
+    draftSavedAt: item.report_draft_saved_at || null
+  }
+  showReportModal.value = true
+}
+
+const compressImage = async (file: File, maxWidth = 1600, quality = 0.72): Promise<Blob> => {
+  const bitmap = await createImageBitmap(file)
+  const scale = Math.min(1, maxWidth / bitmap.width)
+  const canvas = document.createElement('canvas')
+  canvas.width = bitmap.width * scale
+  canvas.height = bitmap.height * scale
+  const ctx = canvas.getContext('2d')!
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+  return await new Promise((resolve) => canvas.toBlob(b => resolve(b as Blob), 'image/jpeg', quality))
+}
+
+const onPhotosSelected = async (e: Event) => {
+  const input = e.target as HTMLInputElement
+  const files = Array.from(input.files || [])
+  for (const file of files) {
+    if (file.size > 8 * 1024 * 1024) {
+      showToast(`${file.name} is too large (max 8MB)`, 'error')
+      continue
+    }
+    const preview = URL.createObjectURL(file)
+    reportForm.value.photos.push({ file, preview, category: 'other' })
+  }
+  input.value = ''
+}
+
+const removePhoto = (idx: number) => {
+  reportForm.value.photos.splice(idx, 1)
+}
+
+const onVideoSelected = (e: Event) => {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  if (file.size > 40 * 1024 * 1024) {
+    showToast('Video too large (max 40MB)', 'error')
+    return
+  }
+  reportForm.value.video = file
+}
+
+const uploadMedia = async (inspectionId: string, agentId: string) => {
+  const urls: { type: string; url: string; path: string; category: string }[] = []
+  let i = 0
+  for (const photo of reportForm.value.photos) {
+    if (photo.url) {
+      urls.push({ type: 'photo', url: photo.url, path: photo.path || '', category: photo.category || 'other' })
+      continue
+    }
+    i++
+    uploadProgress.value = `Uploading photo ${i}/${reportForm.value.photos.length}...`
+    const blob = await compressImage(photo.file)
+    const path = `${agentId}/${inspectionId}/photo-${Date.now()}-${i}.jpg`
+    const { error } = await supabase.storage.from('inspection-evidence').upload(path, blob, {
+      contentType: 'image/jpeg',
+      upsert: false
+    })
+    if (error) throw error
+    const { data: pub } = supabase.storage.from('inspection-evidence').getPublicUrl(path)
+    // if bucket is private, store path and signed URLs later
+    urls.push({ type: 'photo', url: pub.publicUrl || path, path, category: photo.category || 'other' })
+  }
+
+  if (reportForm.value.video && reportForm.value.video instanceof File) {
+    uploadProgress.value = 'Uploading video...'
+    const path = `${agentId}/${inspectionId}/video-${Date.now()}.mp4`
+    const { error } = await supabase.storage.from('inspection-evidence').upload(path, reportForm.value.video, {
+      contentType: reportForm.value.video.type || 'video/mp4',
+      upsert: false
+    })
+    if (error) throw error
+    const { data: pub } = supabase.storage.from('inspection-evidence').getPublicUrl(path)
+    urls.push({ type: 'video', url: pub.publicUrl || path, path, category: 'video' })
+  }
+
+  uploadProgress.value = ''
+  return urls
+}
+
+const saveDraftReport = async () => {
+  if (!modalTarget.value) return
+  saving.value = true
+  try {
+    const draft = { ...reportForm.value, photos: reportForm.value.photos.map((p: any) => ({
+      url: p.url, path: p.path, category: p.category, preview: undefined, file: undefined
+    })) }
+    const now = new Date().toISOString()
+    const data = await updateInspection(modalTarget.value.id, {
+      report_draft: draft,
+      report_draft_saved_at: now
+    })
+    applyLocalUpdate(data)
+    reportForm.value.draftSavedAt = now
+    showToast(`Draft saved at ${formatDateTime(now)}`)
+  } catch (e: any) {
+    showToast(e.message || 'Failed to save draft', 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+const submitReport = async () => {
+  if (!modalTarget.value || !canSubmitReport.value) return
+  saving.value = true
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const media = await uploadMedia(modalTarget.value.id, user.id)
+
+    // persist media rows
+    if (media.length) {
+      await supabase.from('inspection_media').insert(
+        media.map(m => ({
+          inspection_id: modalTarget.value!.id,
+          agent_id: user.id,
+          media_type: m.type,
+          category: m.category,
+          url: m.url,
+          storage_path: m.path
+        }))
+      )
+    }
+
+    const data = await updateInspection(modalTarget.value.id, {
+      status: 'completed',
+      inspection_completed_at: new Date().toISOString(),
+      inspection_outcome: reportForm.value.outcome,
+      general_condition: reportForm.value.generalCondition,
+      property_accessibility: reportForm.value.accessibility,
+      customer_attended: reportForm.value.customerAttended,
+      condition_details: reportForm.value.conditions,
+      agent_recommendation: reportForm.value.recommendation,
+      agent_recommendation_notes: reportForm.value.recommendationNotes,
+      customer_feedback: reportForm.value.feedback,
+      agent_notes: reportForm.value.notes,
+      completion_notes: reportForm.value.notes,
+      report_draft: null,
+      report_draft_saved_at: null
+    })
+    applyLocalUpdate(data)
+    showReportModal.value = false
+    showToast('Inspection report submitted.')
+    await fetchInspections()
+  } catch (e: any) {
+    showToast(e.message || 'Failed to submit report', 'error')
+  } finally {
+    saving.value = false
+    uploadProgress.value = ''
+  }
+}
+
+const openMaps = (item: InspectionRow) => {
+  const q = encodeURIComponent(fullAddress(item))
+  window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank')
+}
+
+const copyText = async (text: string, msg: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    showToast(msg)
+  } catch {
+    showToast('Copy failed', 'error')
+  }
+}
+
+const copyAddress = (item: InspectionRow) => copyText(fullAddress(item), 'Address copied')
+
 const openProperty = () => {
-  const id = selected.value?.properties?.id || selected.value?.property_id
+  const id = selected.value?.property?.id || selected.value?.property_id
   if (id) router.push(`/agent/properties/${id}`)
 }
 
 const setupRealtime = async () => {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session?.user) return
-
   if (channel) await supabase.removeChannel(channel)
 
   channel = supabase
@@ -946,18 +1848,12 @@ const setupRealtime = async () => {
       {
         event: '*',
         schema: 'public',
-        table: 'property_requests'
+        table: 'inspections',
+        filter: `agent_id=eq.${session.user.id}`
       },
-      (payload) => {
-        const row: any = payload.new || payload.old
-        if (row?.agent_id === session.user.id) {
-          refreshData()
-        }
-      }
+      async () => { await refreshData() }
     )
-    .subscribe((status, err) => {
-      console.log('Inspections realtime:', status, err)
-    })
+    .subscribe()
 }
 
 onMounted(async () => {
@@ -965,7 +1861,7 @@ onMounted(async () => {
   await setupRealtime()
 })
 
-onUnmounted(() => {
-  if (channel) supabase.removeChannel(channel)
+onUnmounted(async () => {
+  if (channel) await supabase.removeChannel(channel)
 })
 </script>

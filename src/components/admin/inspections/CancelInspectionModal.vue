@@ -1,7 +1,6 @@
 <template>
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
     <div class="bg-white rounded-3xl w-full max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl">
-      <!-- Header -->
       <div class="sticky top-0 bg-white border-b px-6 py-5 flex items-center justify-between z-10">
         <div>
           <h3 class="text-xl font-bold text-red-600">Cancel Inspection</h3>
@@ -9,41 +8,29 @@
             {{ inspection.inspection_code || 'Inspection' }}
           </p>
         </div>
-        <button @click="$emit('close')" class="text-2xl text-gray-400 hover:text-gray-600">×</button>
+        <button type="button" @click="$emit('close')" class="text-2xl text-gray-400 hover:text-gray-600">×</button>
       </div>
 
       <div class="p-6 space-y-6">
-        <!-- Inspection Summary -->
         <div class="bg-gray-50 rounded-3xl p-4 text-sm space-y-1">
           <p class="font-semibold text-[var(--royal-blue)] mb-2">Inspection Summary</p>
-          <p>
-            <span class="text-medium-gray">Customer:</span>
-            {{ inspection.customer?.full_name || 'N/A' }}
-          </p>
-          <p>
-            <span class="text-medium-gray">Property:</span>
-            {{ inspection.property?.title || 'N/A' }}
-          </p>
+          <p><span class="text-medium-gray">Customer:</span> {{ inspection.customer?.full_name || 'N/A' }}</p>
+          <p><span class="text-medium-gray">Property:</span> {{ inspection.property?.title || 'N/A' }}</p>
           <p>
             <span class="text-medium-gray">Date:</span>
             {{ formatDate(inspection.inspection_date) }} at {{ inspection.inspection_time || '—' }}
           </p>
-          <p>
-            <span class="text-medium-gray">Agent:</span>
-            {{ inspection.agent?.full_name || 'Not assigned' }}
-          </p>
+          <p><span class="text-medium-gray">Agent:</span> {{ inspection.agent?.full_name || 'Not assigned' }}</p>
           <p>
             <span class="text-medium-gray">Current Status:</span>
             <span class="capitalize">{{ inspection.status || '—' }}</span>
           </p>
         </div>
 
-        <!-- Cancellation Reason -->
         <div>
           <label class="block text-sm font-medium text-[var(--royal-blue)] mb-2">
             Cancellation Reason
           </label>
-
           <div class="space-y-3">
             <button
               v-for="option in reasonOptions"
@@ -62,20 +49,16 @@
           </div>
         </div>
 
-        <!-- Custom Reason -->
         <div v-if="form.reason === 'Other'">
-          <label class="block text-sm font-medium text-[var(--royal-blue)] mb-2">
-            Custom Reason
-          </label>
+          <label class="block text-sm font-medium text-[var(--royal-blue)] mb-2">Custom Reason</label>
           <textarea
             v-model="form.custom_reason"
             rows="3"
             placeholder="Enter the cancellation reason..."
-            class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)] outline-none resize-none"
+            class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] outline-none resize-none"
           ></textarea>
         </div>
 
-        <!-- Additional Notes -->
         <div>
           <label class="block text-sm font-medium text-[var(--royal-blue)] mb-2">
             Additional Notes (Optional)
@@ -83,65 +66,37 @@
           <textarea
             v-model="form.notes"
             rows="3"
-            placeholder="Any extra details about this cancellation..."
-            class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)] outline-none resize-none"
+            placeholder="Any extra details..."
+            class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] outline-none resize-none"
           ></textarea>
         </div>
 
-        <!-- Notify Options -->
         <div class="space-y-3">
           <label class="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              v-model="form.notify_customer"
-              class="accent-[var(--royal-blue)] w-4 h-4"
-            />
+            <input type="checkbox" v-model="form.notify_customer" class="accent-[var(--royal-blue)] w-4 h-4" />
             <span class="text-sm text-[var(--royal-blue)]">Notify customer</span>
           </label>
-
           <label class="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              v-model="form.notify_agent"
-              class="accent-[var(--royal-blue)] w-4 h-4"
-            />
+            <input type="checkbox" v-model="form.notify_agent" class="accent-[var(--royal-blue)] w-4 h-4" />
             <span class="text-sm text-[var(--royal-blue)]">Notify assigned agent</span>
           </label>
         </div>
 
-        <!-- Warning -->
         <div class="bg-red-50 border border-red-100 rounded-3xl p-4 text-sm text-red-700">
-          This will mark the inspection as <strong>cancelled</strong>.  
-          This action can be tracked in history, but should only be used when the inspection will not hold.
-        </div>
-
-        <!-- Final Summary -->
-        <div class="bg-[var(--light-blue)] rounded-3xl p-4 text-sm space-y-1">
-          <p class="font-semibold text-[var(--royal-blue)] mb-2">Cancellation Summary</p>
-          <p>
-            <span class="text-medium-gray">Reason:</span>
-            {{ finalReason || '—' }}
-          </p>
-          <p>
-            <span class="text-medium-gray">Notify Customer:</span>
-            {{ form.notify_customer ? 'Yes' : 'No' }}
-          </p>
-          <p>
-            <span class="text-medium-gray">Notify Agent:</span>
-            {{ form.notify_agent ? 'Yes' : 'No' }}
-          </p>
+          This will mark the inspection as <strong>cancelled by admin</strong>.
         </div>
       </div>
 
-      <!-- Footer -->
       <div class="sticky bottom-0 bg-white border-t px-6 py-5 flex gap-3">
         <button
+          type="button"
           @click="$emit('close')"
           class="flex-1 py-3.5 border border-gray-200 rounded-2xl hover:bg-gray-50"
         >
           Keep Inspection
         </button>
         <button
+          type="button"
           @click="cancelInspection"
           :disabled="!canSubmit || saving"
           class="flex-1 py-3.5 bg-red-500 text-white rounded-2xl font-medium hover:bg-red-600 disabled:opacity-50"
@@ -158,14 +113,10 @@ import { ref, computed } from 'vue'
 import { supabase } from '@/supabaseClient'
 
 const props = defineProps({
-  inspection: {
-    type: Object,
-    required: true
-  }
+  inspection: { type: Object, required: true }
 })
 
 const emit = defineEmits(['close', 'cancelled'])
-
 const saving = ref(false)
 
 const reasonOptions = [
@@ -185,9 +136,7 @@ const form = ref({
 })
 
 const finalReason = computed(() => {
-  if (form.value.reason === 'Other') {
-    return form.value.custom_reason.trim() || 'Other'
-  }
+  if (form.value.reason === 'Other') return form.value.custom_reason.trim() || 'Other'
   return form.value.reason
 })
 
@@ -208,15 +157,17 @@ const formatDate = (date) => {
 
 const cancelInspection = async () => {
   if (!canSubmit.value) return
-
   saving.value = true
+
   try {
     const reasonText = finalReason.value
 
     const updatePayload = {
       status: 'cancelled',
+      cancelled_by: 'admin',
       cancellation_reason: reasonText,
       cancelled_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       admin_notes: [
         props.inspection.admin_notes,
         form.value.notes ? `Cancellation note: ${form.value.notes}` : null
@@ -230,23 +181,25 @@ const cancelInspection = async () => {
 
     if (error) throw error
 
-    // Notify customer
     if (form.value.notify_customer && props.inspection.customer_id) {
       await supabase.from('notifications').insert({
         user_id: props.inspection.customer_id,
         title: 'Inspection Cancelled',
         message: `Your inspection for ${props.inspection.property?.title || 'the property'} has been cancelled. Reason: ${reasonText}`,
-        type: 'inspection'
+        type: 'inspection',
+        related_id: props.inspection.id,
+        related_table: 'inspections'
       })
     }
 
-    // Notify agent
     if (form.value.notify_agent && props.inspection.agent_id) {
       await supabase.from('notifications').insert({
         user_id: props.inspection.agent_id,
         title: 'Inspection Cancelled',
         message: `The inspection for ${props.inspection.property?.title || 'a property'} has been cancelled. Reason: ${reasonText}`,
-        type: 'inspection'
+        type: 'inspection',
+        related_id: props.inspection.id,
+        related_table: 'inspections'
       })
     }
 
