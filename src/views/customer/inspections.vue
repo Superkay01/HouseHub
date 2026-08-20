@@ -782,21 +782,38 @@ const drawerMedia = ref([])
 const drawerMediaLoading = ref(false)
 
 const drawerPhotos = computed(() =>
-  drawerMedia.value.filter((m) => m.media_type === 'photo')
+  drawerMedia.value.filter((m) => m.media_type === 'photo' && m.displayUrl)
 )
 const drawerVideos = computed(() =>
-  drawerMedia.value.filter((m) => m.media_type === 'video')
+  drawerMedia.value.filter((m) => m.media_type === 'video' && m.displayUrl)
 )
 
 const resolveMediaUrl = async (item) => {
-  if (item.url && String(item.url).startsWith('http')) return item.url
-  if (!item.storage_path) return item.url || null
+  // 1. Prefer existing public URL
+  if (item.url && String(item.url).startsWith('http')) {
+    return item.url
+  }
 
-  const { data } = await supabase.storage
-    .from('inspection-evidence')
-    .createSignedUrl(item.storage_path, 3600)
+  // 2. Build public URL from storage_path
+  if (item.storage_path) {
+    const publicUrl =
+      `https://kmkcrttmchdvnpggqwey.supabase.co/storage/v1/object/public/inspection-evidence/${item.storage_path}`
 
-  return data?.signedUrl || item.url || null
+    // 3. Also try signed URL as fallback (works if bucket is private)
+    try {
+      const { data } = await supabase.storage
+        .from('inspection-evidence')
+        .createSignedUrl(item.storage_path, 3600)
+
+      if (data?.signedUrl) return data.signedUrl
+    } catch (e) {
+      console.warn('Signed URL failed, using public URL', e)
+    }
+
+    return publicUrl
+  }
+
+  return null
 }
 
 const loadDrawerMedia = async (inspectionId) => {
@@ -811,15 +828,22 @@ const loadDrawerMedia = async (inspectionId) => {
       .eq('inspection_id', inspectionId)
       .order('created_at', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+      console.error('Media fetch error:', error)
+      throw error
+    }
+
+    console.log('Raw media rows:', data)
 
     const withUrls = await Promise.all(
-      (data || []).map(async (item) => ({
-        ...item,
-        displayUrl: await resolveMediaUrl(item)
-      }))
+      (data || []).map(async (item) => {
+        const displayUrl = await resolveMediaUrl(item)
+        return { ...item, displayUrl }
+      })
     )
-    drawerMedia.value = withUrls.filter((m) => m.displayUrl)
+
+    console.log('Media with URLs:', withUrls)
+    drawerMedia.value = withUrls.filter((m) => !!m.displayUrl)
   } catch (err) {
     console.error(err)
     drawerMedia.value = []
@@ -827,6 +851,14 @@ const loadDrawerMedia = async (inspectionId) => {
     drawerMediaLoading.value = false
   }
 }
+
+watch(
+  () => selectedInspection.value?.id,
+  (id) => {
+    if (id) loadDrawerMedia(id)
+    else drawerMedia.value = []
+  }
+)
 
 watch(
   () => selectedInspection.value?.id,

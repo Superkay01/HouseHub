@@ -50,11 +50,11 @@
         <div class="flex flex-wrap justify-center gap-3 mt-8">
           <button
             v-for="area in quickAreas"
-            :key="area"
+            :key="`${area.city}-${area.name}`"
             @click="selectQuickArea(area)"
             class="bg-white/20 hover:bg-white/30 text-white px-5 py-2 rounded-full text-sm backdrop-blur-md transition-all"
           >
-            {{ area }}
+            {{ area.name }}
           </button>
         </div>
       </div>
@@ -63,20 +63,20 @@
     <div class="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
       <div class="flex gap-8">
         <!-- Filters Sidebar -->
-        <div class="w-60 hidden lg:block">
+        <!-- <div class="w-60 hidden lg:block">
           <PropertyFilters
             v-model="filters"
             @change="fetchProperties"
           />
-        </div>
+        </div> -->
 
         <!-- Main Content -->
-        <div class="flex-1">
+        <div class="">
           <div class="flex items-center justify-between mb-8">
             <p class="text-2xl font-semibold text-gray-900 border border-[var(--steel-blue)] rounded-2xl px-6 py-3 focus:outline-none focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20 bg-white text-sm font-medium">
               <span class="font-bold text-[var(--royal-blue)]">
                 {{ properties.length }}
-              </span> 
+              </span>
               properties found
             </p>
 
@@ -106,13 +106,13 @@
     </div>
 
     <!-- Mobile Filter Button -->
-    <MobileFiltersButton 
+    <MobileFiltersButton
       :filters="filters"
       @open="showMobileFilters = true"
     />
 
     <!-- Mobile Filter Modal -->
-    <MobilePropertyFilter 
+    <MobilePropertyFilter
       v-if="showMobileFilters"
       @close="showMobileFilters = false"
       @apply="applyMobileFilters"
@@ -121,26 +121,68 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
-import { supabase } from '@/supabaseClient.js';
-import { Search } from 'lucide-vue-next';
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+import { supabase } from '@/supabaseClient.js'
+import { Search } from 'lucide-vue-next'
 
-import PropertyFilters from '@/components/customer/properties/PropertyFilters.vue';
-import PropertyGrid from '@/components/customer/properties/PropertyGrid.vue';
-import EmptyProperties from '@/components/customer/properties/EmptyProperties.vue';
-import MobileFiltersButton from '@/components/customer/properties/MobileFiltersButton.vue';
-import MobilePropertyFilter from '@/components/customer/properties/MobilePropertyFilter.vue';
+// import PropertyFilters from '@/components/customer/properties/PropertyFilters.vue'
+import PropertyGrid from '@/components/customer/properties/PropertyGrid.vue'
+import EmptyProperties from '@/components/customer/properties/EmptyProperties.vue'
+// import MobileFiltersButton from '@/components/customer/properties/MobileFiltersButton.vue'
+// import MobilePropertyFilter from '@/components/customer/properties/MobilePropertyFilter.vue'
 
-const router = useRouter();
+const router = useRouter()
 
-const searchQuery = ref('');
-const sortBy = ref('newest');
-const loading = ref(false);
-const properties = ref<any[]>([]);
-const showMobileFilters = ref(false);
+const searchQuery = ref('')
+const sortBy = ref('newest')
+const loading = ref(false)
+const properties = ref<any[]>([])
+const showMobileFilters = ref(false)
 
-const quickAreas = ['Tanke', 'Fate', 'GRA', 'Oke-Ose', 'Oke-Aje', 'Molipa'];
+const quickAreas = [
+  // Ilorin
+  { name: 'Tanke', city: 'Ilorin' },
+  { name: 'Fate', city: 'Ilorin' },
+  { name: 'GRA', city: 'Ilorin' },
+  { name: 'Oke-Ose', city: 'Ilorin' },
+  { name: 'Adewole', city: 'Ilorin' },
+  { name: 'Basin', city: 'Ilorin' },
+  { name: 'Gambari', city: 'Ilorin' },
+  { name: 'Oko-Erin', city: 'Ilorin' },
+  { name: 'Pakata', city: 'Ilorin' },
+  { name: 'Sabo-Oke', city: 'Ilorin' },
+  { name: 'Surulere', city: 'Ilorin' },
+  { name: 'Taiwo', city: 'Ilorin' },
+  { name: 'Unity', city: 'Ilorin' },
+  { name: 'Challenge', city: 'Ilorin' },
+  { name: 'Agbo-Oba', city: 'Ilorin' },
+  { name: 'Post Office', city: 'Ilorin' },
+  { name: 'Maraba', city: 'Ilorin' },
+  { name: 'Kulende', city: 'Ilorin' },
+  { name: 'Oyun', city: 'Ilorin' },
+  { name: 'Apata Yakuba', city: 'Ilorin' },
+  { name: 'Mubo', city: 'Ilorin' },
+
+  // Ijebu Ode
+  { name: 'Molipa', city: 'Ijebu Ode' },
+  { name: 'Oke-Aje', city: 'Ijebu Ode' },
+  { name: 'Porogun', city: 'Ijebu Ode' },
+  { name: 'Obalende', city: 'Ijebu Ode' },
+  { name: 'Imagbon', city: 'Ijebu Ode' },
+  { name: 'Ita-Aladan', city: 'Ijebu Ode' },
+  { name: 'Ita-Merin', city: 'Ijebu Ode' },
+  { name: 'Ita-Osun', city: 'Ijebu Ode' },
+  { name: 'Ijasi', city: 'Ijebu Ode' },
+  { name: 'Odo-Nla', city: 'Ijebu Ode' },
+  { name: 'Isoku', city: 'Ijebu Ode' },
+  { name: 'Oke-Sopen', city: 'Ijebu Ode' },
+  { name: 'Ayetoro', city: 'Ijebu Ode' },
+  { name: 'Folagbade', city: 'Ijebu Ode' },
+  { name: 'Degun', city: 'Ijebu Ode' },
+  { name: 'Ososa', city: 'Ijebu Ode' },
+  { name: 'Imowo', city: 'Ijebu Ode' },
+]
 
 const filters = ref({
   state: '',
@@ -152,91 +194,120 @@ const filters = ref({
   maxPrice: null as number | null,
   bedrooms: null as number | null,
   amenities: [] as string[],
-});
+})
 
-let timeout: ReturnType<typeof setTimeout>;
-let subscription: any = null;
+let timeout: ReturnType<typeof setTimeout>
+let subscription: any = null
 
 const fetchProperties = async () => {
-  loading.value = true;
+  loading.value = true
 
   try {
     let q = supabase
       .from('properties')
       .select('*')
-      .eq('status', 'approved');
+      .eq('status', 'approved')
 
-    // Filters
-    if (filters.value.state) q = q.eq('state', filters.value.state);
-    if (filters.value.city) q = q.eq('city', filters.value.city);
-    if (filters.value.area) q = q.eq('area', filters.value.area);
-    if (filters.value.property_type) q = q.eq('property_type', filters.value.property_type);
-    if (filters.value.purpose) q = q.eq('purpose', filters.value.purpose);
-    
-    if (filters.value.minPrice) q = q.gte('price', Number(filters.value.minPrice));
-    if (filters.value.maxPrice) q = q.lte('price', Number(filters.value.maxPrice));
-    if (filters.value.bedrooms) q = q.eq('bedrooms', Number(filters.value.bedrooms));
+    // Flexible filters (same style as the search input)
+    if (filters.value.state) {
+      q = q.ilike('state', `%${filters.value.state}%`)
+    }
+    if (filters.value.city) {
+      q = q.ilike('city', `%${filters.value.city}%`)
+    }
+    if (filters.value.area) {
+      q = q.ilike('area', `%${filters.value.area}%`)
+    }
 
+    if (filters.value.property_type) q = q.eq('property_type', filters.value.property_type)
+    if (filters.value.purpose) q = q.eq('purpose', filters.value.purpose)
+
+    if (filters.value.minPrice) q = q.gte('price', Number(filters.value.minPrice))
+    if (filters.value.maxPrice) q = q.lte('price', Number(filters.value.maxPrice))
+    if (filters.value.bedrooms) q = q.eq('bedrooms', Number(filters.value.bedrooms))
+
+    // Free text search (flexible)
     if (searchQuery.value?.trim()) {
-      const term = searchQuery.value.trim();
-      q = q.or(`title.ilike.%${term}%,area.ilike.%${term}%,address.ilike.%${term}%`);
+      const term = searchQuery.value.trim()
+      q = q.or(
+        `title.ilike.%${term}%,area.ilike.%${term}%,address.ilike.%${term}%,city.ilike.%${term}%`
+      )
     }
 
     // Sorting
     if (sortBy.value === 'newest') {
-      q = q.order('created_at', { ascending: false });
+      q = q.order('created_at', { ascending: false })
     } else if (sortBy.value === 'price-low') {
-      q = q.order('price', { ascending: true });
+      q = q.order('price', { ascending: true })
     } else if (sortBy.value === 'price-high') {
-      q = q.order('price', { ascending: false });
+      q = q.order('price', { ascending: false })
     }
 
-    const { data, error } = await q;
+    const { data, error } = await q
 
     if (error) {
-      console.error('Supabase Error:', error);
-      alert('Error fetching properties: ' + error.message);
+      console.error('Supabase Error:', error)
+      alert('Error fetching properties: ' + error.message)
     } else {
-      console.log('✅ Fetched approved properties:', data?.length || 0);
-      properties.value = data || [];
+      console.log('✅ Fetched approved properties:', data?.length || 0)
+      properties.value = data || []
     }
   } catch (err) {
-    console.error('Unexpected error:', err);
+    console.error('Unexpected error:', err)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const debouncedSearch = () => {
-  if (timeout) clearTimeout(timeout);
+  if (timeout) clearTimeout(timeout)
   timeout = setTimeout(() => {
-    fetchProperties();
-  }, 600);
-};
+    fetchProperties()
+  }, 600)
+}
 
-const selectQuickArea = (area: string) => {
-  filters.value.area = area;
-  fetchProperties();
-};
+const selectQuickArea = (area: { name: string; city: string }) => {
+  // Works exactly like typing in the search input
+  searchQuery.value = area.name
+
+  // Also keep the sidebar filters in sync
+  filters.value.area = area.name
+  filters.value.city = area.city
+
+  if (area.city === 'Ilorin') {
+    filters.value.state = 'Kwara'
+  } else if (area.city === 'Ijebu Ode') {
+    filters.value.state = 'Ogun'
+  }
+
+  fetchProperties()
+}
 
 const clearFilters = () => {
   filters.value = {
-    state: '', city: '', area: '', property_type: '', purpose: 'For Rent',
-    minPrice: null, maxPrice: null, bedrooms: null, amenities: []
-  };
-  searchQuery.value = '';
-  fetchProperties();
-};
+    state: '',
+    city: '',
+    area: '',
+    property_type: '',
+    purpose: 'For Rent',
+    minPrice: null,
+    maxPrice: null,
+    bedrooms: null,
+    amenities: [],
+  }
+  searchQuery.value = ''
+  fetchProperties()
+}
 
 const applyMobileFilters = (newFilters: typeof filters.value) => {
-  filters.value = { ...newFilters };
-  fetchProperties();
-  showMobileFilters.value = false;
-};
+  filters.value = { ...newFilters }
+  fetchProperties()
+  showMobileFilters.value = false
+}
 
 const viewPropertyDetails = (id: string) => {
-  router.push(`/customer/properties/${id}`);
-};
+  router.push(`/customer/properties/${id}`)
+}
 
 // Real-time subscription
 const setupRealtime = () => {
@@ -246,21 +317,21 @@ const setupRealtime = () => {
       'postgres_changes',
       { event: '*', schema: 'public', table: 'properties' },
       () => {
-        console.log('🔄 Real-time update received');
-        fetchProperties();
+        console.log('🔄 Real-time update received')
+        fetchProperties()
       }
     )
-    .subscribe();
-};
+    .subscribe()
+}
 
 onMounted(() => {
-  fetchProperties();
-  setupRealtime();
-});
+  fetchProperties()
+  setupRealtime()
+})
 
 onBeforeUnmount(() => {
   if (subscription) {
-    supabase.removeChannel(subscription);
+    supabase.removeChannel(subscription)
   }
-});
+})
 </script>

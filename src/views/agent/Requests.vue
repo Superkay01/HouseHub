@@ -3,9 +3,7 @@
     <div class="max-w-7xl mx-auto p-6">
 
       <!-- Header -->
-      <div
-        class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10"
-      >
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
         <div>
           <h1 class="text-4xl font-bold text-[var(--royal-blue)]">
             Customer Requests
@@ -17,7 +15,7 @@
 
           <p class="mt-2 text-sm font-medium text-[var(--royal-blue)]">
             📍 {{ agentProfile.city || '—' }},
-            {{ agentProfile.state || '—' }}
+            {{ normalizeState(agentProfile.state) || '—' }}
           </p>
         </div>
 
@@ -32,41 +30,30 @@
 
       <!-- Stats -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-
         <div class="bg-white rounded-3xl p-6 shadow-sm">
           <p class="text-sm text-medium-gray">Total Requests</p>
-          <p class="text-4xl font-bold mt-2">
-            {{ stats.total }}
-          </p>
+          <p class="text-4xl font-bold mt-2">{{ stats.total }}</p>
         </div>
 
         <div class="bg-white rounded-3xl p-6 shadow-sm">
           <p class="text-sm text-medium-gray">Assigned</p>
-          <p class="text-4xl font-bold text-blue-600 mt-2">
-            {{ stats.assigned }}
-          </p>
+          <p class="text-4xl font-bold text-blue-600 mt-2">{{ stats.assigned }}</p>
         </div>
 
         <div class="bg-white rounded-3xl p-6 shadow-sm">
           <p class="text-sm text-medium-gray">Accepted</p>
-          <p class="text-4xl font-bold text-purple-600 mt-2">
-            {{ stats.accepted }}
-          </p>
+          <p class="text-4xl font-bold text-purple-600 mt-2">{{ stats.accepted }}</p>
         </div>
 
         <div class="bg-white rounded-3xl p-6 shadow-sm">
           <p class="text-sm text-medium-gray">Completed</p>
-          <p class="text-4xl font-bold text-green-600 mt-2">
-            {{ stats.completed }}
-          </p>
+          <p class="text-4xl font-bold text-green-600 mt-2">{{ stats.completed }}</p>
         </div>
-
       </div>
 
       <!-- Search & Filters -->
       <div class="bg-white rounded-3xl p-6 shadow-sm mb-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
           <input
             v-model="searchQuery"
             type="text"
@@ -99,46 +86,31 @@
             <option value="upcoming">Upcoming</option>
             <option value="past">Past</option>
           </select>
-
         </div>
       </div>
 
       <!-- Requests -->
       <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
 
-        <!-- Loading -->
-        <div
-          v-if="loading"
-          class="p-16 text-center text-medium-gray"
-        >
+        <div v-if="loading" class="p-16 text-center text-medium-gray">
           Loading requests...
         </div>
 
-        <!-- Empty -->
-        <div
-          v-else-if="filteredRequests.length === 0"
-          class="p-16 text-center"
-        >
+        <div v-else-if="filteredRequests.length === 0" class="p-16 text-center">
           <div class="text-6xl mb-4">📋</div>
-
           <h3 class="text-2xl font-semibold text-[var(--royal-blue)]">
             No Requests Found
           </h3>
-
           <p class="text-medium-gray mt-2 max-w-md mx-auto">
             You currently have no property requests assigned to you.
-            New requests assigned by the State Admin will appear here
-            automatically.
+            New requests assigned by the State Admin will appear here automatically.
           </p>
         </div>
 
         <div v-else>
-
           <!-- Desktop -->
           <div class="hidden md:block overflow-x-auto">
-
             <table class="w-full">
-
               <thead>
                 <tr class="border-b text-left text-sm text-medium-gray">
                   <th class="py-4 px-6">Request ID</th>
@@ -152,13 +124,11 @@
               </thead>
 
               <tbody class="divide-y">
-
                 <tr
                   v-for="request in filteredRequests"
                   :key="request.id"
                   class="hover:bg-gray-50 transition"
                 >
-
                   <td class="py-5 px-6 font-medium">
                     {{ request.request_code || request.id.slice(0, 8) }}
                   </td>
@@ -204,8 +174,6 @@
 
                   <td class="py-5 px-6 text-right">
                     <div class="flex items-center justify-end gap-2">
-
-                      <!-- Accept -->
                       <button
                         v-if="isAssigned(request.status)"
                         @click="acceptRequestFromTable(request)"
@@ -215,7 +183,6 @@
                         ✓ Accept
                       </button>
 
-                      <!-- Decline -->
                       <button
                         v-if="isAssigned(request.status)"
                         @click="declineRequestFromTable(request)"
@@ -225,34 +192,26 @@
                         Decline
                       </button>
 
-                      <!-- View -->
                       <button
                         @click="openDrawer(request)"
                         class="px-5 py-2 bg-[var(--royal-blue)] text-white rounded-2xl text-sm hover:bg-[var(--medium-blue)]"
                       >
                         View
                       </button>
-
                     </div>
                   </td>
-
                 </tr>
-
               </tbody>
-
             </table>
-
           </div>
 
           <!-- Mobile -->
           <div class="md:hidden divide-y">
-
             <div
               v-for="request in filteredRequests"
               :key="request.id"
               class="p-5"
             >
-
               <div class="flex justify-between items-start gap-3">
                 <div>
                   <p class="font-semibold">
@@ -302,15 +261,10 @@
                   View Request
                 </button>
               </div>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
 
     <!-- Request Details Drawer -->
@@ -319,13 +273,8 @@
       class="fixed inset-0 z-50 bg-black/50 flex justify-end"
       @click.self="closeDrawer"
     >
-
       <div class="bg-white w-full max-w-xl h-full overflow-y-auto shadow-2xl">
-
-        <!-- Drawer Header -->
-        <div
-          class="sticky top-0 bg-white border-b px-6 py-5 flex items-center justify-between z-10"
-        >
+        <div class="sticky top-0 bg-white border-b px-6 py-5 flex items-center justify-between z-10">
           <div>
             <h2 class="text-xl font-bold text-[var(--royal-blue)]">
               Request Details
@@ -335,16 +284,12 @@
             </p>
           </div>
 
-          <button
-            @click="closeDrawer"
-            class="text-3xl text-gray-400 hover:text-black"
-          >
+          <button @click="closeDrawer" class="text-3xl text-gray-400 hover:text-black">
             ×
           </button>
         </div>
 
         <div class="p-6 space-y-8">
-
           <!-- Property -->
           <div>
             <img
@@ -360,14 +305,12 @@
               📍
               {{ selected.properties?.area || selected.area || '—' }},
               {{ selected.properties?.city || selected.city || '—' }},
-              {{ selected.properties?.state || selected.state || '—' }}
+              {{ normalizeState(selected.properties?.state || selected.state) || '—' }}
             </p>
 
             <p class="text-2xl font-bold text-green-600 mt-3">
               ₦{{ Number(selected.properties?.price || 0).toLocaleString() }}
-              <span class="text-sm font-normal text-medium-gray">
-                / year
-              </span>
+              <span class="text-sm font-normal text-medium-gray">/ year</span>
             </p>
           </div>
 
@@ -419,7 +362,7 @@
           <div class="border rounded-3xl p-5">
             <p class="text-sm text-medium-gray">Assigned State Admin</p>
             <p class="font-semibold mt-1">
-              {{ selected.state || agentProfile.state }} Admin
+              {{ normalizeState(selected.state || agentProfile.state) }} Admin
             </p>
             <p class="text-sm text-green-600 mt-1">✓ Verified coordinator</p>
 
@@ -439,14 +382,10 @@
 
             <div class="space-y-5">
               <div class="flex gap-3">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-green-100 text-green-600">
-                  ✓
-                </div>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-green-100 text-green-600">✓</div>
                 <div>
                   <p class="font-medium">Customer submitted request</p>
-                  <p class="text-sm text-medium-gray">
-                    {{ formatDate(selected.created_at) }}
-                  </p>
+                  <p class="text-sm text-medium-gray">{{ formatDate(selected.created_at) }}</p>
                 </div>
               </div>
 
@@ -459,9 +398,7 @@
                 </div>
                 <div>
                   <p class="font-medium">Assigned to you</p>
-                  <p class="text-sm text-medium-gray">
-                    State Admin assigned this request
-                  </p>
+                  <p class="text-sm text-medium-gray">State Admin assigned this request</p>
                 </div>
               </div>
 
@@ -474,9 +411,7 @@
                 </div>
                 <div>
                   <p class="font-medium">Agent response</p>
-                  <p class="text-sm text-medium-gray">
-                    Accept or decline the request
-                  </p>
+                  <p class="text-sm text-medium-gray">Accept or decline the request</p>
                 </div>
               </div>
 
@@ -489,9 +424,7 @@
                 </div>
                 <div>
                   <p class="font-medium">Inspection scheduled</p>
-                  <p class="text-sm text-medium-gray">
-                    State Admin schedules the inspection
-                  </p>
+                  <p class="text-sm text-medium-gray">State Admin schedules the inspection</p>
                 </div>
               </div>
             </div>
@@ -499,8 +432,6 @@
 
           <!-- Actions -->
           <div class="space-y-3 pt-2">
-
-            <!-- Accept -->
             <button
               v-if="isAssigned(selected?.status)"
               @click="acceptRequest"
@@ -510,7 +441,6 @@
               {{ actionLoading ? 'Accepting...' : '✓ Accept Request' }}
             </button>
 
-            <!-- Decline -->
             <button
               v-if="isAssigned(selected?.status)"
               @click="declineRequest"
@@ -520,7 +450,6 @@
               {{ actionLoading ? 'Processing...' : 'Decline Request' }}
             </button>
 
-            <!-- Accepted -->
             <div
               v-if="normalizeStatus(selected?.status) === 'accepted'"
               class="bg-purple-50 text-purple-700 p-4 rounded-2xl text-center"
@@ -531,7 +460,6 @@
               </p>
             </div>
 
-            <!-- Scheduled -->
             <div
               v-if="['scheduled', 'confirmed'].includes(normalizeStatus(selected?.status))"
               class="bg-blue-50 text-blue-700 p-4 rounded-2xl text-center"
@@ -548,7 +476,6 @@
               </button>
             </div>
 
-            <!-- Completed -->
             <div
               v-if="normalizeStatus(selected?.status) === 'completed'"
               class="bg-green-50 text-green-700 p-4 rounded-2xl text-center"
@@ -556,52 +483,61 @@
               ✓ This request has been completed.
             </div>
 
-            <!-- Property -->
             <button
               @click="openProperty"
               class="w-full py-4 border rounded-2xl font-medium hover:bg-gray-50"
             >
               Open Property
             </button>
-
           </div>
-
         </div>
-
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import {
-  ref,
-  computed,
-  onMounted,
-  onUnmounted
-} from 'vue'
-
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 
 const router = useRouter()
 
 /* ---------------------------------
+   NORMALIZE STATE (Kwara → Kwara State)
+---------------------------------- */
+const STATE_MAP = {
+  'Kwara': 'Kwara State',
+  'Ogun': 'Ogun State',
+  'Lagos': 'Lagos State',
+  'Oyo': 'Oyo State',
+  'Osun': 'Osun State',
+  'Ondo': 'Ondo State',
+  'Ekiti': 'Ekiti State',
+  'Edo': 'Edo State',
+  'Delta': 'Delta State',
+  'Rivers': 'Rivers State',
+  'FCT': 'Federal Capital Territory',
+  'Abuja': 'Federal Capital Territory'
+}
+
+const normalizeState = (state) => {
+  if (!state) return state
+  const trimmed = String(state).trim()
+  if (trimmed.endsWith(' State') || trimmed === 'Federal Capital Territory') {
+    return trimmed
+  }
+  return STATE_MAP[trimmed] || trimmed
+}
+
+/* ---------------------------------
    STATE
 ---------------------------------- */
-
-const agentProfile = ref({
-  city: '',
-  state: ''
-})
-
+const agentProfile = ref({ city: '', state: '' })
 const requests = ref([])
 const selected = ref(null)
-
 const loading = ref(true)
-const actionLoading = ref(false)   // ← THIS WAS MISSING
-
+const actionLoading = ref(false)
 const searchQuery = ref('')
 const statusFilter = ref('')
 const dateFilter = ref('')
@@ -611,14 +547,8 @@ let channel = null
 /* ---------------------------------
    STATUS HELPERS
 ---------------------------------- */
-
 const statusOrder = [
-  'pending',
-  'assigned',
-  'accepted',
-  'scheduled',
-  'confirmed',
-  'completed'
+  'pending', 'assigned', 'accepted', 'scheduled', 'confirmed', 'completed'
 ]
 
 const normalizeStatus = (status) => {
@@ -626,17 +556,13 @@ const normalizeStatus = (status) => {
   return String(status).toLowerCase().trim()
 }
 
-const isAssigned = (status) => {
-  return normalizeStatus(status) === 'assigned'
-}
+const isAssigned = (status) => normalizeStatus(status) === 'assigned'
 
 /* ---------------------------------
    STATISTICS
 ---------------------------------- */
-
 const stats = computed(() => {
   const list = requests.value
-
   return {
     total: list.length,
     assigned: list.filter(r => isAssigned(r.status)).length,
@@ -648,21 +574,17 @@ const stats = computed(() => {
 /* ---------------------------------
    FILTER
 ---------------------------------- */
-
 const filteredRequests = computed(() => {
   let result = [...requests.value]
 
   if (searchQuery.value) {
     const term = searchQuery.value.toLowerCase()
-
-    result = result.filter(request => {
-      return (
-        request.properties?.title?.toLowerCase().includes(term) ||
-        request.request_code?.toLowerCase().includes(term) ||
-        request.city?.toLowerCase().includes(term) ||
-        request.properties?.area?.toLowerCase().includes(term)
-      )
-    })
+    result = result.filter(request =>
+      request.properties?.title?.toLowerCase().includes(term) ||
+      request.request_code?.toLowerCase().includes(term) ||
+      request.city?.toLowerCase().includes(term) ||
+      request.properties?.area?.toLowerCase().includes(term)
+    )
   }
 
   if (statusFilter.value) {
@@ -673,35 +595,24 @@ const filteredRequests = computed(() => {
 
   if (dateFilter.value) {
     const now = new Date()
-
     result = result.filter(request => {
       const created = new Date(request.created_at)
-
       if (dateFilter.value === 'today') {
         return created.toDateString() === now.toDateString()
       }
-
       if (dateFilter.value === 'week') {
         const weekAgo = new Date(now)
         weekAgo.setDate(weekAgo.getDate() - 7)
         return created >= weekAgo && created <= now
       }
-
       if (dateFilter.value === 'month') {
         return (
           created.getMonth() === now.getMonth() &&
           created.getFullYear() === now.getFullYear()
         )
       }
-
-      if (dateFilter.value === 'upcoming') {
-        return created >= now
-      }
-
-      if (dateFilter.value === 'past') {
-        return created < now
-      }
-
+      if (dateFilter.value === 'upcoming') return created >= now
+      if (dateFilter.value === 'past') return created < now
       return true
     })
   }
@@ -712,10 +623,8 @@ const filteredRequests = computed(() => {
 /* ---------------------------------
    STATUS UI
 ---------------------------------- */
-
 const statusClass = (status) => {
   const key = normalizeStatus(status)
-
   const map = {
     pending: 'bg-amber-100 text-amber-700',
     assigned: 'bg-blue-100 text-blue-700',
@@ -726,25 +635,18 @@ const statusClass = (status) => {
     cancelled: 'bg-red-100 text-red-700',
     declined: 'bg-gray-100 text-gray-600'
   }
-
   return map[key] || 'bg-gray-100 text-gray-600'
 }
 
 const formatStatus = (status) => {
   if (!status) return 'Unknown'
-
   return String(status)
     .replace(/_/g, ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
-/* ---------------------------------
-   DATE
----------------------------------- */
-
 const formatDate = (date) => {
   if (!date) return '—'
-
   return new Date(date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -752,21 +654,12 @@ const formatDate = (date) => {
   })
 }
 
-/* ---------------------------------
-   CUSTOMER PRIVACY
----------------------------------- */
-
 const maskCustomerName = (name) => {
   if (!name?.trim()) return 'Customer'
-
   const parts = name.trim().split(/\s+/).filter(Boolean)
   if (parts.length === 0) return 'Customer'
-
   const first = parts[0] || ''
-  if (parts.length === 1) {
-    return `${first.charAt(0)}.`
-  }
-
+  if (parts.length === 1) return `${first.charAt(0)}.`
   const last = parts[parts.length - 1] || ''
   return `${first} ${last.charAt(0)}.`
 }
@@ -774,12 +667,8 @@ const maskCustomerName = (name) => {
 /* ---------------------------------
    FETCH PROFILE
 ---------------------------------- */
-
 const fetchAgentProfile = async () => {
-  const {
-    data: { user }
-  } = await supabase.auth.getUser()
-
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
   const { data, error } = await supabase
@@ -788,12 +677,13 @@ const fetchAgentProfile = async () => {
     .eq('id', user.id)
     .single()
 
-  if (error) {
-    console.error('Profile error:', error)
-  }
+  if (error) console.error('Profile error:', error)
 
   if (data) {
-    agentProfile.value = data
+    agentProfile.value = {
+      ...data,
+      state: normalizeState(data.state)   // always full name
+    }
   }
 
   return user
@@ -802,7 +692,6 @@ const fetchAgentProfile = async () => {
 /* ---------------------------------
    FETCH REQUESTS
 ---------------------------------- */
-
 const fetchRequests = async () => {
   loading.value = true
 
@@ -814,7 +703,7 @@ const fetchRequests = async () => {
       .from('property_requests')
       .select(`
         *,
-        properties (
+        properties:properties!property_id (
           id,
           title,
           cover_image,
@@ -843,13 +732,19 @@ const fetchRequests = async () => {
             .select('id, full_name')
             .eq('id', request.customer_id)
             .maybeSingle()
-
           customer = customerData
         }
 
         return {
           ...request,
-          customer
+          state: normalizeState(request.state),
+          customer,
+          properties: request.properties
+            ? {
+                ...request.properties,
+                state: normalizeState(request.properties.state)
+              }
+            : null
         }
       })
     )
@@ -865,7 +760,6 @@ const fetchRequests = async () => {
 /* ---------------------------------
    DRAWER
 ---------------------------------- */
-
 const openDrawer = (request) => {
   selected.value = request
 }
@@ -877,7 +771,6 @@ const closeDrawer = () => {
 /* ---------------------------------
    ACCEPT / DECLINE FROM TABLE
 ---------------------------------- */
-
 const acceptRequestFromTable = async (request) => {
   selected.value = request
   await acceptRequest()
@@ -891,78 +784,69 @@ const declineRequestFromTable = async (request) => {
 /* ---------------------------------
    ACCEPT REQUEST
 ---------------------------------- */
-
 const acceptRequest = async () => {
   if (!selected.value) return
 
   const confirmed = window.confirm(
     'Accept this request? An inspection record will be created and the State Admin will be notified.'
   )
-
   if (!confirmed) return
 
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+  actionLoading.value = true
 
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       alert('You are not logged in.')
       return
     }
 
+    // Ensure the request itself has the full state name before the RPC runs
+    await supabase
+      .from('property_requests')
+      .update({
+        state: normalizeState(selected.value.state || selected.value.properties?.state),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', selected.value.id)
+      .eq('agent_id', user.id)
+
     const { data: inspectionId, error } = await supabase.rpc(
       'accept_property_request',
-      {
-        p_request_id: selected.value.id,
-      }
+      { p_request_id: selected.value.id }
     )
 
-    if (error) {
-      console.error('Accept request error:', error)
-      throw error
-    }
+    if (error) throw error
 
     if (!inspectionId) {
-      throw new Error(
-        'The request was accepted, but no inspection was created.'
-      )
+      throw new Error('The request was accepted, but no inspection was created.')
     }
 
-    alert(
-      '✓ Request accepted successfully. The inspection has been created and the State Admin can now schedule it.'
-    )
+    alert('✓ Request accepted successfully. The inspection has been created and the State Admin can now schedule it.')
 
     selected.value = null
-
     await fetchRequests()
   } catch (error) {
     console.error('Failed to accept request:', error)
-
-    alert(
-      error?.message ||
-        'Unable to accept this request. Please try again.'
-    )
+    alert(error?.message || 'Unable to accept this request. Please try again.')
+  } finally {
+    actionLoading.value = false
   }
 }
+
 /* ---------------------------------
    DECLINE REQUEST
 ---------------------------------- */
-
 const declineRequest = async () => {
   if (!selected.value) return
 
   const reason = window.prompt('Why are you declining this request?')
-
   if (!reason) return
 
   actionLoading.value = true
 
   try {
-    const {
-      data: { user }
-    } = await supabase.auth.getUser()
-
+    const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
     const { error } = await supabase
@@ -971,6 +855,7 @@ const declineRequest = async () => {
         status: 'declined',
         admin_notes: `Agent declined: ${reason}`,
         agent_id: null,
+        state: normalizeState(selected.value.state), // keep full name
         updated_at: new Date().toISOString()
       })
       .eq('id', selected.value.id)
@@ -980,7 +865,6 @@ const declineRequest = async () => {
     if (error) throw error
 
     alert('Request declined and returned to the State Admin.')
-
     selected.value = null
     await fetchRequests()
   } catch (error) {
@@ -994,41 +878,27 @@ const declineRequest = async () => {
 /* ---------------------------------
    PROGRESS
 ---------------------------------- */
-
 const hasReachedStatus = (status) => {
   if (!selected.value?.status) return false
-
   const current = statusOrder.indexOf(normalizeStatus(selected.value.status))
   const target = statusOrder.indexOf(status)
-
   return current >= target
 }
 
 /* ---------------------------------
-   PROPERTY
+   NAVIGATION
 ---------------------------------- */
-
 const openProperty = () => {
   const propertyId =
     selected.value?.property_id ||
     selected.value?.properties?.id
-
   if (!propertyId) return
-
   router.push(`/agent/properties/${propertyId}`)
 }
-
-/* ---------------------------------
-   INSPECTIONS
----------------------------------- */
 
 const goToInspections = () => {
   router.push('/agent/inspections')
 }
-
-/* ---------------------------------
-   ADMIN MESSAGE
----------------------------------- */
 
 const messageAdmin = () => {
   router.push('/agent/messages')
@@ -1037,17 +907,11 @@ const messageAdmin = () => {
 /* ---------------------------------
    REALTIME
 ---------------------------------- */
-
 const setupRealtime = async () => {
-  const {
-    data: { user }
-  } = await supabase.auth.getUser()
-
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  if (channel) {
-    await supabase.removeChannel(channel)
-  }
+  if (channel) await supabase.removeChannel(channel)
 
   channel = supabase
     .channel(`agent-requests-${user.id}`)
@@ -1061,32 +925,23 @@ const setupRealtime = async () => {
       (payload) => {
         const newRow = payload.new
         const oldRow = payload.old
-
-        if (
-          newRow?.agent_id === user.id ||
-          oldRow?.agent_id === user.id
-        ) {
+        if (newRow?.agent_id === user.id || oldRow?.agent_id === user.id) {
           fetchRequests()
         }
       }
     )
-    .subscribe((status, error) => {
-      console.log('Agent request realtime:', status, error)
-    })
+    .subscribe()
 }
 
 /* ---------------------------------
    LIFECYCLE
 ---------------------------------- */
-
 onMounted(async () => {
   await fetchRequests()
   await setupRealtime()
 })
 
 onUnmounted(async () => {
-  if (channel) {
-    await supabase.removeChannel(channel)
-  }
+  if (channel) await supabase.removeChannel(channel)
 })
 </script>

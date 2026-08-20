@@ -48,15 +48,42 @@
           </div>
         </div>
 
-        <!-- Property Info -->
-        <div class="flex justify-between items-start">
+        <!-- Property Info + Price -->
+        <div class="flex flex-col lg:flex-row justify-between items-start gap-6">
           <div>
             <h1 class="text-3xl font-bold text-[var(--royal-blue)]">{{ property.title }}</h1>
-            <p class="text-xl text-[var(--royal-blue)]">{{ property.property_type }} • {{ property.purpose }}</p>
+            <p class="text-xl text-[var(--royal-blue)] mt-1">
+              {{ property.property_type }} • {{ property.purpose }}
+            </p>
           </div>
-          <div class="text-right">
-            <p class="text-4xl font-bold text-[var(--royal-blue)]">₦{{ Number(property.price || 0).toLocaleString() }}</p>
-            <p class="text-sm text-[var(--royal-blue)]">{{ property.rent_duration || 'per year' }}</p>
+
+          <!-- Pricing Summary Card -->
+          <div class="bg-[#f0f7ff] border border-[var(--hover-blue)] rounded-3xl p-6 min-w-[280px] space-y-3">
+            <div>
+              <p class="text-sm text-[var(--steel-blue)]">Listed / Transaction Price</p>
+              <p class="text-3xl font-bold text-[var(--royal-blue)]">
+                ₦{{ formatNaira(property.price) }}
+              </p>
+              <p class="text-xs text-gray-500">{{ property.rent_duration || 'per year' }}</p>
+            </div>
+
+            <div class="border-t border-[var(--hover-blue)] pt-3 space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-[var(--steel-blue)]">System Charge Rate</span>
+                <span class="font-semibold text-[var(--royal-blue)]">5%</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-[var(--steel-blue)]">Platform System Charge</span>
+                <span class="font-bold text-green-600 text-lg">
+                  ₦{{ formatNaira(systemChargeAmount) }}
+                </span>
+              </div>
+            </div>
+
+            <p class="text-xs text-gray-500 leading-relaxed pt-1">
+              Calculated automatically as 5% of the listed transaction price. 
+              This is a platform charge and is <strong>not</strong> added to the customer’s inspection payment.
+            </p>
           </div>
         </div>
 
@@ -68,7 +95,9 @@
         <!-- Location -->
         <div>
           <h3 class="font-semibold mb-2 text-[var(--royal-blue)]">Location</h3>
-          <p class="text-lg text-[var(--royal-blue)]">📍 {{ property.address || property.area }}, {{ property.city }}, {{ property.state }}</p>
+          <p class="text-lg text-[var(--royal-blue)]">
+            📍 {{ property.address || property.area }}, {{ property.city }}, {{ property.state }}
+          </p>
         </div>
 
         <!-- Specs -->
@@ -115,10 +144,10 @@
           <div class="flex items-center gap-4">
             <img 
               :src="property.profiles.avatar_url || `https://ui-avatars.com/api/?name=${property.profiles.full_name}`" 
-              class="w-16 h-16 rounded-2xl"
+              class="w-16 h-16 rounded-2xl object-cover"
             />
             <div>
-              <div class="font-semibold">{{ property.profiles.full_name }}</div>
+              <div class="font-semibold text-[var(--royal-blue)]">{{ property.profiles.full_name }}</div>
               <div v-if="property.profiles.is_verified" class="text-green-600 text-sm">✓ Verified Agent</div>
             </div>
           </div>
@@ -129,7 +158,7 @@
       <div class="sticky bottom-0 bg-white border-t p-6 flex gap-4">
         <button 
           @click="close"
-          class="flex-1 py-4 border border-gray-300 rounded-2xl font-medium">
+          class="flex-1 py-4 border border-gray-300 rounded-2xl font-medium hover:bg-gray-50 transition">
           Close
         </button>
         <button 
@@ -152,6 +181,7 @@
 <script setup>
 import { defineProps, defineEmits, computed, ref } from 'vue'
 import PropertyStatusBadge from './PropertyStatusBadge.vue'
+import { calculateSystemCharge, formatNaira } from '@/utils/systemCharge'
 
 const props = defineProps({
   property: {
@@ -163,6 +193,11 @@ const props = defineProps({
 const emit = defineEmits(['close', 'approve', 'reject'])
 
 const mainImage = ref(props.property.cover_image)
+
+// Always calculate from the listed price (never trust a stored value from the agent)
+const systemChargeAmount = computed(() => {
+  return calculateSystemCharge(props.property.price)
+})
 
 const allImages = computed(() => {
   const images = []

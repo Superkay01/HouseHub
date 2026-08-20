@@ -7,8 +7,6 @@
         
         <!-- Media Section -->
         <div class="lg:w-5/12 space-y-6">
-          
-          <!-- Cover Image -->
           <div v-if="form.cover_image" class="relative">
             <img 
               :src="form.cover_image" 
@@ -19,18 +17,14 @@
             </div>
           </div>
 
-          <!-- Other Images & Video -->
           <div v-if="hasOtherMedia" class="space-y-4">
             <h4 class="font-semibold text-gray-700">Other Photos & Video</h4>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              
-              <!-- Show image_1 to image_5 (excluding cover) -->
               <div v-for="(url, index) in otherImages" :key="index" 
                    class="relative rounded-2xl overflow-hidden border border-gray-200 aspect-video group">
                 <img :src="url" class="w-full h-full object-cover" />
               </div>
 
-              <!-- Video -->
               <div v-if="form.video_url" class="relative rounded-2xl overflow-hidden border border-gray-200 aspect-video bg-black">
                 <video :src="form.video_url" class="w-full h-full object-cover" muted></video>
                 <div class="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-xl">VIDEO</div>
@@ -61,14 +55,35 @@
               <span class="text-gray-500">Full Address</span><br>
               <strong class="text-base">{{ form.address || 'Not provided' }}</strong>
             </div>
-            <div>
-              <span class="text-gray-500">Price</span><br>
-              <strong class="text-3xl text-green-600">₦{{ form.price?.toLocaleString() || '0' }}</strong>
-              <span class="text-sm text-gray-500">/ year</span>
-            </div>
-            <div>
-              <span class="text-gray-500">Service Charge</span><br>
-              <strong class="text-xl">₦{{ form.service_charge?.toLocaleString() || '0' }}</strong>
+            
+            <!-- Pricing section -->
+            <div class="col-span-2">
+              <div class="bg-white rounded-2xl p-5 border border-gray-100 space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-500">Property Price</span>
+                  <strong class="text-2xl text-green-600">
+                    ₦{{ formatNaira(form.price) }}
+                    <span class="text-sm text-gray-500 font-normal">/ year</span>
+                  </strong>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-500">System Charge Rate</span>
+                  <strong class="text-lg">5%</strong>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-500">Platform System Charge</span>
+                  <strong class="text-xl text-[var(--royal-blue)]">
+                    ₦{{ formatNaira(systemChargeAmount) }}
+                  </strong>
+                </div>
+
+                <p class="text-xs text-gray-500 pt-2 border-t">
+                  This system charge is calculated automatically at 5% of the listed transaction price. 
+                  It is a platform charge and is not added to the customer’s inspection payment.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -127,12 +142,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { calculateSystemCharge, formatNaira } from '@/utils/systemCharge'
 
 const props = defineProps<{
   form: any
 }>()
 
-// Collect all uploaded images from image_1 to image_5
+const systemChargeAmount = computed(() => calculateSystemCharge(props.form.price))
+
 const allImages = computed(() => {
   const imgs: string[] = []
   if (props.form.image_1) imgs.push(props.form.image_1)
@@ -143,7 +160,6 @@ const allImages = computed(() => {
   return imgs
 })
 
-// Other images (excluding cover)
 const otherImages = computed(() => {
   return allImages.value.filter(url => url !== props.form.cover_image)
 })

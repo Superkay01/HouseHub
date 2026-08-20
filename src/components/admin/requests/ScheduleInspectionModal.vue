@@ -95,36 +95,118 @@ const form = ref({
 
 const saving = ref(false)
 
+// Normalize state so we always store "Kwara State"
+const STATE_MAP = {
+  'Kwara': 'Kwara State',
+  'Ogun': 'Ogun State',
+  'Lagos': 'Lagos State',
+  'Oyo': 'Oyo State',
+  'Osun': 'Osun State',
+  'Ondo': 'Ondo State',
+  'Ekiti': 'Ekiti State',
+  'Edo': 'Edo State',
+  'Delta': 'Delta State',
+  'Rivers': 'Rivers State',
+  'FCT': 'Federal Capital Territory',
+  'Abuja': 'Federal Capital Territory'
+}
+
+const normalizeState = (state) => {
+  if (!state) return state
+  const trimmed = String(state).trim()
+  if (trimmed.endsWith(' State') || trimmed === 'Federal Capital Territory') {
+    return trimmed
+  }
+  return STATE_MAP[trimmed] || trimmed
+}
+
 const scheduleInspection = async () => {
+  if (!props.request?.id) {
+    alert('No request selected')
+    return
+  }
+
+  if (!props.request.agent_id) {
+    alert('Please assign an agent before scheduling the inspection.')
+    return
+  }
+
   saving.value = true
+
   try {
-    const { error } = await supabase
+    const fullState = normalizeState(
+      props.request.state ||
+      props.request.property?.state ||
+      props.request.properties?.state
+    )
+
+    // 1. Update the request
+    const { error: requestError } = await supabase
       .from('property_requests')
       .update({
         scheduled_date: form.value.scheduled_date,
         scheduled_time: form.value.scheduled_time,
-        meeting_location: form.value.meeting_location,
-        admin_notes: form.value.admin_notes,
-        status: 'scheduled'
+        meeting_location: form.value.meeting_location || null,
+        admin_notes: form.value.admin_notes || null,
+        status: 'scheduled',
+        state: fullState,
+        updated_at: new Date().toISOString()
       })
       .eq('id', props.request.id)
 
-    if (error) throw error
+    if (requestError) throw requestError
 
-    // Optional: create notification for customer
+    // 2. Create the inspection (this is what was missing)
+    const { data: inspection, error: inspectionError } = await supabase
+      .from('inspections')
+      .insert({
+        agent_id: props.request.agent_id,
+        customer_id: props.request.customer_id,
+        property_id: props.request.property_id,
+        request_id: props.request.id,
+        status: 'scheduled',
+        state: fullState,
+        city: props.request.city || props.request.property?.city || null,
+        inspection_date: form.value.scheduled_date,
+        inspection_time: form.value.scheduled_time,
+        admin_notes: form.value.admin_notes || null,
+        meeting_location: form.value.meeting_location || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select('id')
+      .single()
+
+    if (inspectionError) throw inspectionError
+
+    // 3. Notify customer
     if (props.request.customer_id) {
       await supabase.from('notifications').insert({
         user_id: props.request.customer_id,
         title: 'Inspection Scheduled',
         message: `Your property inspection has been scheduled for ${form.value.scheduled_date} at ${form.value.scheduled_time}.`,
-        type: 'inspection'
+        type: 'inspection',
+        related_id: inspection?.id || props.request.id,
+        related_table: 'inspections'
+      })
+    }
+
+    // 4. Notify agent
+    if (props.request.agent_id) {
+      await supabase.from('notifications').insert({
+        user_id: props.request.agent_id,
+        title: 'New Inspection Scheduled',
+        message: `An inspection has been scheduled for ${form.value.scheduled_date} at ${form.value.scheduled_time}.`,
+        type: 'inspection',
+        related_id: inspection?.id || props.request.id,
+        related_table: 'inspections'
       })
     }
 
     emit('scheduled')
   } catch (err) {
-    console.error(err)
-    alert('Failed to schedule inspection')
+    console.error('Schedule error:', err)
+    alert(err.message || 'Failed to schedule inspection')
   } finally {
     saving.value = false
   }

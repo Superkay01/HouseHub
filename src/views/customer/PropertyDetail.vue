@@ -92,6 +92,11 @@
             <p class="text-[var(--royal-blue)] mb-6">
               📍 {{ property.area }}, {{ property.city }}, {{ property.state }}
             </p>
+            <p class="text-[var(--royal-blue)] mb-6">
+              {{ property.inspection_fee 
+                  ? `Inspection Fee: ₦${Number(property.inspection_fee).toLocaleString()}` 
+                  : 'No Inspection Fee' }}
+            </p>
 
             <!-- Unique View Count -->
             <div class="flex items-center gap-2 text-medium-gray text-sm mb-6">

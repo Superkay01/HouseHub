@@ -29,7 +29,7 @@
           </div>
 
           <!-- Stats Cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-12 text-[var(--royal-blue)] text-sm">
             <StatsCard 
               title="Total Properties" 
               :value="stats.totalProperties" 
@@ -58,6 +58,13 @@
               :trend="getTrend(stats.customers)"
               color="medium-blue"
             />
+            <StatsCard 
+              title="Inspection Payments" 
+              :value="stats.inspectionPayments" 
+              :icon="ClipboardCheck" 
+              :trend="getTrend(stats.inspectionPayments)"
+              color="steel-blue"
+            />
           </div>
 
           <!-- Recent Activity -->
@@ -81,7 +88,7 @@ import { ref, onMounted } from 'vue'
 import { supabase } from '@/supabaseClient.js'
 
 // Lucide Icons
-import { Building2, Users, ShieldCheck, UserRound } from 'lucide-vue-next'
+import { Building2, Users, ShieldCheck, UserRound, ClipboardCheck } from 'lucide-vue-next'
 
 // Components
 import StatsCard from '@/components/admin/StatsCard.vue'
@@ -98,7 +105,8 @@ const stats = ref({
   totalProperties: 0,
   activeAgents: 0,
   pendingVerifications: 0,
-  customers: 0
+  customers: 0,
+  inspectionPayments: 0
 })
 
 const fetchAdminProfile = async () => {
@@ -122,25 +130,40 @@ const fetchAllStats = async () => {
   try {
     // Total Properties
     const { count: propCount } = await supabase
-      .from('properties').select('*', { count: 'exact', head: true })
+      .from('properties')
+      .select('*', { count: 'exact', head: true })
 
     // Active Agents
     const { count: agentCount } = await supabase
-      .from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'agent')
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'agent')
 
     // Pending Verifications
     const { count: pendingCount } = await supabase
-      .from('agent_verifications').select('*', { count: 'exact', head: true }).eq('verification_status', 'pending')
+      .from('agent_verifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('verification_status', 'pending')
 
     // Customers
     const { count: custCount } = await supabase
-      .from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'customer')
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'customer')
+
+    // Successful Inspection Fee Payments
+    const { count: inspectionCount } = await supabase
+      .from('payments')
+      .select('*', { count: 'exact', head: true })
+      .eq('payment_type', 'inspection_fee')
+      .eq('status', 'success')
 
     stats.value = {
       totalProperties: propCount || 0,
       activeAgents: agentCount || 0,
       pendingVerifications: pendingCount || 0,
-      customers: custCount || 0
+      customers: custCount || 0,
+      inspectionPayments: inspectionCount || 0
     }
   } catch (err) {
     console.error('Stats fetch error:', err)
