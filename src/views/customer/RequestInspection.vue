@@ -12,23 +12,24 @@
       <div class="p-6 border-b" v-if="property">
         <div class="flex gap-4">
           <img 
-            :src="property.cover_image" 
+            :src="property.cover_image || placeholderImg" 
             class="w-24 h-24 object-cover rounded-2xl flex-shrink-0"
+            alt=""
           />
-          <div class="flex-1">
+          <div class="flex-1 min-w-0">
             <h1 class="text-2xl font-semibold leading-tight">{{ property.title }}</h1>
             <p class="text-medium-gray mt-1">
               📍 {{ property.area }}, {{ property.city }}, {{ property.state }}
             </p>
             
             <div class="flex items-center gap-6 mt-3 text-sm">
-              <div>🛏️ {{ property.bedrooms }} Bedrooms</div>
-              <div>🚿 {{ property.bathrooms }} Bathrooms</div>
-              <div>🚗 {{ property.parking_spaces || 0 }} Parking</div>
+              <div>🛏️ {{ property.bedrooms ?? '—' }} Bedrooms</div>
+              <div>🚿 {{ property.bathrooms ?? '—' }} Bathrooms</div>
+              <div>🚗 {{ property.parking_spaces ?? 0 }} Parking</div>
             </div>
 
             <p class="mt-3 text-2xl font-bold text-[var(--bright-green)]">
-              ₦{{ Number(property.price).toLocaleString() }} 
+              ₦{{ formatMoney(property.price) }} 
               <span class="text-sm font-normal text-medium-gray">per year</span>
             </p>
           </div>
@@ -88,7 +89,7 @@
             ></textarea>
           </div>
 
-          <!-- ==================== INSPECTION FEE PAYMENT ==================== -->
+          <!-- Inspection Fee Payment -->
           <div class="bg-[#f0f7ff] border border-[var(--hover-blue)] rounded-3xl p-6">
             <div class="flex items-center justify-between mb-4">
               <div>
@@ -98,35 +99,33 @@
                 </p>
               </div>
               <p class="text-2xl font-bold text-[var(--royal-blue)]">
-                ₦{{ Number(property.inspection_fee || 0).toLocaleString() }}
+                ₦{{ formatMoney(property.inspection_fee) }}
               </p>
             </div>
 
-            <!-- Payment Success -->
             <div v-if="hasPaid" class="flex items-center gap-2 text-green-600 font-medium mb-4">
               <span class="text-xl">✓</span>
               <span>Payment Successful</span>
             </div>
 
-            <!-- Pay Button -->
             <button
-  v-else
-  type="button"
-  @click="payInspectionFee"
-  :disabled="isPaying || isVerifying || !property.inspection_fee"
-  class="w-full bg-[var(--bright-green)] hover:bg-green-600 disabled:bg-gray-400 text-white py-3.5 rounded-2xl font-semibold transition-all"
->
-  <span v-if="isPaying">Opening Paystack...</span>
-  <span v-else-if="isVerifying">Verifying Payment...</span>
-  <span v-else>Pay Inspection Fee</span>
-</button>
+              v-else
+              type="button"
+              @click="payInspectionFee"
+              :disabled="isPaying || isVerifying || !canPay"
+              class="w-full bg-[var(--bright-green)] hover:bg-green-600 disabled:bg-gray-400 text-white py-3.5 rounded-2xl font-semibold transition-all"
+            >
+              <span v-if="isPaying">Opening Paystack...</span>
+              <span v-else-if="isVerifying">Verifying Payment...</span>
+              <span v-else>Pay Inspection Fee</span>
+            </button>
 
-            <p v-if="!property.inspection_fee" class="mt-3 text-sm text-red-500">
-              This property has no inspection fee set.
+            <p v-if="!canPay" class="mt-3 text-sm text-red-500">
+              This property has no valid inspection fee set.
             </p>
           </div>
 
-          <!-- Submit Button (only active after payment) -->
+          <!-- Submit -->
           <button
             type="submit"
             :disabled="isSubmitting || !hasPaid || !form.inspection_date || !form.inspection_time"
@@ -145,7 +144,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 
@@ -155,9 +154,10 @@ const router = useRouter()
 const property = ref(null)
 const isSubmitting = ref(false)
 const isPaying = ref(false)
+const isVerifying = ref(false)
 const hasPaid = ref(false)
 const paymentReference = ref('')
-const isVerifying = ref(false)
+const placeholderImg = 'https://via.placeholder.com/200x200?text=Property'
 
 const form = ref({
   inspection_date: '',
@@ -171,6 +171,16 @@ const timeSlots = [
 ]
 
 const today = new Date().toISOString().split('T')[0]
+
+const formatMoney = (value) => {
+  if (value == null || value === '') return '0'
+  return Number(value).toLocaleString()
+}
+
+const canPay = computed(() => {
+  const fee = Number(property.value?.inspection_fee || 0)
+  return fee > 0
+})
 
 const fetchProperty = async () => {
   try {
@@ -189,77 +199,15 @@ const fetchProperty = async () => {
   }
 }
 
-// ==================== VERIFY PAYMENT WITH BACKEND ====================
-const verifyAndSavePayment = async (reference) => {
-  isVerifying.value = true
-  try {
-    const { data: { session } } = await supabase.auth.getSession()
-
-    if (!session) {
-      throw new Error('No active session. Please login again.')
-    }
-
-    const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-paystack-payment`
-
-    console.log('Calling URL:', functionUrl)
-    console.log('Reference:', reference)
-    console.log('Property ID:', property.value.id)
-
-    const response = await fetch(functionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY
-      },
-      body: JSON.stringify({
-        reference: reference,
-        property_id: property.value.id
-      })
-    })
-
-    const responseText = await response.text()
-    console.log('Status Code:', response.status)
-    console.log('Raw Response:', responseText)
-
-    if (!responseText) {
-      throw new Error(`Empty response from server (Status: ${response.status})`)
-    }
-
-    let result
-    try {
-      result = JSON.parse(responseText)
-    } catch (e) {
-      throw new Error(`Invalid JSON (Status ${response.status}): ${responseText}`)
-    }
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || result.error || 'Verification failed')
-    }
-
-    // Success
-    paymentReference.value = reference
-    hasPaid.value = true
-    alert('✅ Payment successful and verified!')
-
-  } catch (error) {
-    console.error('Full error:', error)
-    hasPaid.value = false
-    alert('Payment verification failed: ' + error.message)
-  } finally {
-    isVerifying.value = false
-    isPaying.value = false
-  }
-}
 // ==================== PAYSTACK ====================
 const payInspectionFee = async () => {
-  if (!property.value?.inspection_fee || property.value.inspection_fee <= 0) {
-    alert('No inspection fee set for this property')
+  if (!canPay.value) {
+    alert('No valid inspection fee set for this property')
     return
   }
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!user?.email) {
     alert('Please login to pay')
     router.push('/login')
     return
@@ -270,12 +218,33 @@ const payInspectionFee = async () => {
     return
   }
 
+  const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
+  if (!publicKey || !String(publicKey).startsWith('pk_')) {
+    alert('Payment is not configured correctly (invalid public key).')
+    console.error('VITE_PAYSTACK_PUBLIC_KEY missing or invalid:', publicKey)
+    return
+  }
+
+  // Must be integer kobo
+  const amountInKobo = Math.round(Number(property.value.inspection_fee) * 100)
+  if (!amountInKobo || amountInKobo < 100) {
+    alert('Invalid inspection fee amount')
+    return
+  }
+
+  console.log('Paystack init:', {
+    key: publicKey.slice(0, 12) + '...',
+    email: user.email,
+    amount: amountInKobo,
+    fee: property.value.inspection_fee
+  })
+
   isPaying.value = true
 
   const handler = window.PaystackPop.setup({
-    key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+    key: publicKey,
     email: user.email,
-    amount: Number(property.value.inspection_fee) * 100, // kobo
+    amount: amountInKobo,
     currency: 'NGN',
     ref: `insp_${property.value.id}_${Date.now()}`,
     metadata: {
@@ -283,8 +252,8 @@ const payInspectionFee = async () => {
       customer_id: user.id,
       type: 'inspection_fee'
     },
-    callback: function (response) {          // ← Must be a normal function (not async)
-      // We call an async function inside
+    callback: function (response) {
+      // Keep callback sync; do async work outside
       savePayment(response.reference, user.id)
     },
     onClose: function () {
@@ -296,16 +265,16 @@ const payInspectionFee = async () => {
   handler.openIframe()
 }
 
-// Separate async function to save the payment
 const savePayment = async (reference, customerId) => {
+  isVerifying.value = true
   try {
     const { error } = await supabase
       .from('payments')
       .insert({
-        reference: reference,
+        reference,
         customer_id: customerId,
         property_id: property.value.id,
-        amount: property.value.inspection_fee,
+        amount: Number(property.value.inspection_fee),
         currency: 'NGN',
         status: 'success',
         payment_type: 'inspection_fee',
@@ -314,12 +283,12 @@ const savePayment = async (reference, customerId) => {
 
     if (error) {
       console.error('Error saving payment:', error)
-      alert('Payment was successful but failed to save. Please contact support with reference: ' + reference)
-      isPaying.value = false
+      alert(
+        'Payment was successful but failed to save. Contact support with ref: ' + reference
+      )
       return
     }
 
-    // Success
     paymentReference.value = reference
     hasPaid.value = true
     alert('✅ Payment successful! You can now submit your inspection request.')
@@ -327,6 +296,7 @@ const savePayment = async (reference, customerId) => {
     console.error(err)
     alert('Something went wrong while saving the payment.')
   } finally {
+    isVerifying.value = false
     isPaying.value = false
   }
 }
@@ -376,7 +346,6 @@ const submitRequest = async () => {
 
     alert('✅ Inspection request submitted successfully!')
     router.push('/customer/request')
-
   } catch (error) {
     console.error(error)
     alert(error.message || 'Failed to submit request. Please try again.')
