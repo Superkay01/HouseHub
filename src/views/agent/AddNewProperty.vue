@@ -84,8 +84,8 @@
     v-model="form.state"
     class="w-full px-5 py-4 border border-[var(--hover-blue)] text-[var(--royal-blue)] rounded-2xl"
   >
-    <option value="Kwara">Kwara State</option>
-    <option value="Ogun">Ogun State</option>
+    <option value="Kwara State">Kwara State</option>
+    <option value="Ogun State">Ogun State</option>
   </select>
 </div>
 
@@ -328,7 +328,7 @@ const form = ref({
   title: '',
   property_type: '',
   purpose: 'For Rent',
-  state: 'Kwara',
+  state: 'Kwara State',
   city: 'Ilorin',
   area: '',
   address: '',
@@ -354,7 +354,7 @@ const form = ref({
 
 // 2. Location data
 const locationData: Record<string, { cities: string[]; areas: Record<string, string[]> }> = {
-  Kwara: {
+  'Kwara State': {
     cities: ['Ilorin'],
     areas: {
       Ilorin: [
@@ -365,7 +365,7 @@ const locationData: Record<string, { cities: string[]; areas: Record<string, str
       ]
     }
   },
-  Ogun: {
+  'Ogun State': {
     cities: ['Ijebu Ode'],
     areas: {
       'Ijebu Ode': [

@@ -206,7 +206,9 @@ const fetchRequests = async () => {
           status
         )
       `)
-      .or(`state.eq.${admin.state},state.eq.Kwara`)
+      .or(
+  `state.eq.${admin.state},state.eq.Kwara,state.eq.Kwara State,state.eq.Ogun,state.eq.Ogun State`
+)
       .order('created_at', { ascending: false })
 
     if (error) {
