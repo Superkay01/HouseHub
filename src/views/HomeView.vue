@@ -10,7 +10,8 @@
     <HowItWorks/>
     <WhyChooseUs/>
     <BecomeAgentCTA/>
-    <Testimonials/>
+    <!-- <Testimonials/> -->
+     <AppReviewsSection/>
     <FAQSection/>
     <Footer/>
 
@@ -29,5 +30,6 @@ import Testimonials from '@/components/Testimonials.vue';
 import FAQSection from '@/components/FAQSection.vue';
 import Footer from '@/components/Footer.vue';
 import Navbar from '@/components/Navbar.vue';
+import AppReviewsSection from '@/components/AppReviewsSection.vue';
 
 </script>

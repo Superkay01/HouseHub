@@ -82,54 +82,30 @@
 
             <div class="flex flex-wrap gap-2 mt-4">
               <template v-if="item.status === 'pending'">
-                <button
-                  type="button"
-                  @click="acceptInspection(item)"
-                  class="flex-1 py-2.5 bg-[var(--royal-blue)] text-white rounded-2xl text-sm font-semibold"
-                >
+                <button type="button" @click="acceptInspection(item)" class="flex-1 py-2.5 bg-[var(--royal-blue)] text-white rounded-2xl text-sm font-semibold">
                   Accept Inspection
                 </button>
-                <button
-                  type="button"
-                  @click="openDecline(item)"
-                  class="flex-1 py-2.5 bg-red-50 text-red-700 rounded-2xl text-sm font-semibold"
-                >
+                <button type="button" @click="openDecline(item)" class="flex-1 py-2.5 bg-red-50 text-red-700 rounded-2xl text-sm font-semibold">
                   Decline
                 </button>
               </template>
 
               <template v-else-if="item.status === 'scheduled'">
-                <button
-                  type="button"
-                  @click="confirmInspection(item)"
-                  class="flex-1 py-2.5 bg-green-600 text-white rounded-2xl text-sm font-semibold"
-                >
+                <button type="button" @click="confirmInspection(item)" class="flex-1 py-2.5 bg-green-600 text-white rounded-2xl text-sm font-semibold">
                   Confirm Inspection
                 </button>
-                <button
-                  type="button"
-                  @click="openReschedule(item)"
-                  class="flex-1 py-2.5 border rounded-2xl text-sm font-medium"
-                >
+                <button type="button" @click="openReschedule(item)" class="flex-1 py-2.5 border rounded-2xl text-sm font-medium">
                   Request Reschedule
                 </button>
               </template>
 
               <template v-else-if="item.status === 'in_progress' && hasIncompleteReport(item)">
-                <button
-                  type="button"
-                  @click="openDrawer(item)"
-                  class="w-full py-2.5 bg-amber-500 text-white rounded-2xl text-sm font-semibold"
-                >
+                <button type="button" @click="openDrawer(item)" class="w-full py-2.5 bg-amber-500 text-white rounded-2xl text-sm font-semibold">
                   Continue Report
                 </button>
               </template>
 
-              <button
-                type="button"
-                @click="openDrawer(item)"
-                class="w-full py-2.5 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl text-sm font-medium"
-              >
+              <button type="button" @click="openDrawer(item)" class="w-full py-2.5 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl text-sm font-medium">
                 View Details
               </button>
             </div>
@@ -170,10 +146,7 @@
             placeholder="Search property, inspection ID, area, city..."
             class="px-5 py-3.5 rounded-2xl border border-gray-200 focus:border-[var(--royal-blue)] outline-none"
           />
-          <select
-            v-model="statusFilter"
-            class="px-5 py-3.5 rounded-2xl border border-gray-200 focus:border-[var(--royal-blue)] outline-none"
-          >
+          <select v-model="statusFilter" class="px-5 py-3.5 rounded-2xl border border-gray-200 focus:border-[var(--royal-blue)] outline-none">
             <option value="">All Status</option>
             <option value="pending">Pending</option>
             <option value="accepted">Accepted</option>
@@ -186,10 +159,7 @@
             <option value="no_show">No Show</option>
             <option value="declined">Declined</option>
           </select>
-          <select
-            v-model="dateFilter"
-            class="px-5 py-3.5 rounded-2xl border border-gray-200 focus:border-[var(--royal-blue)] outline-none"
-          >
+          <select v-model="dateFilter" class="px-5 py-3.5 rounded-2xl border border-gray-200 focus:border-[var(--royal-blue)] outline-none">
             <option value="">All Dates</option>
             <option value="today">Today</option>
             <option value="tomorrow">Tomorrow</option>
@@ -214,10 +184,7 @@
         </p>
       </div>
 
-      <div
-        v-else-if="filteredInspections.length === 0"
-        class="bg-white rounded-3xl p-12 text-center shadow-sm"
-      >
+      <div v-else-if="filteredInspections.length === 0" class="bg-white rounded-3xl p-12 text-center shadow-sm">
         <h3 class="text-xl font-semibold text-[var(--royal-blue)]">{{ emptyTitle }}</h3>
         <p class="text-medium-gray mt-2">{{ emptyMessage }}</p>
       </div>
@@ -238,20 +205,13 @@
               </tr>
             </thead>
             <tbody class="divide-y">
-              <tr
-                v-for="item in filteredInspections"
-                :key="item.id"
-                class="hover:bg-gray-50 transition"
-              >
+              <tr v-for="item in filteredInspections" :key="item.id" class="hover:bg-gray-50 transition">
                 <td class="py-5 px-6 font-medium text-sm">
                   {{ item.inspection_code || item.id.slice(0, 8) }}
                 </td>
                 <td class="py-5 px-6">
                   <div class="flex items-center gap-3">
-                    <img
-                      :src="item.property?.cover_image || placeholderImg"
-                      class="w-12 h-12 rounded-xl object-cover"
-                    />
+                    <img :src="item.property?.cover_image || placeholderImg" class="w-12 h-12 rounded-xl object-cover" />
                     <span class="font-medium line-clamp-1">{{ item.property?.title }}</span>
                   </div>
                 </td>
@@ -275,11 +235,7 @@
                   </span>
                 </td>
                 <td class="py-5 px-6 text-right">
-                  <button
-                    type="button"
-                    @click="openDrawer(item)"
-                    class="px-4 py-2 bg-[var(--royal-blue)] text-white rounded-2xl text-sm"
-                  >
+                  <button type="button" @click="openDrawer(item)" class="px-4 py-2 bg-[var(--royal-blue)] text-white rounded-2xl text-sm">
                     View
                   </button>
                 </td>
@@ -290,16 +246,9 @@
 
         <!-- Mobile cards -->
         <div class="lg:hidden space-y-4">
-          <div
-            v-for="item in filteredInspections"
-            :key="item.id"
-            class="bg-white rounded-3xl p-5 shadow-sm"
-          >
+          <div v-for="item in filteredInspections" :key="item.id" class="bg-white rounded-3xl p-5 shadow-sm">
             <div class="flex gap-4">
-              <img
-                :src="item.property?.cover_image || placeholderImg"
-                class="w-20 h-20 rounded-2xl object-cover"
-              />
+              <img :src="item.property?.cover_image || placeholderImg" class="w-20 h-20 rounded-2xl object-cover" />
               <div class="flex-1 min-w-0">
                 <p class="font-semibold line-clamp-1">{{ item.property?.title }}</p>
                 <p class="text-sm mt-1">
@@ -317,11 +266,7 @@
                 </span>
               </div>
             </div>
-            <button
-              type="button"
-              @click="openDrawer(item)"
-              class="w-full mt-4 py-3 border rounded-2xl text-sm font-medium"
-            >
+            <button type="button" @click="openDrawer(item)" class="w-full mt-4 py-3 border rounded-2xl text-sm font-medium">
               View Inspection
             </button>
           </div>
@@ -330,11 +275,7 @@
     </div>
 
     <!-- ===================== DRAWER ===================== -->
-    <div
-      v-if="selected"
-      class="fixed inset-0 z-50 bg-black/50 flex justify-end"
-      @click.self="selected = null"
-    >
+    <div v-if="selected" class="fixed inset-0 z-50 bg-black/50 flex justify-end" @click.self="selected = null">
       <div class="bg-white w-full max-w-xl h-full overflow-y-auto shadow-2xl">
         <div class="sticky top-0 bg-white border-b px-6 py-5 flex items-center justify-between z-10">
           <div>
@@ -347,7 +288,6 @@
         </div>
 
         <div class="p-6 space-y-8">
-          <!-- Status helper -->
           <div class="rounded-2xl p-4 bg-blue-50 border border-blue-100">
             <p class="text-sm font-semibold text-[var(--royal-blue)]">{{ statusMessage(selected).title }}</p>
             <p class="text-sm text-medium-gray mt-1">{{ statusMessage(selected).body }}</p>
@@ -356,12 +296,8 @@
             </p>
           </div>
 
-          <!-- Property -->
           <div>
-            <img
-              :src="selected.property?.cover_image || placeholderImg"
-              class="w-full h-48 object-cover rounded-3xl mb-4"
-            />
+            <img :src="selected.property?.cover_image || placeholderImg" class="w-full h-48 object-cover rounded-3xl mb-4" />
             <h3 class="text-2xl font-semibold">{{ selected.property?.title }}</h3>
             <p class="text-medium-gray mt-1">
               {{ selected.property?.property_type }} ·
@@ -372,7 +308,6 @@
             </p>
           </div>
 
-          <!-- Preparation -->
           <section class="bg-gray-50 rounded-3xl p-5 space-y-3">
             <h4 class="font-semibold text-[var(--royal-blue)]">Inspection Preparation</h4>
             <div class="grid grid-cols-2 gap-3 text-sm">
@@ -380,62 +315,34 @@
               <div><span class="text-medium-gray">Beds / Baths</span><p class="font-medium">{{ selected.property?.bedrooms || 0 }} / {{ selected.property?.bathrooms || 0 }}</p></div>
               <div class="col-span-2"><span class="text-medium-gray">Address</span><p class="font-medium">{{ fullAddress(selected) }}</p></div>
             </div>
-
             <div class="flex flex-wrap gap-2 pt-2">
-              <button type="button" @click="openMaps(selected)" class="px-4 py-2 bg-[var(--royal-blue)] text-white rounded-2xl text-sm">
-                📍 Get Directions
-              </button>
-              <button type="button" @click="copyAddress(selected)" class="px-4 py-2 border rounded-2xl text-sm">
-                Copy Address
-              </button>
+              <button type="button" @click="openMaps(selected)" class="px-4 py-2 bg-[var(--royal-blue)] text-white rounded-2xl text-sm">📍 Get Directions</button>
+              <button type="button" @click="copyAddress(selected)" class="px-4 py-2 border rounded-2xl text-sm">Copy Address</button>
             </div>
-
             <div v-if="selected.admin_notes" class="mt-3 p-3 bg-amber-50 rounded-2xl text-sm">
               <p class="font-semibold text-amber-800">Admin Instructions</p>
               <p class="mt-1 text-amber-900">{{ selected.admin_notes }}</p>
             </div>
           </section>
 
-          <!-- Customer -->
           <section class="bg-gray-50 rounded-3xl p-5">
             <p class="text-sm text-medium-gray">Customer</p>
             <p class="font-semibold mt-1">{{ maskName(selected.customer?.full_name) }}</p>
             <p class="text-sm mt-2">
               Customer Confirmation:
-              <span class="font-medium">
-                {{ customerConfirmationLabel(selected) }}
-              </span>
+              <span class="font-medium">{{ customerConfirmationLabel(selected) }}</span>
             </p>
             <div v-if="canContactCustomer" class="flex flex-wrap gap-2 mt-3">
-              <a
-                v-if="selected.customer?.phone"
-                :href="`tel:${selected.customer.phone}`"
-                class="px-4 py-2 bg-green-600 text-white rounded-2xl text-sm"
-              >Call</a>
-              <a
-                v-if="selected.customer?.phone"
-                :href="`https://wa.me/${normalizePhone(selected.customer.phone)}`"
-                target="_blank"
-                class="px-4 py-2 bg-[#25D366] text-white rounded-2xl text-sm"
-              >WhatsApp</a>
-              <button
-                v-if="selected.customer?.phone"
-                type="button"
-                @click="copyText(selected.customer.phone, 'Phone copied')"
-                class="px-4 py-2 border rounded-2xl text-sm"
-              >Copy phone</button>
+              <a v-if="selected.customer?.phone" :href="`tel:${selected.customer.phone}`" class="px-4 py-2 bg-green-600 text-white rounded-2xl text-sm">Call</a>
+              <a v-if="selected.customer?.phone" :href="`https://wa.me/${normalizePhone(selected.customer.phone)}`" target="_blank" class="px-4 py-2 bg-[#25D366] text-white rounded-2xl text-sm">WhatsApp</a>
+              <button v-if="selected.customer?.phone" type="button" @click="copyText(selected.customer.phone, 'Phone copied')" class="px-4 py-2 border rounded-2xl text-sm">Copy phone</button>
             </div>
           </section>
 
-          <!-- Timeline -->
           <section>
             <h4 class="font-semibold mb-4">Inspection Timeline</h4>
             <div class="space-y-3">
-              <div
-                v-for="(step, i) in buildTimeline(selected)"
-                :key="i"
-                class="flex gap-3 text-sm"
-              >
+              <div v-for="(step, i) in buildTimeline(selected)" :key="i" class="flex gap-3 text-sm">
                 <div
                   :class="[
                     'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
@@ -453,316 +360,256 @@
             </div>
           </section>
 
-          <!-- Actions (same as your original – kept intact) -->
           <div class="space-y-3 pt-2">
             <template v-if="selected.status === 'pending'">
-              <button type="button" @click="acceptInspection(selected)" class="w-full py-4 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold">
-                Accept Inspection
-              </button>
-              <button type="button" @click="openDecline(selected)" class="w-full py-4 bg-red-50 text-red-700 rounded-2xl font-semibold">
-                Decline Inspection
-              </button>
+              <button type="button" @click="acceptInspection(selected)" class="w-full py-4 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold">Accept Inspection</button>
+              <button type="button" @click="openDecline(selected)" class="w-full py-4 bg-red-50 text-red-700 rounded-2xl font-semibold">Decline Inspection</button>
             </template>
 
-            <button
-              v-if="selected.status === 'scheduled'"
-              type="button"
-              @click="confirmInspection(selected)"
-              class="w-full py-4 bg-green-600 text-white rounded-2xl font-semibold"
-            >
+            <button v-if="selected.status === 'scheduled'" type="button" @click="confirmInspection(selected)" class="w-full py-4 bg-green-600 text-white rounded-2xl font-semibold">
               Confirm Inspection
             </button>
 
-            <button
-              v-if="['accepted','scheduled','confirmed'].includes(selected.status)"
-              type="button"
-              @click="openReschedule(selected)"
-              class="w-full py-4 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl font-semibold"
-            >
+            <button v-if="['accepted','scheduled','confirmed'].includes(selected.status)" type="button" @click="openReschedule(selected)" class="w-full py-4 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl font-semibold">
               Request Reschedule
             </button>
 
-            <button
-              v-if="['confirmed','scheduled'].includes(selected.status) && !selected.checked_in_at"
-              type="button"
-              @click="checkIn(selected)"
-              class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-semibold"
-            >
+            <button v-if="['confirmed','scheduled'].includes(selected.status) && !selected.checked_in_at" type="button" @click="checkIn(selected)" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-semibold">
               Check In at Property
             </button>
             <p v-if="selected.checked_in_at" class="text-sm text-green-700 font-medium">
               ✓ Checked in at {{ formatDateTime(selected.checked_in_at) }}
             </p>
 
-            <button
-              v-if="canStart(selected)"
-              type="button"
-              @click="openStartConfirm(selected)"
-              class="w-full py-4 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold"
-            >
+            <button v-if="canStart(selected)" type="button" @click="openStartConfirm(selected)" class="w-full py-4 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold">
               Start Inspection
             </button>
 
-            <button
-              v-if="selected.status === 'in_progress'"
-              type="button"
-              @click="openReport(selected)"
-              class="w-full py-4 bg-green-600 text-white rounded-2xl font-semibold"
-            >
+            <button v-if="selected.status === 'in_progress'" type="button" @click="openReport(selected)" class="w-full py-4 bg-green-600 text-white rounded-2xl font-semibold">
               {{ hasIncompleteReport(selected) ? 'Continue / Submit Report' : 'Complete Inspection Report' }}
             </button>
 
-            <button
-              v-if="['scheduled','confirmed','in_progress'].includes(selected.status)"
-              type="button"
-              @click="openNoShow(selected)"
-              class="w-full py-4 bg-amber-50 text-amber-800 rounded-2xl font-semibold"
-            >
+            <button v-if="['scheduled','confirmed','in_progress'].includes(selected.status)" type="button" @click="openNoShow(selected)" class="w-full py-4 bg-amber-50 text-amber-800 rounded-2xl font-semibold">
               Report Customer No-Show
             </button>
 
-            <button
-              v-if="['scheduled','confirmed','accepted'].includes(selected.status)"
-              type="button"
-              @click="openCancel(selected)"
-              class="w-full py-4 bg-red-50 text-red-700 rounded-2xl font-semibold"
-            >
+            <button v-if="['scheduled','confirmed','accepted'].includes(selected.status)" type="button" @click="openCancel(selected)" class="w-full py-4 bg-red-50 text-red-700 rounded-2xl font-semibold">
               Cancel Inspection
             </button>
 
-            <button type="button" @click="openIssue(selected)" class="w-full py-4 border rounded-2xl font-medium">
-              Report an Issue
-            </button>
-
-            <button type="button" @click="openProperty" class="w-full py-4 border rounded-2xl font-medium">
-              Open Property
-            </button>
+            <button type="button" @click="openIssue(selected)" class="w-full py-4 border rounded-2xl font-medium">Report an Issue</button>
+            <button type="button" @click="openProperty" class="w-full py-4 border rounded-2xl font-medium">Open Property</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Start confirm -->
-<div v-if="showStartModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-3xl w-full max-w-lg p-6">
-    <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Ready to Start?</h3>
-    <div class="space-y-2 text-sm mb-6">
-      <p><span class="text-medium-gray">Property:</span> {{ modalTarget?.property?.title }}</p>
-      <p><span class="text-medium-gray">Customer:</span> {{ maskName(modalTarget?.customer?.full_name) }}</p>
-      <p><span class="text-medium-gray">Scheduled:</span> {{ formatDate(modalTarget?.inspection_date) }} · {{ modalTarget?.inspection_time }}</p>
-      <p><span class="text-medium-gray">Location:</span> {{ fullAddress(modalTarget) }}</p>
-    </div>
-    <div class="flex gap-3">
-      <button type="button" @click="showStartModal = false" class="flex-1 py-3 border rounded-2xl">
-        Back
-      </button>
-      <button
-        type="button"
-        :disabled="saving"
-        @click="startInspection"
-        class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl"
-      >
-        {{ saving ? 'Starting...' : 'Start Inspection' }}
-      </button>
-    </div>
-  </div>
-</div>
-<!-- ===================== INSPECTION REPORT MODAL ===================== -->
-<div
-  v-if="showReportModal"
-  class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
->
-  <div class="bg-white rounded-3xl w-full max-w-2xl p-6 max-h-[92vh] overflow-y-auto">
-    <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-1">Inspection Report</h3>
-    <p v-if="reportForm.draftSavedAt" class="text-xs text-medium-gray mb-4">
-      Draft saved at {{ formatDateTime(reportForm.draftSavedAt) }}
-    </p>
-
-    <div class="space-y-4">
-      <!-- Outcome -->
-      <div>
-        <label class="text-sm font-medium">Inspection Outcome *</label>
-        <select v-model="reportForm.outcome" class="w-full px-4 py-3 rounded-2xl border mt-1">
-          <option value="property_inspected">Property inspected</option>
-          <option value="partial_inspection">Partial inspection</option>
-          <option value="could_not_access">Could not access property</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <!-- General Condition -->
-      <div>
-        <label class="text-sm font-medium">General Condition *</label>
-        <select v-model="reportForm.generalCondition" class="w-full px-4 py-3 rounded-2xl border mt-1">
-          <option value="">Select</option>
-          <option value="excellent">Excellent</option>
-          <option value="good">Good</option>
-          <option value="fair">Fair</option>
-          <option value="poor">Poor</option>
-        </select>
-      </div>
-
-      <!-- Accessibility -->
-      <div>
-        <label class="text-sm font-medium">Property Accessibility *</label>
-        <select v-model="reportForm.accessibility" class="w-full px-4 py-3 rounded-2xl border mt-1">
-          <option value="">Select</option>
-          <option value="accessible">Property accessible</option>
-          <option value="locked">Property locked</option>
-          <option value="no_access">Could not access property</option>
-        </select>
-      </div>
-
-      <!-- Customer Attendance -->
-      <div>
-        <label class="text-sm font-medium">Customer Attendance</label>
-        <select v-model="reportForm.customerAttended" class="w-full px-4 py-3 rounded-2xl border mt-1">
-          <option :value="true">Customer attended</option>
-          <option :value="false">Customer did not attend</option>
-        </select>
-      </div>
-
-      <!-- Room / Area Conditions -->
-      <div>
-        <label class="text-sm font-medium mb-2 block">Area Conditions</label>
-        <div class="grid grid-cols-2 gap-3">
-          <div v-for="field in conditionFields" :key="field.key">
-            <label class="text-xs font-medium">{{ field.label }}</label>
-            <select v-model="reportForm.conditions[field.key]" class="w-full px-3 py-2 rounded-xl border mt-1 text-sm">
-              <option value="">Not inspected</option>
-              <option value="good">Good</option>
-              <option value="fair">Fair</option>
-              <option value="poor">Poor</option>
-            </select>
-          </div>
+    <div v-if="showStartModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-4">Ready to Start?</h3>
+        <div class="space-y-2 text-sm mb-6">
+          <p><span class="text-medium-gray">Property:</span> {{ modalTarget?.property?.title }}</p>
+          <p><span class="text-medium-gray">Customer:</span> {{ maskName(modalTarget?.customer?.full_name) }}</p>
+          <p><span class="text-medium-gray">Scheduled:</span> {{ formatDate(modalTarget?.inspection_date) }} · {{ modalTarget?.inspection_time }}</p>
+          <p><span class="text-medium-gray">Location:</span> {{ fullAddress(modalTarget) }}</p>
         </div>
-      </div>
-
-      <!-- Notes -->
-      <div>
-        <label class="text-sm font-medium">Inspection Notes *</label>
-        <textarea
-          v-model="reportForm.notes"
-          rows="3"
-          class="w-full px-4 py-3 rounded-2xl border mt-1"
-          placeholder="e.g. Everywhere is good and conducive"
-        />
-      </div>
-
-      <!-- Recommendation -->
-      <div>
-        <label class="text-sm font-medium">Agent Recommendation *</label>
-        <select v-model="reportForm.recommendation" class="w-full px-4 py-3 rounded-2xl border mt-1">
-          <option value="">Select</option>
-          <option value="highly_recommended">Highly Recommended</option>
-          <option value="recommended">Recommended</option>
-          <option value="neutral">Neutral</option>
-          <option value="not_recommended">Not Recommended</option>
-        </select>
-        <textarea
-          v-model="reportForm.recommendationNotes"
-          rows="2"
-          class="w-full px-4 py-3 rounded-2xl border mt-2"
-          placeholder="Recommendation notes..."
-        />
-      </div>
-
-      <!-- Customer Feedback -->
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-sm font-medium">Customer interested?</label>
-          <select v-model="reportForm.feedback.interested" class="w-full px-4 py-3 rounded-2xl border mt-1">
-            <option value="">—</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-            <option value="maybe">Maybe</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-sm font-medium">Another viewing?</label>
-          <select v-model="reportForm.feedback.anotherViewing" class="w-full px-4 py-3 rounded-2xl border mt-1">
-            <option value="">—</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-      </div>
-      <textarea
-        v-model="reportForm.feedback.comments"
-        rows="2"
-        class="w-full px-4 py-3 rounded-2xl border"
-        placeholder="Customer comments..."
-      />
-
-      <!-- Photos -->
-      <div>
-        <label class="text-sm font-medium">Inspection Photos (proof)</label>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          class="mt-2 block w-full text-sm"
-          @change="onPhotosSelected"
-        />
-        <div class="flex flex-wrap gap-2 mt-3">
-          <div v-for="(p, idx) in reportForm.photos" :key="idx" class="relative">
-            <img :src="p.preview || p.url" class="w-20 h-20 object-cover rounded-xl" />
-            <button
-              type="button"
-              class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs"
-              @click="removePhoto(Number(idx))"
-            >×</button>
-          </div>
-        </div>
-        <p v-if="uploadProgress" class="text-xs text-medium-gray mt-2">{{ uploadProgress }}</p>
-      </div>
-
-      <!-- Video -->
-      <div>
-        <label class="text-sm font-medium">Inspection Video (optional)</label>
-        <input
-          type="file"
-          accept="video/*"
-          class="mt-2 block w-full text-sm"
-          @change="onVideoSelected"
-        />
-        <div v-if="reportForm.video" class="mt-2 flex items-center gap-3">
-          <span class="text-sm truncate">{{ reportForm.video.name || 'Video attached' }}</span>
-          <button type="button" class="text-red-600 text-sm" @click="reportForm.video = null">
-            Remove
+        <div class="flex gap-3">
+          <button type="button" @click="showStartModal = false" class="flex-1 py-3 border rounded-2xl">Back</button>
+          <button type="button" :disabled="saving" @click="startInspection" class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl">
+            {{ saving ? 'Starting...' : 'Start Inspection' }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Actions -->
-    <div class="flex flex-col sm:flex-row gap-3 mt-6">
-      <button
-        type="button"
-        @click="showReportModal = false"
-        class="flex-1 py-3 border rounded-2xl"
-      >
-        Close
-      </button>
-      <button
-        type="button"
-        :disabled="saving"
-        @click="saveDraftReport"
-        class="flex-1 py-3 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl"
-      >
-        {{ saving ? 'Saving...' : 'Save Draft' }}
-      </button>
-      <button
-        type="button"
-        :disabled="saving || !canSubmitReport"
-        @click="submitReport"
-        class="flex-1 py-3 bg-green-600 text-white rounded-2xl disabled:opacity-50"
-      >
-        {{ saving ? 'Submitting...' : 'Submit Report' }}
-      </button>
+    <!-- ===================== INSPECTION REPORT MODAL ===================== -->
+    <div v-if="showReportModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-2xl p-6 max-h-[92vh] overflow-y-auto">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-1">Inspection Report</h3>
+        <p v-if="reportForm.draftSavedAt" class="text-xs text-medium-gray mb-4">
+          Draft saved at {{ formatDateTime(reportForm.draftSavedAt) }}
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium">Inspection Outcome *</label>
+            <select v-model="reportForm.outcome" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option value="property_inspected">Property inspected</option>
+              <option value="partial_inspection">Partial inspection</option>
+              <option value="could_not_access">Could not access property</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">General Condition *</label>
+            <select v-model="reportForm.generalCondition" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option value="">Select</option>
+              <option value="excellent">Excellent</option>
+              <option value="good">Good</option>
+              <option value="fair">Fair</option>
+              <option value="poor">Poor</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Property Accessibility *</label>
+            <select v-model="reportForm.accessibility" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option value="">Select</option>
+              <option value="accessible">Property accessible</option>
+              <option value="locked">Property locked</option>
+              <option value="no_access">Could not access property</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Customer Attendance</label>
+            <select v-model="reportForm.customerAttended" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option :value="true">Customer attended</option>
+              <option :value="false">Customer did not attend</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">Area Conditions</label>
+            <div class="grid grid-cols-2 gap-3">
+              <div v-for="field in conditionFields" :key="field.key">
+                <label class="text-xs font-medium">{{ field.label }}</label>
+                <select v-model="reportForm.conditions[field.key]" class="w-full px-3 py-2 rounded-xl border mt-1 text-sm">
+                  <option value="">Not inspected</option>
+                  <option value="good">Good</option>
+                  <option value="fair">Fair</option>
+                  <option value="poor">Poor</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Inspection Notes *</label>
+            <textarea v-model="reportForm.notes" rows="3" class="w-full px-4 py-3 rounded-2xl border mt-1" placeholder="e.g. Everywhere is good and conducive" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Agent Recommendation *</label>
+            <select v-model="reportForm.recommendation" class="w-full px-4 py-3 rounded-2xl border mt-1">
+              <option value="">Select</option>
+              <option value="highly_recommended">Highly Recommended</option>
+              <option value="recommended">Recommended</option>
+              <option value="neutral">Neutral</option>
+              <option value="not_recommended">Not Recommended</option>
+            </select>
+            <textarea v-model="reportForm.recommendationNotes" rows="2" class="w-full px-4 py-3 rounded-2xl border mt-2" placeholder="Recommendation notes..." />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-sm font-medium">Customer interested?</label>
+              <select v-model="reportForm.feedback.interested" class="w-full px-4 py-3 rounded-2xl border mt-1">
+                <option value="">—</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+                <option value="maybe">Maybe</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-medium">Another viewing?</label>
+              <select v-model="reportForm.feedback.anotherViewing" class="w-full px-4 py-3 rounded-2xl border mt-1">
+                <option value="">—</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+          </div>
+          <textarea v-model="reportForm.feedback.comments" rows="2" class="w-full px-4 py-3 rounded-2xl border" placeholder="Customer comments..." />
+
+          <div>
+            <label class="text-sm font-medium">Inspection Photos (proof)</label>
+            <input type="file" accept="image/*" multiple class="mt-2 block w-full text-sm" @change="onPhotosSelected" />
+            <div class="flex flex-wrap gap-2 mt-3">
+              <div v-for="(p, idx) in reportForm.photos" :key="idx" class="relative">
+                <img :src="p.preview || p.url" class="w-20 h-20 object-cover rounded-xl" />
+                <button type="button" class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs" @click="removePhoto(Number(idx))">×</button>
+              </div>
+            </div>
+            <p v-if="uploadProgress" class="text-xs text-medium-gray mt-2">{{ uploadProgress }}</p>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium">Inspection Video (optional)</label>
+            <input type="file" accept="video/*" class="mt-2 block w-full text-sm" @change="onVideoSelected" />
+            <div v-if="reportForm.video" class="mt-2 flex items-center gap-3">
+              <span class="text-sm truncate">{{ reportForm.video.name || 'Video attached' }}</span>
+              <button type="button" class="text-red-600 text-sm" @click="reportForm.video = null">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 mt-6">
+          <button type="button" @click="showReportModal = false" class="flex-1 py-3 border rounded-2xl">Close</button>
+          <button type="button" :disabled="saving" @click="saveDraftReport" class="flex-1 py-3 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl">
+            {{ saving ? 'Saving...' : 'Save Draft' }}
+          </button>
+          <button type="button" :disabled="saving || !canSubmitReport" @click="submitReport" class="flex-1 py-3 bg-green-600 text-white rounded-2xl disabled:opacity-50">
+            {{ saving ? 'Submitting...' : 'Submit Report' }}
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+
+    <!-- ===================== AGENT APP REVIEW MODAL ===================== -->
+    <div v-if="showAgentReviewModal" class="fixed inset-0 z-[70] bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-2">Rate Your Experience</h3>
+        <p class="text-sm text-medium-gray mb-6">
+          Thank you for submitting the report! How was your experience using LodgeNext?
+        </p>
+
+        <div class="flex justify-center gap-2 mb-6">
+          <button
+            v-for="star in 5"
+            :key="star"
+            type="button"
+            @click="agentReviewForm.rating = star"
+            class="text-4xl transition-transform hover:scale-110"
+            :class="star <= agentReviewForm.rating ? 'text-yellow-400' : 'text-gray-300'"
+          >
+            ★
+          </button>
+        </div>
+
+        <textarea
+          v-model="agentReviewForm.review"
+          rows="4"
+          class="w-full px-4 py-3 rounded-2xl border resize-none mb-6"
+          placeholder="Write a short review (optional)..."
+        ></textarea>
+
+        <div class="flex gap-3">
+          <button type="button" class="flex-1 py-3 border rounded-2xl" @click="skipAgentReview">
+            Skip
+          </button>
+          <button
+            type="button"
+            class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold disabled:opacity-50"
+            :disabled="!agentReviewForm.rating || savingAgentReview"
+            @click="submitAgentReview"
+          >
+            {{ savingAgentReview ? 'Submitting...' : 'Submit Review' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div
+      v-if="toast"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] px-5 py-3 rounded-2xl shadow-lg text-sm font-medium text-white"
+      :class="toast.type === 'error' ? 'bg-red-600' : 'bg-gray-900'"
+    >
+      {{ toast.message }}
+    </div>
   </div>
 </template>
 
@@ -771,30 +618,16 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 
-/* ---------------------------------
-   NORMALIZE STATE (Kwara → Kwara State)
----------------------------------- */
 const STATE_MAP: Record<string, string> = {
-  'Kwara': 'Kwara State',
-  'Ogun': 'Ogun State',
-  'Lagos': 'Lagos State',
-  'Oyo': 'Oyo State',
-  'Osun': 'Osun State',
-  'Ondo': 'Ondo State',
-  'Ekiti': 'Ekiti State',
-  'Edo': 'Edo State',
-  'Delta': 'Delta State',
-  'Rivers': 'Rivers State',
-  'FCT': 'Federal Capital Territory',
-  'Abuja': 'Federal Capital Territory'
+  'Kwara': 'Kwara State', 'Ogun': 'Ogun State', 'Lagos': 'Lagos State', 'Oyo': 'Oyo State',
+  'Osun': 'Osun State', 'Ondo': 'Ondo State', 'Ekiti': 'Ekiti State', 'Edo': 'Edo State',
+  'Delta': 'Delta State', 'Rivers': 'Rivers State', 'FCT': 'Federal Capital Territory', 'Abuja': 'Federal Capital Territory'
 }
 
 const normalizeState = (state?: string | null) => {
   if (!state) return state || ''
   const trimmed = String(state).trim()
-  if (trimmed.endsWith(' State') || trimmed === 'Federal Capital Territory') {
-    return trimmed
-  }
+  if (trimmed.endsWith(' State') || trimmed === 'Federal Capital Territory') return trimmed
   return STATE_MAP[trimmed] || trimmed
 }
 
@@ -864,6 +697,12 @@ const showCancelModal = ref(false)
 const showIssueModal = ref(false)
 const showReportModal = ref(false)
 
+// Agent App Review
+const showAgentReviewModal = ref(false)
+const savingAgentReview = ref(false)
+const agentReviewTarget = ref<InspectionRow | null>(null)
+const agentReviewForm = ref({ rating: 0, review: '' })
+
 const declineForm = ref({ reason: '', notes: '' })
 const rescheduleForm = ref({ date: '', time: '', reason: '', notes: '' })
 const noShowForm = ref({ waited: 20, note: '' })
@@ -871,14 +710,10 @@ const cancelReason = ref('')
 const issueForm = ref({ type: '', note: '' })
 
 const conditionFields = [
-  { key: 'exterior', label: 'Exterior' },
-  { key: 'interior', label: 'Interior' },
-  { key: 'living', label: 'Living area' },
-  { key: 'bedrooms', label: 'Bedrooms' },
-  { key: 'bathrooms', label: 'Bathrooms' },
-  { key: 'kitchen', label: 'Kitchen' },
-  { key: 'utilities', label: 'Utilities' },
-  { key: 'security', label: 'Security' },
+  { key: 'exterior', label: 'Exterior' }, { key: 'interior', label: 'Interior' },
+  { key: 'living', label: 'Living area' }, { key: 'bedrooms', label: 'Bedrooms' },
+  { key: 'bathrooms', label: 'Bathrooms' }, { key: 'kitchen', label: 'Kitchen' },
+  { key: 'utilities', label: 'Utilities' }, { key: 'security', label: 'Security' },
   { key: 'surroundings', label: 'Surroundings' }
 ]
 
@@ -914,11 +749,7 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
   setTimeout(() => { toast.value = null }, 3200)
 }
 
-const isToday = (d?: string) => {
-  if (!d) return false
-  return new Date(d).toDateString() === new Date().toDateString()
-}
-
+const isToday = (d?: string) => d ? new Date(d).toDateString() === new Date().toDateString() : false
 const isUpcomingDate = (d?: string) => {
   if (!d) return false
   const date = new Date(d)
@@ -928,20 +759,14 @@ const isUpcomingDate = (d?: string) => {
 }
 
 const needsAction = (i: InspectionRow) => {
-  if (i.status === 'pending') return true
-  if (i.status === 'scheduled') return true
+  if (i.status === 'pending' || i.status === 'scheduled') return true
   if (i.status === 'in_progress' && hasIncompleteReport(i)) return true
   return false
 }
 
-const hasIncompleteReport = (i: InspectionRow) => {
-  if (i.status !== 'in_progress') return false
-  return !i.inspection_completed_at
-}
+const hasIncompleteReport = (i: InspectionRow) => i.status === 'in_progress' && !i.inspection_completed_at
 
-const actionRequiredList = computed(() =>
-  inspections.value.filter(needsAction).slice(0, 6)
-)
+const actionRequiredList = computed(() => inspections.value.filter(needsAction).slice(0, 6))
 
 const stats = computed(() => {
   const list = inspections.value
@@ -958,16 +783,11 @@ const filteredInspections = computed(() => {
 
   if (activeTab.value === 'action') result = result.filter(needsAction)
   else if (activeTab.value === 'upcoming') {
-    result = result.filter(i =>
-      isUpcomingDate(i.inspection_date) &&
-      !['completed', 'cancelled', 'no_show', 'declined'].includes(i.status)
-    )
+    result = result.filter(i => isUpcomingDate(i.inspection_date) && !['completed', 'cancelled', 'no_show', 'declined'].includes(i.status))
   } else if (activeTab.value === 'today') result = result.filter(i => isToday(i.inspection_date))
   else if (activeTab.value === 'in_progress') result = result.filter(i => i.status === 'in_progress')
   else if (activeTab.value === 'completed') result = result.filter(i => i.status === 'completed')
-  else if (activeTab.value === 'cancelled') {
-    result = result.filter(i => ['cancelled', 'no_show', 'declined'].includes(i.status))
-  }
+  else if (activeTab.value === 'cancelled') result = result.filter(i => ['cancelled', 'no_show', 'declined'].includes(i.status))
 
   if (searchQuery.value) {
     const term = searchQuery.value.toLowerCase()
@@ -998,9 +818,7 @@ const filteredInspections = computed(() => {
         week.setDate(week.getDate() + 7)
         return date >= now && date <= week
       }
-      if (dateFilter.value === 'month') {
-        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
-      }
+      if (dateFilter.value === 'month') return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
       if (dateFilter.value === 'past') return date < now
       return true
     })
@@ -1024,16 +842,10 @@ const emptyMessage = computed(() => {
 
 const statusClass = (status: string) => {
   const map: Record<string, string> = {
-    pending: 'bg-red-100 text-red-700',
-    accepted: 'bg-cyan-100 text-cyan-700',
-    declined: 'bg-gray-200 text-gray-700',
-    scheduled: 'bg-purple-100 text-purple-700',
-    confirmed: 'bg-green-100 text-green-700',
-    reschedule_requested: 'bg-indigo-100 text-indigo-700',
-    in_progress: 'bg-amber-100 text-amber-700',
-    completed: 'bg-emerald-100 text-emerald-700',
-    cancelled: 'bg-red-100 text-red-700',
-    no_show: 'bg-gray-100 text-gray-700'
+    pending: 'bg-red-100 text-red-700', accepted: 'bg-cyan-100 text-cyan-700', declined: 'bg-gray-200 text-gray-700',
+    scheduled: 'bg-purple-100 text-purple-700', confirmed: 'bg-green-100 text-green-700',
+    reschedule_requested: 'bg-indigo-100 text-indigo-700', in_progress: 'bg-amber-100 text-amber-700',
+    completed: 'bg-emerald-100 text-emerald-700', cancelled: 'bg-red-100 text-red-700', no_show: 'bg-gray-100 text-gray-700'
   }
   return map[status] || 'bg-gray-100 text-gray-600'
 }
@@ -1072,17 +884,8 @@ const rowBadgeClass = (item: InspectionRow) => {
   return 'bg-gray-100 text-gray-600'
 }
 
-const formatDate = (d?: string) => {
-  if (!d) return '—'
-  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
-const formatDateTime = (d?: string) => {
-  if (!d) return '—'
-  return new Date(d).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-  })
-}
+const formatDate = (d?: string) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'
+const formatDateTime = (d?: string) => d ? new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—'
 
 const maskName = (name?: string): string => {
   const trimmed = name?.trim()
@@ -1096,12 +899,7 @@ const maskName = (name?: string): string => {
 
 const fullAddress = (item?: InspectionRow | null) => {
   if (!item) return '—'
-  return [
-    item.property?.address,
-    item.property?.area,
-    item.city || item.property?.city,
-    normalizeState(item.state || item.property?.state)
-  ].filter(Boolean).join(', ') || '—'
+  return [item.property?.address, item.property?.area, item.city || item.property?.city, normalizeState(item.state || item.property?.state)].filter(Boolean).join(', ') || '—'
 }
 
 const normalizePhone = (phone: string) => phone.replace(/[^\d]/g, '').replace(/^0/, '234')
@@ -1135,47 +933,19 @@ const countdownText = (item: InspectionRow) => {
 
 const statusMessage = (item: InspectionRow) => {
   const map: Record<string, { title: string; body: string }> = {
-    pending: {
-      title: 'New Assignment',
-      body: 'Admin assigned this inspection to you. Accept or decline.'
-    },
-    accepted: {
-      title: 'Accepted',
-      body: 'You accepted this inspection. Waiting for final schedule confirmation if needed.'
-    },
-    scheduled: {
-      title: 'Scheduled',
-      body: 'Inspection has been scheduled. Please confirm your availability.'
-    },
-    confirmed: {
-      title: 'Confirmed',
-      body: 'You confirmed this inspection. Please attend at the scheduled date and time.'
-    },
-    reschedule_requested: {
-      title: 'Reschedule Requested',
-      body: 'Your reschedule request is with admin for review.'
-    },
-    in_progress: {
-      title: 'In Progress',
-      body: 'Inspection started. Complete and submit your report.'
-    },
-    completed: {
-      title: 'Completed',
-      body: 'Inspection report submitted.'
-    },
+    pending: { title: 'New Assignment', body: 'Admin assigned this inspection to you. Accept or decline.' },
+    accepted: { title: 'Accepted', body: 'You accepted this inspection. Waiting for final schedule confirmation if needed.' },
+    scheduled: { title: 'Scheduled', body: 'Inspection has been scheduled. Please confirm your availability.' },
+    confirmed: { title: 'Confirmed', body: 'You confirmed this inspection. Please attend at the scheduled date and time.' },
+    reschedule_requested: { title: 'Reschedule Requested', body: 'Your reschedule request is with admin for review.' },
+    in_progress: { title: 'In Progress', body: 'Inspection started. Complete and submit your report.' },
+    completed: { title: 'Completed', body: 'Inspection report submitted.' },
     cancelled: {
-      title: item.cancelled_by === 'admin' ? 'Cancelled by Admin' :
-        item.cancelled_by === 'customer' ? 'Cancelled by Customer' : 'Cancelled by Agent',
+      title: item.cancelled_by === 'admin' ? 'Cancelled by Admin' : item.cancelled_by === 'customer' ? 'Cancelled by Customer' : 'Cancelled by Agent',
       body: item.cancellation_reason || 'This inspection was cancelled.'
     },
-    no_show: {
-      title: 'Customer No-Show',
-      body: 'Customer did not attend the inspection.'
-    },
-    declined: {
-      title: 'Declined',
-      body: item.agent_decline_reason || 'You declined this assignment.'
-    }
+    no_show: { title: 'Customer No-Show', body: 'Customer did not attend the inspection.' },
+    declined: { title: 'Declined', body: item.agent_decline_reason || 'You declined this assignment.' }
   }
   return map[item.status] || { title: displayStatus(item.status), body: '' }
 }
@@ -1197,32 +967,15 @@ const canStart = (item: InspectionRow) => {
   return now >= earliest || isToday(item.inspection_date)
 }
 
-const cancelWarning = computed(() => {
-  const item = modalTarget.value
-  if (!item) return ''
-  const dt = getInspectionDateTime(item)
-  if (!dt) return ''
-  const hours = (dt.getTime() - Date.now()) / 3600000
-  if (hours < 0) return 'Inspection time has passed. Cancellation may require State Admin approval.'
-  if (hours < 6) return 'Cancelling this inspection close to the scheduled time may require State Admin approval.'
-  return ''
-})
+const cancelBlocked = computed(() => modalTarget.value?.status === 'in_progress')
 
-const cancelBlocked = computed(() => {
-  const item = modalTarget.value
-  if (!item) return false
-  return item.status === 'in_progress'
-})
-
-const canSubmitReport = computed(() => {
-  return !!(
-    reportForm.value.outcome &&
-    reportForm.value.generalCondition &&
-    reportForm.value.accessibility &&
-    reportForm.value.notes &&
-    reportForm.value.recommendation
-  )
-})
+const canSubmitReport = computed(() => !!(
+  reportForm.value.outcome &&
+  reportForm.value.generalCondition &&
+  reportForm.value.accessibility &&
+  reportForm.value.notes &&
+  reportForm.value.recommendation
+))
 
 const buildTimeline = (item: InspectionRow) => {
   const steps = [
@@ -1250,19 +1003,8 @@ const buildTimeline = (item: InspectionRow) => {
 const fetchAgentProfile = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
-
-  const { data } = await supabase
-    .from('profiles')
-    .select('id, full_name, city, state, role')
-    .eq('id', user.id)
-    .single()
-
-  if (data) {
-    agentProfile.value = {
-      ...data,
-      state: normalizeState(data.state)
-    }
-  }
+  const { data } = await supabase.from('profiles').select('id, full_name, city, state, role').eq('id', user.id).single()
+  if (data) agentProfile.value = { ...data, state: normalizeState(data.state) }
   return user
 }
 
@@ -1270,22 +1012,14 @@ const fetchInspections = async () => {
   loading.value = true
   try {
     const user = await fetchAgentProfile()
-    if (!user) {
-      inspections.value = []
-      return
-    }
+    if (!user) { inspections.value = []; return }
 
     const { data, error } = await supabase
       .from('inspections')
       .select(`
         *,
-        property:properties!property_id (
-          id, title, cover_image, area, city, state, address,
-          price, bedrooms, bathrooms, property_type, status
-        ),
-        customer:profiles!customer_id (
-          id, full_name, phone
-        )
+        property:properties!property_id (id, title, cover_image, area, city, state, address, price, bedrooms, bathrooms, property_type, status),
+        customer:profiles!customer_id (id, full_name, phone)
       `)
       .eq('agent_id', user.id)
       .order('inspection_date', { ascending: true, nullsFirst: false })
@@ -1295,9 +1029,7 @@ const fetchInspections = async () => {
     inspections.value = (data || []).map((row: any) => ({
       ...row,
       state: normalizeState(row.state),
-      property: row.property
-        ? { ...row.property, state: normalizeState(row.property.state) }
-        : null
+      property: row.property ? { ...row.property, state: normalizeState(row.property.state) } : null
     })) as InspectionRow[]
   } catch (err: any) {
     console.error(err)
@@ -1309,22 +1041,15 @@ const fetchInspections = async () => {
 
 const refreshData = async () => {
   await fetchInspections()
-  if (selected.value) {
-    selected.value = inspections.value.find(i => i.id === selected.value!.id) || null
-  }
+  if (selected.value) selected.value = inspections.value.find(i => i.id === selected.value!.id) || null
 }
 
-const openDrawer = (item: InspectionRow) => {
-  selected.value = item
-}
+const openDrawer = (item: InspectionRow) => { selected.value = item }
 
 const updateInspection = async (id: string, payload: Record<string, any>) => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
-
-  if (payload.state) {
-    payload.state = normalizeState(payload.state)
-  }
+  if (payload.state) payload.state = normalizeState(payload.state)
 
   const { data, error } = await supabase
     .from('inspections')
@@ -1333,21 +1058,16 @@ const updateInspection = async (id: string, payload: Record<string, any>) => {
     .eq('agent_id', user.id)
     .select(`
       *,
-      property:properties!property_id (
-        id, title, cover_image, area, city, state, address,
-        price, bedrooms, bathrooms, property_type, status
-      ),
+      property:properties!property_id (id, title, cover_image, area, city, state, address, price, bedrooms, bathrooms, property_type, status),
       customer:profiles!customer_id (id, full_name, phone)
     `)
     .maybeSingle()
 
   if (error) throw error
-
   if (data) {
     data.state = normalizeState(data.state)
     if (data.property) data.property.state = normalizeState(data.property.state)
   }
-
   return data as InspectionRow
 }
 
@@ -1362,19 +1082,13 @@ const applyLocalUpdate = (data: InspectionRow | null) => {
 const acceptInspection = async (item: InspectionRow) => {
   saving.value = true
   try {
-    const data = await updateInspection(item.id, {
-      status: 'accepted',
-      agent_accepted_at: new Date().toISOString(),
-      agent_response_at: new Date().toISOString()
-    })
+    const data = await updateInspection(item.id, { status: 'accepted', agent_accepted_at: new Date().toISOString(), agent_response_at: new Date().toISOString() })
     applyLocalUpdate(data)
     showToast('Inspection accepted successfully.')
     await fetchInspections()
   } catch (e: any) {
     showToast(e.message || 'Failed to accept', 'error')
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
 
 const openDecline = (item: InspectionRow) => {
@@ -1383,75 +1097,22 @@ const openDecline = (item: InspectionRow) => {
   showDeclineModal.value = true
 }
 
-const declineInspection = async () => {
-  if (!modalTarget.value || !declineForm.value.reason) return
-  saving.value = true
-  try {
-    const reason = declineForm.value.reason === 'Other'
-      ? declineForm.value.notes || 'Other'
-      : declineForm.value.reason
-
-    const data = await updateInspection(modalTarget.value.id, {
-      status: 'declined',
-      agent_declined_at: new Date().toISOString(),
-      agent_response_at: new Date().toISOString(),
-      agent_decline_reason: reason
-    })
-    applyLocalUpdate(data)
-    showDeclineModal.value = false
-    showToast('Inspection declined. Admin has been notified.')
-    await fetchInspections()
-  } catch (e: any) {
-    showToast(e.message || 'Failed to decline', 'error')
-  } finally {
-    saving.value = false
-  }
-}
-
 const confirmInspection = async (item: InspectionRow) => {
   saving.value = true
   try {
-    const data = await updateInspection(item.id, {
-      status: 'confirmed',
-      agent_confirmed_at: new Date().toISOString()
-    })
+    const data = await updateInspection(item.id, { status: 'confirmed', agent_confirmed_at: new Date().toISOString() })
     applyLocalUpdate(data)
     showToast('Inspection confirmed. Customer and admin have been notified.')
     await fetchInspections()
   } catch (e: any) {
     showToast(e.message || 'Failed to confirm', 'error')
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
 
 const openReschedule = (item: InspectionRow) => {
   modalTarget.value = item
   rescheduleForm.value = { date: '', time: '', reason: '', notes: '' }
   showRescheduleModal.value = true
-}
-
-const submitReschedule = async () => {
-  if (!modalTarget.value) return
-  saving.value = true
-  try {
-    const data = await updateInspection(modalTarget.value.id, {
-      status: 'reschedule_requested',
-      reschedule_requested_at: new Date().toISOString(),
-      reschedule_reason: rescheduleForm.value.reason,
-      proposed_inspection_date: rescheduleForm.value.date,
-      proposed_inspection_time: rescheduleForm.value.time,
-      reschedule_notes: rescheduleForm.value.notes
-    })
-    applyLocalUpdate(data)
-    showRescheduleModal.value = false
-    showToast('Reschedule request submitted to admin.')
-    await fetchInspections()
-  } catch (e: any) {
-    showToast(e.message || 'Failed to request reschedule', 'error')
-  } finally {
-    saving.value = false
-  }
 }
 
 const checkIn = async (item: InspectionRow) => {
@@ -1468,18 +1129,12 @@ const checkIn = async (item: InspectionRow) => {
         lng = pos.coords.longitude
       } catch { /* optional */ }
     }
-    const data = await updateInspection(item.id, {
-      checked_in_at: new Date().toISOString(),
-      check_in_latitude: lat,
-      check_in_longitude: lng
-    })
+    const data = await updateInspection(item.id, { checked_in_at: new Date().toISOString(), check_in_latitude: lat, check_in_longitude: lng })
     applyLocalUpdate(data)
     showToast('Checked in at property.')
   } catch (e: any) {
     showToast(e.message || 'Check-in failed', 'error')
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
 
 const openStartConfirm = (item: InspectionRow) => {
@@ -1491,19 +1146,14 @@ const startInspection = async () => {
   if (!modalTarget.value) return
   saving.value = true
   try {
-    const data = await updateInspection(modalTarget.value.id, {
-      status: 'in_progress',
-      inspection_started_at: new Date().toISOString()
-    })
+    const data = await updateInspection(modalTarget.value.id, { status: 'in_progress', inspection_started_at: new Date().toISOString() })
     applyLocalUpdate(data)
     showStartModal.value = false
     showToast('Inspection started')
     await fetchInspections()
   } catch (e: any) {
     showToast(e.message || 'Failed to start', 'error')
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
 
 const openNoShow = (item: InspectionRow) => {
@@ -1512,53 +1162,10 @@ const openNoShow = (item: InspectionRow) => {
   showNoShowModal.value = true
 }
 
-const submitNoShow = async () => {
-  if (!modalTarget.value) return
-  saving.value = true
-  try {
-    const data = await updateInspection(modalTarget.value.id, {
-      status: 'no_show',
-      no_show_at: new Date().toISOString(),
-      waiting_duration_minutes: noShowForm.value.waited,
-      no_show_reason: noShowForm.value.note || `Customer did not arrive after waiting ${noShowForm.value.waited} minutes.`,
-      agent_notes: noShowForm.value.note
-    })
-    applyLocalUpdate(data)
-    showNoShowModal.value = false
-    showToast('No-show reported. Admin notified.')
-    await fetchInspections()
-  } catch (e: any) {
-    showToast(e.message || 'Failed', 'error')
-  } finally {
-    saving.value = false
-  }
-}
-
 const openCancel = (item: InspectionRow) => {
   modalTarget.value = item
   cancelReason.value = ''
   showCancelModal.value = true
-}
-
-const cancelInspection = async () => {
-  if (!modalTarget.value || !cancelReason.value || cancelBlocked.value) return
-  saving.value = true
-  try {
-    const data = await updateInspection(modalTarget.value.id, {
-      status: 'cancelled',
-      cancelled_by: 'agent',
-      cancellation_reason: cancelReason.value,
-      cancelled_at: new Date().toISOString()
-    })
-    applyLocalUpdate(data)
-    showCancelModal.value = false
-    showToast('Inspection cancelled')
-    await fetchInspections()
-  } catch (e: any) {
-    showToast(e.message || 'Failed to cancel', 'error')
-  } finally {
-    saving.value = false
-  }
 }
 
 const openIssue = (item: InspectionRow) => {
@@ -1567,34 +1174,10 @@ const openIssue = (item: InspectionRow) => {
   showIssueModal.value = true
 }
 
-const submitIssue = async () => {
-  if (!modalTarget.value || !issueForm.value.type) return
-  saving.value = true
-  try {
-    const existing = modalTarget.value.issue_reports || []
-    const report = {
-      type: issueForm.value.type,
-      note: issueForm.value.note,
-      at: new Date().toISOString()
-    }
-    const data = await updateInspection(modalTarget.value.id, {
-      issue_reports: [...existing, report]
-    })
-    applyLocalUpdate(data)
-    showIssueModal.value = false
-    showToast('Issue reported to admin.')
-  } catch (e: any) {
-    showToast(e.message || 'Failed to report issue', 'error')
-  } finally {
-    saving.value = false
-  }
-}
-
 /* ---------- REPORT ---------- */
 const openReport = (item: InspectionRow) => {
   modalTarget.value = item
   const draft = item.report_draft || {}
-
   reportForm.value = {
     outcome: draft.outcome || 'property_inspected',
     generalCondition: draft.generalCondition || item.general_condition || '',
@@ -1609,34 +1192,28 @@ const openReport = (item: InspectionRow) => {
     video: draft.video || null,
     draftSavedAt: item.report_draft_saved_at || null
   }
-
   showReportModal.value = true
 }
 
 const onPhotosSelected = (e: Event) => {
   const input = e.target as HTMLInputElement
   const files = Array.from(input.files || [])
-
   for (const file of files) {
     if (file.size > 8 * 1024 * 1024) {
       showToast(`${file.name} is too large (max 8MB)`, 'error')
       continue
     }
-    const preview = URL.createObjectURL(file)
-    reportForm.value.photos.push({ file, preview, category: 'other' })
+    reportForm.value.photos.push({ file, preview: URL.createObjectURL(file), category: 'other' })
   }
   input.value = ''
 }
 
-const removePhoto = (idx: number) => {
-  reportForm.value.photos.splice(idx, 1)
-}
+const removePhoto = (idx: number) => { reportForm.value.photos.splice(idx, 1) }
 
 const onVideoSelected = (e: Event) => {
   const input = e.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
-
   if (file.size > 40 * 1024 * 1024) {
     showToast('Video too large (max 40MB)', 'error')
     return
@@ -1652,139 +1229,64 @@ const compressImage = async (file: File, maxWidth = 1600, quality = 0.72): Promi
   canvas.height = bitmap.height * scale
   const ctx = canvas.getContext('2d')!
   ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
-  return await new Promise((resolve) =>
-    canvas.toBlob((b) => resolve(b as Blob), 'image/jpeg', quality)
-  )
+  return await new Promise((resolve) => canvas.toBlob((b) => resolve(b as Blob), 'image/jpeg', quality))
 }
 
 const uploadMedia = async (inspectionId: string, agentId: string) => {
-  const results: {
-    type: string
-    url: string
-    path: string
-    category: string
-    file_size?: number
-  }[] = []
-
+  const results: { type: string; url: string; path: string; category: string; file_size?: number }[] = []
   let i = 0
   const SUPABASE_URL = 'https://kmkcrttmchdvnpggqwey.supabase.co'
 
-  // Photos
   for (const photo of reportForm.value.photos) {
     if (photo.url && photo.path) {
-      results.push({
-        type: 'photo',
-        url: photo.url,
-        path: photo.path,
-        category: photo.category || 'other'
-      })
+      results.push({ type: 'photo', url: photo.url, path: photo.path, category: photo.category || 'other' })
       continue
     }
-
     if (!photo.file) continue
-
     i++
     uploadProgress.value = `Uploading photo ${i}/${reportForm.value.photos.length}...`
-
     const blob = await compressImage(photo.file)
     const path = `${agentId}/${inspectionId}/photo-${Date.now()}-${i}.jpg`
-
-    const { error: uploadError } = await supabase.storage
-      .from('inspection-evidence')
-      .upload(path, blob, {
-        contentType: 'image/jpeg',
-        upsert: false
-      })
-
-    if (uploadError) {
-      console.error('Photo upload error:', uploadError)
-      throw new Error(`Photo upload failed: ${uploadError.message}`)
-    }
-
-    const { data: urlData } = supabase.storage
-      .from('inspection-evidence')
-      .getPublicUrl(path)
-
-    const publicUrl = urlData?.publicUrl ||
-      `${SUPABASE_URL}/storage/v1/object/public/inspection-evidence/${path}`
-
-    results.push({
-      type: 'photo',
-      url: publicUrl,
-      path,
-      category: photo.category || 'other',
-      file_size: blob.size
-    })
+    const { error: uploadError } = await supabase.storage.from('inspection-evidence').upload(path, blob, { contentType: 'image/jpeg', upsert: false })
+    if (uploadError) throw new Error(`Photo upload failed: ${uploadError.message}`)
+    const { data: urlData } = supabase.storage.from('inspection-evidence').getPublicUrl(path)
+    const publicUrl = urlData?.publicUrl || `${SUPABASE_URL}/storage/v1/object/public/inspection-evidence/${path}`
+    results.push({ type: 'photo', url: publicUrl, path, category: photo.category || 'other', file_size: blob.size })
   }
 
-  // Video
   if (reportForm.value.video && reportForm.value.video instanceof File) {
     uploadProgress.value = 'Uploading video...'
-
     const path = `${agentId}/${inspectionId}/video-${Date.now()}.mp4`
-
-    const { error: videoError } = await supabase.storage
-      .from('inspection-evidence')
-      .upload(path, reportForm.value.video, {
-        contentType: reportForm.value.video.type || 'video/mp4',
-        upsert: false
-      })
-
-    if (videoError) {
-      console.error('Video upload error:', videoError)
-      throw new Error(`Video upload failed: ${videoError.message}`)
-    }
-
-    const { data: urlData } = supabase.storage
-      .from('inspection-evidence')
-      .getPublicUrl(path)
-
-    const publicUrl = urlData?.publicUrl ||
-      `${SUPABASE_URL}/storage/v1/object/public/inspection-evidence/${path}`
-
-    results.push({
-      type: 'video',
-      url: publicUrl,
-      path,
-      category: 'video',
-      file_size: reportForm.value.video.size
+    const { error: videoError } = await supabase.storage.from('inspection-evidence').upload(path, reportForm.value.video, {
+      contentType: reportForm.value.video.type || 'video/mp4', upsert: false
     })
+    if (videoError) throw new Error(`Video upload failed: ${videoError.message}`)
+    const { data: urlData } = supabase.storage.from('inspection-evidence').getPublicUrl(path)
+    const publicUrl = urlData?.publicUrl || `${SUPABASE_URL}/storage/v1/object/public/inspection-evidence/${path}`
+    results.push({ type: 'video', url: publicUrl, path, category: 'video', file_size: reportForm.value.video.size })
   }
 
   uploadProgress.value = ''
-  console.log('Media ready to save:', results)
   return results
 }
 
 const saveDraftReport = async () => {
   if (!modalTarget.value) return
   saving.value = true
-
   try {
     const draft = {
       ...reportForm.value,
-      photos: reportForm.value.photos.map((p: any) => ({
-        url: p.url,
-        path: p.path,
-        category: p.category
-      })),
+      photos: reportForm.value.photos.map((p: any) => ({ url: p.url, path: p.path, category: p.category })),
       video: null
     }
-
     const now = new Date().toISOString()
-    const data = await updateInspection(modalTarget.value.id, {
-      report_draft: draft,
-      report_draft_saved_at: now
-    })
-
+    const data = await updateInspection(modalTarget.value.id, { report_draft: draft, report_draft_saved_at: now })
     applyLocalUpdate(data)
     reportForm.value.draftSavedAt = now
     showToast(`Draft saved at ${formatDateTime(now)}`)
   } catch (e: any) {
     showToast(e.message || 'Failed to save draft', 'error')
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
 
 const submitReport = async () => {
@@ -1795,10 +1297,8 @@ const submitReport = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
-    // 1. Upload media
     const media = await uploadMedia(modalTarget.value.id, user.id)
 
-    // 2. Save media records (with URL)
     if (media.length > 0) {
       const rows = media.map((m) => ({
         inspection_id: modalTarget.value!.id,
@@ -1809,23 +1309,10 @@ const submitReport = async () => {
         storage_path: m.path,
         file_size: m.file_size || null
       }))
-
-      console.log('Inserting media rows:', rows)
-
-      const { data: inserted, error: mediaError } = await supabase
-        .from('inspection_media')
-        .insert(rows)
-        .select()
-
-      if (mediaError) {
-        console.error('Media insert error:', mediaError)
-        throw new Error(`Could not save media: ${mediaError.message}`)
-      }
-
-      console.log('Media saved:', inserted)
+      const { error: mediaError } = await supabase.from('inspection_media').insert(rows)
+      if (mediaError) throw new Error(`Could not save media: ${mediaError.message}`)
     }
 
-    // 3. Complete the inspection
     const data = await updateInspection(modalTarget.value.id, {
       status: 'completed',
       inspection_completed_at: new Date().toISOString(),
@@ -1846,6 +1333,12 @@ const submitReport = async () => {
     applyLocalUpdate(data)
     showReportModal.value = false
     showToast('Inspection report submitted successfully.')
+
+    // Show App Review popup
+    agentReviewTarget.value = data || modalTarget.value
+    agentReviewForm.value = { rating: 0, review: '' }
+    showAgentReviewModal.value = true
+
     await fetchInspections()
   } catch (e: any) {
     console.error(e)
@@ -1854,6 +1347,42 @@ const submitReport = async () => {
     saving.value = false
     uploadProgress.value = ''
   }
+}
+
+/* ---------- AGENT APP REVIEW ---------- */
+const submitAgentReview = async () => {
+  if (!agentReviewForm.value.rating || !agentReviewTarget.value) return
+
+  savingAgentReview.value = true
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Please login')
+
+    const { error } = await supabase.from('app_reviews').insert({
+      customer_id: user.id,
+      inspection_id: agentReviewTarget.value.id,
+      property_id: agentReviewTarget.value.property_id || agentReviewTarget.value.property?.id,
+      rating: agentReviewForm.value.rating,
+      review: agentReviewForm.value.review || null,
+      is_published: false,
+      reviewer_type: 'agent'
+    })
+
+    if (error) throw error
+
+    showAgentReviewModal.value = false
+    showToast('Thank you for your review!')
+  } catch (err: any) {
+    console.error(err)
+    showToast(err.message || 'Failed to submit review', 'error')
+  } finally {
+    savingAgentReview.value = false
+  }
+}
+
+const skipAgentReview = () => {
+  showAgentReviewModal.value = false
+  showToast('You can rate us later')
 }
 
 /* ---------- helpers ---------- */
@@ -1885,16 +1414,12 @@ const setupRealtime = async () => {
 
   channel = supabase
     .channel(`agent-inspections-${session.user.id}`)
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'inspections',
-        filter: `agent_id=eq.${session.user.id}`
-      },
-      async () => { await refreshData() }
-    )
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'inspections',
+      filter: `agent_id=eq.${session.user.id}`
+    }, async () => { await refreshData() })
     .subscribe()
 }
 

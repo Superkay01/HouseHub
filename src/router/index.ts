@@ -217,6 +217,11 @@ const router = createRouter({
       name: 'AdminNotifications',
       component: () => import('../views/admin/notifications.vue')
     },
+    {
+      path: 'AdminReviews',
+      name: 'AdminReviews',
+      component: () => import('../views/admin/AdminReviews.vue')
+    }
     
   ]
 }

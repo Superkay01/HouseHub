@@ -67,6 +67,7 @@
         <SidebarMenuItem icon="verifications" label="Verifications" to="/admin/verifications" />
         <SidebarMenuItem icon="reports" label="Reports" to="/admin/reports" />
         <SidebarMenuItem icon="notifications" label="Notifications" to="/admin/notifications" />
+        <SidebarMenuItem icon="AdminReviews" label="Reviews" to="/admin/AdminReviews" />
 
         <!-- Head Admin Only -->
         <div v-if="isHeadAdmin">

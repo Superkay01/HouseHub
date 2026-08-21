@@ -55,7 +55,7 @@
           <span class="text-xl text-royal-blue"> →</span>
         </router-link> -->
         <router-link
-          to="/states"
+          to="#states"
           class="inline-flex items-center gap-3 bg-mediumBlue hover:bg-steel-blue text-royal-blue px-8 py-4 rounded-2xl font-semibold text-lg transition-all active:scale-95 shadow-lg hover:shadow-xl"
         >
           Explore Properties

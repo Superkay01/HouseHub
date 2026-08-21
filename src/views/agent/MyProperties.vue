@@ -81,7 +81,7 @@
 
             <!-- Price -->
             <div class="price-tag absolute top-6 right-6 text-white px-5 py-2 rounded-2xl font-semibold shadow-lg">
-              <span class="text-2xl">₦{{ property.price.toLocaleString() }}</span>
+              <span class="text-2xl">₦{{ Number(property.price || 0).toLocaleString() }}</span>
             </div>
 
             <!-- Favorite -->

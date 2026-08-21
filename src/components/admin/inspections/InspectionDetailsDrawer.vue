@@ -86,6 +86,46 @@
           </div>
         </section>
 
+        <!-- ========== CUSTOMER REPORT ========== -->
+        <section>
+          <h3 class="font-semibold text-[var(--royal-blue)] mb-3">Customer Report</h3>
+
+          <div v-if="loadingReport" class="text-sm text-medium-gray">
+            Loading report...
+          </div>
+
+          <div
+            v-else-if="customerReport"
+            class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-sm space-y-3"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <span class="font-medium text-indigo-800 capitalize">
+                Interest Level:
+                {{ (customerReport.interest_level || '—').replace(/_/g, ' ') }}
+              </span>
+              <span class="text-xs text-medium-gray whitespace-nowrap">
+                {{ formatDateTime(customerReport.created_at) }}
+              </span>
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold text-indigo-700 mb-1">Report / Feedback</p>
+              <p class="text-gray-800 whitespace-pre-wrap leading-relaxed">
+                {{ customerReport.report }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            v-else
+            class="bg-gray-50 border border-gray-100 rounded-2xl p-4 text-sm text-medium-gray"
+          >
+            {{ inspection.status === 'completed'
+              ? 'No customer report has been submitted yet.'
+              : 'Customer report will appear here after the inspection is completed and the customer submits feedback.' }}
+          </div>
+        </section>
+
         <!-- Property -->
         <section>
           <h3 class="font-semibold text-[var(--royal-blue)] mb-3">Property</h3>
@@ -334,6 +374,9 @@ const mediaItems = ref([])
 const mediaLoading = ref(false)
 const lightboxUrl = ref(null)
 
+const customerReport = ref(null)
+const loadingReport = ref(false)
+
 const photoItems = computed(() =>
   mediaItems.value.filter((m) => m.media_type === 'photo')
 )
@@ -402,7 +445,7 @@ const statusHelper = computed(() => {
     },
     completed: {
       title: 'Completed',
-      body: 'Inspection report submitted. Review outcome and evidence below.'
+      body: 'Inspection report submitted. Review outcome, customer feedback and evidence below.'
     },
     cancelled: {
       title: 'Cancelled',
@@ -461,6 +504,30 @@ const loadMedia = async (inspectionId) => {
   }
 }
 
+const loadCustomerReport = async (inspectionId) => {
+  customerReport.value = null
+  if (!inspectionId) return
+
+  loadingReport.value = true
+  try {
+    const { data, error } = await supabase
+      .from('customer_reports')
+      .select('*')
+      .eq('inspection_id', inspectionId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (error) throw error
+    customerReport.value = data
+  } catch (err) {
+    console.error('Failed to load customer report:', err)
+    customerReport.value = null
+  } finally {
+    loadingReport.value = false
+  }
+}
+
 const openLightbox = (item) => {
   lightboxUrl.value = item.displayUrl
 }
@@ -470,6 +537,7 @@ watch(
   (id) => {
     lightboxUrl.value = null
     loadMedia(id)
+    loadCustomerReport(id)
   },
   { immediate: true }
 )
