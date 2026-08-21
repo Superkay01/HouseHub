@@ -555,7 +555,7 @@ const prevStep = () => {
   if (currentStep.value > 1) currentStep.value--
 }
 
-const goBack = () => router.push('/my-properties')
+const goBack = () => router.push('/agent/properties')
 
 const updateProperty = async () => {
   if (!validatePrice()) {
@@ -609,7 +609,7 @@ const updateProperty = async () => {
     if (error) throw error
 
     alert('✅ Property updated successfully!')
-    router.push('/my-properties') // or '/agent/properties' – match your route
+    router.push('/agent/properties') // or '/agent/properties' – match your route
   } catch (err: any) {
     console.error(err)
     alert('Update failed: ' + (err.message || err))
