@@ -87,7 +87,7 @@
           @click="closeSidebar"
         /> -->
         <SidebarLink 
-          icon="notifications" 
+          icon="bell" 
           label="Notifications" 
           :to="'/agent/notifications'"
           @click="closeSidebar"
