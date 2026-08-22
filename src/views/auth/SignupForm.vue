@@ -252,27 +252,27 @@ const form = ref({
 const locationData = {
   Kwara: {
     Ilorin: ['Ilorin East', 'Ilorin South', 'Ilorin West', 'Asa'],
-    // Offa: ['Offa', 'Oyun'],
-    // 'Omu-Aran': ['Irepodun', 'Isin', 'Oke-Ero'],
-    // Share: ['Ifelodun'],
-    // Lafiagi: ['Edu'],
-    // Kaiama: ['Kaiama'],
-    // Patigi: ['Patigi'],
-    // 'Bode Saadu': ['Moro'],
-    // 'Araromi-Opin': ['Ekiti']
+    Offa: ['Offa', 'Oyun'],
+    'Omu-Aran': ['Irepodun', 'Isin', 'Oke-Ero'],
+    Share: ['Ifelodun'],
+    Lafiagi: ['Edu'],
+    Kaiama: ['Kaiama'],
+    Patigi: ['Patigi'],
+    'Bode Saadu': ['Moro'],
+    'Araromi-Opin': ['Ekiti']
   },
   Ogun: {
-    // Abeokuta: ['Abeokuta North', 'Abeokuta South', 'Odeda'],
+    Abeokuta: ['Abeokuta North', 'Abeokuta South', 'Odeda'],
     'Ijebu Ode': ['Ijebu Ode', 'Ijebu East', 'Ijebu North East'],
-    // Sagamu: ['Sagamu', 'Remo North', 'Ikenne'],
-    // Ota: ['Ado-Odo/Ota'],
-    // Ifo: ['Ifo', 'Ewekoro'],
-    // Ilaro: ['Yewa South'],
-    // Ayetoro: ['Yewa North'],
-    // 'Ijebu Igbo': ['Ijebu North'],
-    // Owode: ['Obafemi Owode'],
-    // Ipokia: ['Ipokia'],
-    // Imeko: ['Imeko Afon']
+    Sagamu: ['Sagamu', 'Remo North', 'Ikenne'],
+    Ota: ['Ado-Odo/Ota'],
+    Ifo: ['Ifo', 'Ewekoro'],
+    Ilaro: ['Yewa South'],
+    Ayetoro: ['Yewa North'],
+    'Ijebu Igbo': ['Ijebu North'],
+    Owode: ['Obafemi Owode'],
+    Ipokia: ['Ipokia'],
+    Imeko: ['Imeko Afon']
   }
 }
 
