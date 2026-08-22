@@ -106,7 +106,7 @@
       <SidebarLink 
         icon="profile" 
         label="Profile Settings" 
-        :to="'/agent/profile'"
+        :to="'/agent/profile-settings'"
         @click="closeSidebar"
       />
       <SidebarLink 
