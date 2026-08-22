@@ -38,23 +38,6 @@
           </p>
         </div>
 
-        <!-- Google Button -->
-        <button
-          type="button"
-          @click="signUpWithGoogle"
-          class="w-full flex items-center justify-center gap-1 px-1 md:text-[14px] text-[12px] bg-[var(--white)] border border-[var(--light-blue)] hover:border-[var(--steel-blue)] py-4 rounded-2xl font-medium text-[var(--royal-blue)] transition-all hover:shadow-md mb-6"
-        >
-          <img src="https://www.google.com/images/branding/googleg/1x/googleg_standard_color_24dp.png" alt="Google" class="w-4 h-4">
-          Continue with Google
-        </button>
-
-        <div class="relative text-center my-6">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-[var(--light-blue)]"></div>
-          </div>
-          <span class="relative bg-white px-4 text-medium-gray text-sm">OR</span>
-        </div>
-
         <!-- Email Form -->
         <form @submit.prevent="handleSubmit" class="space-y-5">
           <!-- Email -->
@@ -121,8 +104,16 @@
               @change="onCityChange"
               class="w-full px-3 py-1 rounded-2xl border md:text-sm text-xs border-[var(--light-blue)] text-[var(--royal-blue)] focus:border-[var(--royal-blue)] focus:outline-none transition-colors disabled:bg-gray-100"
             >
-              <option value="" disabled>{{ form.state ? 'Select City' : 'Select State first' }}</option>
-              <option v-for="city in availableCities" :key="city" :value="city">{{ city }}</option>
+              <option value="" disabled>
+                {{ form.state ? 'Select City' : 'Select State first' }}
+              </option>
+              <option 
+                v-for="city in availableCities" 
+                :key="city" 
+                :value="city"
+              >
+                {{ city }}
+              </option>
             </select>
           </div>
 
@@ -135,8 +126,16 @@
               :disabled="!form.city"
               class="w-full px-3 py-1 rounded-2xl border md:text-sm text-xs border-[var(--light-blue)] text-[var(--royal-blue)] focus:border-[var(--royal-blue)] focus:outline-none transition-colors disabled:bg-gray-100"
             >
-              <option value="" disabled>{{ form.city ? 'Select LGA' : 'Select City first' }}</option>
-              <option v-for="lga in availableLgas" :key="lga" :value="lga">{{ lga }}</option>
+              <option value="" disabled>
+                {{ form.city ? 'Select LGA' : 'Select City first' }}
+              </option>
+              <option 
+                v-for="lga in availableLgas" 
+                :key="lga" 
+                :value="lga"
+              >
+                {{ lga }}
+              </option>
             </select>
           </div>
 
@@ -248,31 +247,13 @@ const form = ref({
   confirmPassword: ''
 })
 
-// ========== LOCATION DATA ==========
+// ========== LOCATION DATA (Only Ilorin & Ijebu Ode) ==========
 const locationData = {
-  Kwara: {
-    Ilorin: ['Ilorin East', 'Ilorin South', 'Ilorin West', 'Asa'],
-    Offa: ['Offa', 'Oyun'],
-    'Omu-Aran': ['Irepodun', 'Isin', 'Oke-Ero'],
-    Share: ['Ifelodun'],
-    Lafiagi: ['Edu'],
-    Kaiama: ['Kaiama'],
-    Patigi: ['Patigi'],
-    'Bode Saadu': ['Moro'],
-    'Araromi-Opin': ['Ekiti']
+  'Kwara State': {
+    'Ilorin': ['Ilorin East', 'Ilorin South', 'Ilorin West', 'Asa']
   },
-  Ogun: {
-    Abeokuta: ['Abeokuta North', 'Abeokuta South', 'Odeda'],
-    'Ijebu Ode': ['Ijebu Ode', 'Ijebu East', 'Ijebu North East'],
-    Sagamu: ['Sagamu', 'Remo North', 'Ikenne'],
-    Ota: ['Ado-Odo/Ota'],
-    Ifo: ['Ifo', 'Ewekoro'],
-    Ilaro: ['Yewa South'],
-    Ayetoro: ['Yewa North'],
-    'Ijebu Igbo': ['Ijebu North'],
-    Owode: ['Obafemi Owode'],
-    Ipokia: ['Ipokia'],
-    Imeko: ['Imeko Afon']
+  'Ogun State': {
+    'Ijebu Ode': ['Ijebu Ode', 'Ijebu East', 'Ijebu North East', 'Odogbolu']
   }
 }
 
@@ -295,50 +276,25 @@ const onCityChange = () => {
   form.value.lga = ''
 }
 
-// ========== GOOGLE SIGN UP ==========
-const signUpWithGoogle = async () => {
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin }
-    })
-    if (error) {
-      alert("Google Sign Up is currently unavailable. Please use Email signup.")
-    }
-  } catch (err) {
-    alert("Google Sign Up is currently unavailable. Please use Email signup.")
-  }
-}
-
 // ========== CHECK IF EMAIL OR PHONE ALREADY EXISTS ==========
 const checkExistingUser = async (email, phone) => {
-  // Check email
   const { data: emailExists, error: emailErr } = await supabase
     .from('profiles')
     .select('id')
     .eq('email', email.toLowerCase())
     .maybeSingle()
 
-  if (emailErr) {
-    console.error('Email check error:', emailErr)
-  }
-  if (emailExists) {
-    return { exists: true, field: 'email' }
-  }
+  if (emailErr) console.error('Email check error:', emailErr)
+  if (emailExists) return { exists: true, field: 'email' }
 
-  // Check phone
   const { data: phoneExists, error: phoneErr } = await supabase
     .from('profiles')
     .select('id')
     .eq('phone', phone)
     .maybeSingle()
 
-  if (phoneErr) {
-    console.error('Phone check error:', phoneErr)
-  }
-  if (phoneExists) {
-    return { exists: true, field: 'phone' }
-  }
+  if (phoneErr) console.error('Phone check error:', phoneErr)
+  if (phoneExists) return { exists: true, field: 'phone' }
 
   return { exists: false }
 }
@@ -350,7 +306,6 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    // Validation
     if (!form.value.email.toLowerCase().endsWith('@gmail.com')) {
       emailError.value = "Only Gmail addresses (@gmail.com) are allowed"
       return
@@ -366,7 +321,7 @@ const handleSubmit = async () => {
       return
     }
 
-    // ===== CHECK FOR EXISTING EMAIL OR PHONE =====
+    // Check for existing email or phone
     const existing = await checkExistingUser(form.value.email, form.value.phone)
 
     if (existing.exists) {
@@ -376,10 +331,10 @@ const handleSubmit = async () => {
         phoneError.value = "This phone number is already registered. Please use another phone number."
       }
       alert("❌ This email or phone number is already registered.\nPlease use a different Gmail and phone number.")
-      return   // ← DO NOT proceed to auth.signUp or write to database
+      return
     }
 
-    // 1. Sign Up (only if email & phone are unique)
+    // 1. Sign Up
     const { data, error: authError } = await supabase.auth.signUp({
       email: form.value.email,
       password: form.value.password,
@@ -392,7 +347,6 @@ const handleSubmit = async () => {
     })
 
     if (authError) {
-      // Extra safety: catch Supabase's own "already registered" message
       if (authError.message?.toLowerCase().includes('already registered') || 
           authError.message?.toLowerCase().includes('user already exists')) {
         emailError.value = "This Gmail is already registered. Please use another Gmail address."
@@ -407,7 +361,7 @@ const handleSubmit = async () => {
       throw new Error("No user returned from signup")
     }
 
-    // 2. Create Profile (only after successful auth)
+    // 2. Create Profile
     const { error: profileError } = await supabase
       .from('profiles')
       .upsert({
@@ -426,7 +380,6 @@ const handleSubmit = async () => {
     if (profileError) {
       console.error("Profile Error Details:", profileError)
       alert(`Profile creation issue: ${profileError.message || JSON.stringify(profileError)}`)
-      // Auth user was created, but profile failed – you may want to handle cleanup later
     }
 
     alert("✅ Account created successfully!\n\nPlease login to your account.")
