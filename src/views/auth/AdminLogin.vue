@@ -61,7 +61,7 @@
 
           <div class="text-center pt-4">
             <router-link 
-              to="/admin/signup"
+              to="/adminSignup"
               class="text-[var(--royal-blue)] hover:underline text-sm">
               Don't have an account? Create one
             </router-link>
