@@ -123,8 +123,28 @@ const router = createRouter({
         path: '/agent/inspections',
         name: 'AgentInspections',
         component: () => import('@/views/agent/Inspections.vue')
-      }
-  ]
+      },
+      {
+        path: '/agent/notifications',
+        name: 'AgentNotifications',
+        component: () => import('@/views/agent/AgentNotifications.vue'),
+      },
+      {
+        path: '/agent/settings',
+        name: 'AgentSettings',
+        component: () => import('@/views/agent/AgentSettings.vue'),
+      },
+      {
+        path: '/agent/profile-settings',
+        name: 'AgentProfileSettings',
+        component: () => import('@/views/agent/AgentProfileSettings.vue'),
+      },
+      {
+        path: '/agent/help-support',
+        name: 'AgentHelpSupport',
+        component: () => import('@/views/agent/AgentHelpSupport.vue'),
+      },
+        ]
 },
 {
   path: '/customer',
@@ -165,19 +185,21 @@ const router = createRouter({
         name: 'CustomerInspections',
         component: () => import('@/views/customer/inspections.vue')
       },
-      // {
-      //   path: '/properties/:id/request-inspection',
-      //   name: 'request-inspection',
-      //   component: () => import('@/views/RequestInspection.vue'),
-      //   meta: { requiresAuth: true } // optional
-      // },
       {
   path: '/customer/request-inspection/:id',
   name: 'request-inspection',
   component: () => import('@/views/customer/RequestInspection.vue')
+},
+{
+  path: '/customer/notifications',
+  name: 'CustomerNotifications',
+  component: () => import('@/views/customer/CustomerNotifications.vue'),
+},
+{
+  path: '/customer/settings',
+  name: 'CustomerSettings',
+  component: () => import('@/views/customer/CustomerSettings.vue'),
 }
-      
-    
   ]
 },
 {

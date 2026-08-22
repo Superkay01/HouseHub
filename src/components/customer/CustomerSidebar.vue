@@ -93,6 +93,12 @@
         :to="'/customer/help'"
         @click="closeSidebar"
       />
+      <SidebarLink 
+        icon="settings" 
+        label="Settings" 
+        :to="'/customer/Settings'"
+        @click="closeSidebar"
+      />
       
       <button 
         @click="logout"

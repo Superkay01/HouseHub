@@ -18,6 +18,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
+import { useCustomerNotifications } from '@/composables/useCustomerNotifications'
 import CustomerSidebar from '@/components/customer/CustomerSidebar.vue'
 import CustomerNavbar from '@/components/customer/CustomerNavbar.vue'
 
@@ -26,4 +28,18 @@ const sidebarRef = ref(null)
 const toggleSidebar = () => {
   sidebarRef.value?.toggleSidebar()
 }
+
+const {
+  unreadCount,
+  startNotificationListener,
+  stopNotificationListener,
+} = useCustomerNotifications()
+
+onMounted(() => {
+  startNotificationListener()
+})
+
+onBeforeUnmount(() => {
+  stopNotificationListener()
+})
 </script>

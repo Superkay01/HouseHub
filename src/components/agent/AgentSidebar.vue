@@ -54,39 +54,48 @@
           @click="closeSidebar"
         />
         <SidebarLink 
-          icon="properties" 
-          label="My Properties" 
-          :to="'/agent/properties'"
-          @click="closeSidebar"
-        />
-        <SidebarLink 
           icon="add" 
           label="Add New Property" 
           :to="'/agent/add-property'"
           @click="closeSidebar"
         />
         <SidebarLink 
+          icon="properties" 
+          label="My Properties" 
+          :to="'/agent/properties'"
+          @click="closeSidebar"
+        />
+        
+        <SidebarLink 
           icon="requests" 
           label="Property Requests" 
           :to="'/agent/requests'"
           @click="closeSidebar"
         />
-        <SidebarLink 
-          icon="analytics" 
-          label="Analytics" 
-          :to="'/agent/analytics'"
-          @click="closeSidebar"
-        />
+       
         <SidebarLink 
           icon="calendar" 
           label="Inspections" 
           :to="'/agent/inspections'"
           @click="closeSidebar"
         />
-        <SidebarLink 
+       
+        <!-- <SidebarLink 
           icon="messages" 
           label="Messages" 
           :to="'/agent/messages'"
+          @click="closeSidebar"
+        /> -->
+        <SidebarLink 
+          icon="notifications" 
+          label="Notifications" 
+          :to="'/agent/notifications'"
+          @click="closeSidebar"
+        />
+          <SidebarLink 
+          icon="analytics" 
+          label="Analytics" 
+          :to="'/agent/analytics'"
           @click="closeSidebar"
         />
       </nav>
@@ -103,9 +112,15 @@
       <SidebarLink 
         icon="help" 
         label="Help & Support" 
-        :to="'/agent/help'"
+        :to="'/agent/help-support'"
         @click="closeSidebar"
       />
+      <SidebarLink 
+          icon="settings" 
+          label="Settings" 
+          :to="'/agent/settings'"
+          @click="closeSidebar"
+        />
       
       <button 
         @click="logout"
