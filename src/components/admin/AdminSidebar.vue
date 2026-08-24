@@ -68,6 +68,17 @@
         <SidebarMenuItem icon="reports" label="Reports" to="/admin/reports" />
         <SidebarMenuItem icon="notifications" label="Notifications" to="/admin/notifications" />
         <SidebarMenuItem icon="AdminReviews" label="Reviews" to="/admin/AdminReviews" />
+        <SidebarMenuItem
+  icon="HelpCircle"
+  label="Help & Support"
+  to="/admin/help-support"
+/>
+
+<SidebarMenuItem
+  icon="Bell"
+  label="Notification Settings"
+  to="/admin/notification-settings"
+/>
 
         <!-- Head Admin Only -->
         <div v-if="isHeadAdmin">

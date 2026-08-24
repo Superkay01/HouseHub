@@ -199,7 +199,22 @@ const router = createRouter({
   path: '/customer/settings',
   name: 'CustomerSettings',
   component: () => import('@/views/customer/CustomerSettings.vue'),
-}
+},
+{
+  path: '/customer/profile',
+  name: 'CustomerProfile',
+  component: () => import('@/views/customer/CustomerProfile.vue'),
+},
+{
+  path: '/customer/help-support',
+  name: 'CustomerHelpSupport',
+  component: () => import('@/views/customer/CustomerHelpSupport.vue'),
+},
+{
+  path: '/customer/activity',
+  name: 'CustomerActivityHistory',
+  component: () => import('@/views/customer/CustomerActivityHistory.vue'),
+},
   ]
 },
 {
@@ -243,7 +258,22 @@ const router = createRouter({
       path: 'AdminReviews',
       name: 'AdminReviews',
       component: () => import('../views/admin/AdminReviews.vue')
-    }
+    },
+    {
+  path: '/admin/profile',
+  name: 'AdminProfile',
+  component: () => import('@/views/admin/AdminProfile.vue'),
+},
+{
+  path: '/admin/help-support',
+  name: 'AdminHelpSupport',
+  component: () => import('@/views/admin/AdminHelpSupport.vue'),
+},
+{
+  path: '/admin/notification-settings',
+  name: 'AdminNotificationSettings',
+  component: () => import('@/views/admin/AdminNotificationSettings.vue'),
+},
     
   ]
 }

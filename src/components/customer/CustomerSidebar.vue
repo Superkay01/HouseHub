@@ -78,6 +78,12 @@
         />
       </nav>
     </div>
+      <SidebarLink 
+        icon="activity" 
+        label="Activity" 
+        :to="'/customer/activity'"
+        @click="closeSidebar"
+      />
 
     <!-- Bottom Section -->
     <div class="p-4 border-t border-white/10">
@@ -90,7 +96,7 @@
       <SidebarLink 
         icon="help" 
         label="Help & Support" 
-        :to="'/customer/help'"
+        :to="'/customer/help-support'"
         @click="closeSidebar"
       />
       <SidebarLink 
