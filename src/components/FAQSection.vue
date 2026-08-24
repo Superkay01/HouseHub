@@ -81,7 +81,7 @@ import { ref } from 'vue'
 
 const faqs = ref([
   {
-    question: "Is NestFinder free to use?",
+    question: "Is Lodgenext free to use?",
     answer: "Yes. Browsing properties, searching locations, and connecting with agents are completely free for renters."
   },
   {
