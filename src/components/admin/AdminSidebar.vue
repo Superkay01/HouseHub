@@ -79,6 +79,11 @@
   label="Notification Settings"
   to="/admin/notification-settings"
 />
+<SidebarMenuItem
+  icon="BarChart3"
+  label="Analytics"
+  to="/admin/analytics"
+/>
 
         <!-- Head Admin Only -->
         <div v-if="isHeadAdmin">

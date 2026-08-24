@@ -274,6 +274,11 @@ const router = createRouter({
   name: 'AdminNotificationSettings',
   component: () => import('@/views/admin/AdminNotificationSettings.vue'),
 },
+{
+  path: '/admin/analytics',
+  name: 'AdminAnalytics',
+  component: () => import('@/views/admin/AdminDashboardAnalytics.vue'),
+},
     
   ]
 }
