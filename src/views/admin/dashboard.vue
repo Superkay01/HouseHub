@@ -9,6 +9,19 @@
         <p class="text-sm sm:text-base text-gray-500 mt-1">
           Overview of platform activity and performance
         </p>
+
+        <div class="flex flex-wrap items-center gap-3 mt-2">
+          <span class="inline-flex items-center gap-2 text-xs sm:text-sm text-green-600">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            Live updates
+          </span>
+          <span v-if="lastUpdated" class="text-xs text-gray-400">
+            Updated {{ lastUpdated }}
+          </span>
+          <span v-if="refreshing" class="text-xs text-gray-400">
+            Refreshing...
+          </span>
+        </div>
       </div>
 
       <!-- Loading -->
@@ -199,13 +212,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 
 const router = useRouter()
 const loading = ref(true)
+const refreshing = ref(false)
 const recentRequests = ref([])
+const lastUpdated = ref('')
+
+let channel = null
+let refreshTimer = null
 
 const stats = ref({
   properties: { approved: 0, pending: 0, draft: 0, rejected: 0, total: 0 },
@@ -252,8 +270,10 @@ const formatDate = (date) => {
 const countBy = (rows, field, value) =>
   rows.filter((r) => (r[field] || '').toLowerCase() === value.toLowerCase()).length
 
-const loadDashboard = async () => {
-  loading.value = true
+const loadDashboard = async (isRefresh = false) => {
+  if (isRefresh) refreshing.value = true
+  else loading.value = true
+
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
@@ -270,7 +290,10 @@ const loadDashboard = async () => {
       ticketsRes,
     ] = await Promise.all([
       supabase.from('properties').select('id, status'),
-      supabase.from('property_requests').select('id, status, request_code, created_at, properties(title)').order('created_at', { ascending: false }),
+      supabase
+        .from('property_requests')
+        .select('id, status, request_code, created_at, properties(title)')
+        .order('created_at', { ascending: false }),
       supabase.from('inspections').select('id, status'),
       supabase.from('payments').select('id, status, amount'),
       supabase.from('profiles').select('id, role, verified'),
@@ -301,7 +324,9 @@ const loadDashboard = async () => {
 
     stats.value.inspections = {
       total: inspections.length,
-      scheduled: countBy(inspections, 'status', 'scheduled') + countBy(inspections, 'status', 'confirmed'),
+      scheduled:
+        countBy(inspections, 'status', 'scheduled') +
+        countBy(inspections, 'status', 'confirmed'),
       completed: countBy(inspections, 'status', 'completed'),
       cancelled: countBy(inspections, 'status', 'cancelled'),
     }
@@ -328,12 +353,72 @@ const loadDashboard = async () => {
     }
 
     recentRequests.value = requests.slice(0, 8)
+
+    lastUpdated.value = new Date().toLocaleTimeString('en-NG', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    })
   } catch (err) {
-    console.error(err)
+    console.error('Dashboard load error:', err)
   } finally {
     loading.value = false
+    refreshing.value = false
   }
 }
 
-onMounted(loadDashboard)
+const queueRefresh = () => {
+  if (refreshTimer) clearTimeout(refreshTimer)
+  refreshTimer = setTimeout(() => {
+    loadDashboard(true)
+  }, 400)
+}
+
+const setupRealtime = () => {
+  channel = supabase
+    .channel('admin-dashboard-realtime')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'properties' },
+      () => queueRefresh()
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'property_requests' },
+      () => queueRefresh()
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'inspections' },
+      () => queueRefresh()
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'payments' },
+      () => queueRefresh()
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'profiles' },
+      () => queueRefresh()
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'support_tickets' },
+      () => queueRefresh()
+    )
+    .subscribe((status) => {
+      console.log('Admin dashboard realtime:', status)
+    })
+}
+
+onMounted(async () => {
+  await loadDashboard(false)
+  setupRealtime()
+})
+
+onBeforeUnmount(() => {
+  if (refreshTimer) clearTimeout(refreshTimer)
+  if (channel) supabase.removeChannel(channel)
+})
 </script>
