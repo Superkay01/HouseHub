@@ -215,6 +215,11 @@ const router = createRouter({
   name: 'CustomerActivityHistory',
   component: () => import('@/views/customer/CustomerActivityHistory.vue'),
 },
+{
+  path: '/customer/agents/:id',
+  name: 'CustomerAgentProfile',
+  component: () => import('@/views/customer/AgentPublicProfile.vue'),
+}
   ]
 },
 {

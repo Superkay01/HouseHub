@@ -10,7 +10,7 @@
 
       <!-- Verified Badge -->
       <div
-        v-if="property.profiles?.is_verified"
+        v-if="property.profiles?.verified || property.profiles?.is_verified"
         class="absolute top-3 left-3 bg-white/95 text-[#0025cc] text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-xl flex items-center gap-1 shadow"
       >
         <span class="text-green-500">✓</span> Verified
@@ -49,17 +49,20 @@
 
         <div class="text-right flex-shrink-0">
           <p class="font-bold text-base sm:text-lg text-[#0025cc] leading-tight">
-            ₦{{ property.price?.toLocaleString() }}
+            ₦{{ Number(property.price || 0).toLocaleString() }}
           </p>
           <p class="text-[10px] sm:text-xs text-[var(--hover-blue)]">per year</p>
         </div>
       </div>
-      <div class=" gap-7 mb-2">
-        <div class="flex-1 min-w-0">
-          <h3 class="font-semibold text-sm sm:text-base leading-snug text-gray-900 line-clamp-2">
-            {{ property.inspection_fee ? `Inspection Fee: ₦${property.inspection_fee.toLocaleString()}` : 'No Inspection Fee' }}
-          </h3>
-        </div>
+
+      <div class="mb-2">
+        <p class="text-xs sm:text-sm font-medium text-gray-700">
+          {{
+            property.inspection_fee
+              ? `Inspection Fee: ₦${Number(property.inspection_fee).toLocaleString()}`
+              : 'No Inspection Fee'
+          }}
+        </p>
       </div>
 
       <!-- Views -->
@@ -93,29 +96,40 @@
         >
           {{ amenity }}
         </span>
-        <span v-if="property.amenities.length > 3" class="text-[10px] sm:text-xs text-gray-400 self-center">
+        <span
+          v-if="property.amenities.length > 3"
+          class="text-[10px] sm:text-xs text-gray-400 self-center"
+        >
           +{{ property.amenities.length - 3 }}
         </span>
       </div>
 
       <!-- Agent Info + Button -->
       <div class="mt-auto pt-3 border-t flex items-center gap-2.5">
-        <img
-          :src="property.profiles?.avatar_url || 'https://via.placeholder.com/40'"
-          class="w-7 h-7 rounded-full object-cover border border-gray-200 flex-shrink-0"
-        />
-        <div class="flex-1 min-w-0">
-          <p class="text-xs font-medium text-gray-900 truncate">
-            {{ property.profiles?.full_name || 'Agent' }}
-          </p>
-          <p v-if="property.profiles?.agency_name" class="text-[10px] text-gray-500 truncate">
-            {{ property.profiles.agency_name }}
-          </p>
-        </div>
+        <button
+          type="button"
+          @click.stop="viewAgentProfile"
+          class="flex items-center gap-2.5 flex-1 min-w-0 text-left hover:bg-gray-50 rounded-xl p-1 -m-1 transition disabled:opacity-60"
+          :disabled="!agentId"
+          title="View agent profile & reviews"
+        >
+          <img
+            :src="property.profiles?.avatar_url || 'https://via.placeholder.com/40'"
+            class="w-7 h-7 rounded-full object-cover border border-gray-200 flex-shrink-0"
+          />
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-medium text-gray-900 truncate">
+              {{ property.profiles?.full_name || 'Agent' }}
+            </p>
+            <p class="text-[10px] text-[#0025cc] truncate">
+              {{ property.profiles?.agency_name || 'View reviews' }}
+            </p>
+          </div>
+        </button>
 
         <button
           @click.stop="viewDetails"
-          class="bg-[#0025cc] hover:bg-[#001fa3] text-white text-[10px] sm:text-xs font-medium px-3.5 sm:px-4 py-2 rounded-xl transition-all flex items-center gap-1 flex-shrink-0"
+          class="bg-[#0025cc] hover:bg-[#001fa3] text-white text-[10px] sm:text-xs font-medium px-3.5 sm:px-4 py-2 rounded-xl transition-all flex-shrink-0"
         >
           View
         </button>
@@ -125,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Heart } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
@@ -138,6 +152,10 @@ const router = useRouter()
 const viewCount = ref(0)
 const isSaved = ref(false)
 const saving = ref(false)
+
+const agentId = computed(() => {
+  return props.property?.agent_id || props.property?.profiles?.id || null
+})
 
 const formatViews = (count: number) => {
   if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M'
@@ -234,6 +252,18 @@ const viewDetails = async () => {
   router.push({
     name: 'CustomerPropertyDetail',
     params: { id: props.property.id }
+  })
+}
+
+const viewAgentProfile = () => {
+  if (!agentId.value) {
+    alert('Agent profile not available')
+    return
+  }
+
+  router.push({
+    name: 'CustomerAgentProfile',
+    params: { id: agentId.value }
   })
 }
 

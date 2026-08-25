@@ -13,28 +13,39 @@
               <p class="text-[var(--royal-blue)] mt-1 md:text-[15px] text-xs">
                 Here's what's happening with your properties today
               </p>
+              <div class="flex items-center gap-3 mt-2">
+                <span class="inline-flex items-center gap-2 text-xs text-green-600">
+                  <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                  Live
+                </span>
+                <span v-if="lastUpdated" class="text-xs text-gray-400">
+                  Updated {{ lastUpdated }}
+                </span>
+              </div>
             </div>
 
             <!-- Verification Badge -->
-            <div v-if="verificationStatus" class="flex-shrink-0">
+            <div v-if="verificationStatus !== undefined" class="flex-shrink-0">
               <button 
                 v-if="verificationStatus !== 'approved'"
                 @click="goToVerification"
                 class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold hover:scale-105 transition-all active:scale-95"
                 :class="[
-                  verificationStatus === 'pending' 
+                  verificationStatus === 'pending' || verificationStatus === 'under_review'
                     ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 hover:bg-yellow-200' 
                     : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
                 ]"
               >
-                <span v-if="verificationStatus === 'pending'" class="text-lg">⏳</span>
-                <span v-else class="text-lg">🔒</span>
+                <span class="text-lg">
+                  {{ verificationStatus === 'pending' || verificationStatus === 'under_review' ? '⏳' : '🔒' }}
+                </span>
                 {{
-                  verificationStatus === 'pending' ? 'Verification Pending' : 'Complete Verification'
+                  verificationStatus === 'pending' || verificationStatus === 'under_review'
+                    ? 'Verification Pending'
+                    : 'Complete Verification'
                 }}
               </button>
 
-              <!-- Verified Badge (Non-clickable) -->
               <div 
                 v-else
                 class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold bg-green-100 text-green-700 border border-green-200"
@@ -45,84 +56,128 @@
             </div>
           </div>
 
-          <!-- Stats Cards -->
+          <!-- Stats Cards (clickable) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <div class="bg-white rounded-3xl p-6 shadow-sm">
+            <button
+              type="button"
+              @click="router.push('/agent/properties')"
+              class="bg-white rounded-3xl p-6 shadow-sm text-left hover:shadow-md hover:border-[var(--royal-blue)] border border-transparent transition-all"
+            >
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-[var(--royal-blue)] text-sm">Total Properties</p>
-                  <h3 class="text-3xl font-bold mt-2 text-[var(--royal-blue)]">{{ stats.totalProperties }}</h3>
-                  <p class="text-sm text-[var(--royal-blue)] mt-2">+3 this month</p>
+                  <h3 class="text-3xl font-bold mt-2 text-[var(--royal-blue)]">
+                    {{ stats.totalProperties }}
+                  </h3>
+                  <p class="text-sm text-[var(--royal-blue)] mt-2">View all properties</p>
                 </div>
                 <div class="w-14 h-14 rounded-2xl bg-[var(--light-blue)] flex items-center justify-center">
                   <House class="w-7 h-7 text-[var(--royal-blue)]" />
                 </div>
               </div>
-            </div>
+            </button>
 
-            <div class="bg-white rounded-3xl p-6 shadow-sm">
+            <button
+              type="button"
+              @click="router.push('/agent/properties')"
+              class="bg-white rounded-3xl p-6 shadow-sm text-left hover:shadow-md hover:border-green-500 border border-transparent transition-all"
+            >
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-[var(--bright-green)] text-sm">Active Listings</p>
-                  <h3 class="text-3xl font-bold mt-2 text-[var(--bright-green)]">{{ stats.activeListings }}</h3>
-                  <p class="text-sm text-[var(--bright-green)] mt-2">+2</p>
+                  <h3 class="text-3xl font-bold mt-2 text-[var(--bright-green)]">
+                    {{ stats.activeListings }}
+                  </h3>
+                  <p class="text-sm text-[var(--bright-green)] mt-2">Approved listings</p>
                 </div>
                 <div class="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
                   <MapPin class="w-7 h-7 text-green-600" />
                 </div>
               </div>
-            </div>
+            </button>
 
-            <div class="bg-white rounded-3xl p-6 shadow-sm">
+            <button
+              type="button"
+              @click="router.push('/agent/requests')"
+              class="bg-white rounded-3xl p-6 shadow-sm text-left hover:shadow-md hover:border-purple-500 border border-transparent transition-all"
+            >
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-[var(--periwinkle)] text-sm">New Requests</p>
-                  <h3 class="text-3xl font-bold mt-2 text-[var(--periwinkle)]">{{ stats.newRequests }}</h3>
-                  <p class="text-sm text-[var(--periwinkle)] mt-2">+12</p>
+                  <h3 class="text-3xl font-bold mt-2 text-[var(--periwinkle)]">
+                    {{ stats.newRequests }}
+                  </h3>
+                  <p class="text-sm text-[var(--periwinkle)] mt-2">Pending requests</p>
                 </div>
                 <div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center">
                   <User class="w-7 h-7 text-purple-600" />
                 </div>
               </div>
-            </div>
+            </button>
 
-            <div class="bg-white rounded-3xl p-6 shadow-sm">
+            <button
+              type="button"
+              @click="router.push('/agent/inspections')"
+              class="bg-white rounded-3xl p-6 shadow-sm text-left hover:shadow-md hover:border-blue-500 border border-transparent transition-all"
+            >
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-[var(--medium-blue)] text-sm">Scheduled Inspections</p>
-                  <h3 class="text-3xl font-bold mt-2 text-[var(--medium-blue)]">{{ stats.inspections }}</h3>
-                  <p class="text-sm text-[var(--medium-blue)] mt-2">4 today</p>
+                  <h3 class="text-3xl font-bold mt-2 text-[var(--medium-blue)]">
+                    {{ stats.inspections }}
+                  </h3>
+                  <p class="text-sm text-[var(--medium-blue)] mt-2">Upcoming / scheduled</p>
                 </div>
                 <div class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
                   <Calendar class="w-7 h-7 text-blue-600" />
                 </div>
               </div>
-            </div>
+            </button>
           </div>
 
-          <!-- Rest of your dashboard content remains the same -->
+          <!-- Rest of dashboard -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm">
               <div class="flex justify-between items-center mb-6">
-                <h2 class="md:text-xl text-xs font-semibold text-[var(--royal-blue)]">Property Performance</h2>
+                <h2 class="md:text-xl text-xs font-semibold text-[var(--royal-blue)]">
+                  Property Performance
+                </h2>
                 <div class="flex gap-2 text-sm">
-                  <button class="md:px-4 md:py-1.5 px-2 py-1 rounded-xl md:text-xs text-[10px] bg-[var(--royal-blue)] text-white">This Month</button>
-                  <button class="md:px-4 md:py-1.5 px-2 py-1 rounded-xl hover:bg-[var(--light-blue)]">This Year</button>
+                  <button class="md:px-4 md:py-1.5 px-2 py-1 rounded-xl md:text-xs text-[10px] bg-[var(--royal-blue)] text-white">
+                    This Month
+                  </button>
+                  <button class="md:px-4 md:py-1.5 px-2 py-1 rounded-xl hover:bg-[var(--light-blue)]">
+                    This Year
+                  </button>
                 </div>
               </div>
               <AnalyticsChart />
             </div>
 
             <div class="bg-white rounded-3xl p-6 shadow-sm">
-              <h2 class="md:text-xl text-[15px] font-semibold mb-6 text-[var(--royal-blue)]">Quick Actions</h2>
+              <h2 class="md:text-xl text-[15px] font-semibold mb-6 text-[var(--royal-blue)]">
+                Quick Actions
+              </h2>
               <div class="grid grid-cols-2 gap-4">
-                <button class="p-6 rounded-2xl border border-dashed border-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition-all text-center">
+                <button
+                  type="button"
+                  @click="router.push('/agent/properties/add')"
+                  class="p-6 rounded-2xl border border-dashed border-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition-all text-center"
+                >
                   <Plus class="w-10 h-10 mx-auto mb-3 text-[var(--royal-blue)]" />
-                  <div class="font-medium text-[var(--royal-blue)] md:text-xl text-[12px]">Add Property</div>
+                  <div class="font-medium text-[var(--royal-blue)] md:text-xl text-[12px]">
+                    Add Property
+                  </div>
                 </button>
-                <button class="p-6 rounded-2xl border border-dashed border-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition-all text-center">
+                <button
+                  type="button"
+                  @click="router.push('/agent/properties')"
+                  class="p-6 rounded-2xl border border-dashed border-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition-all text-center"
+                >
                   <Camera class="w-10 h-10 mx-auto mb-3 text-[var(--royal-blue)]" />
-                  <div class="font-medium text-[var(--royal-blue)] md:text-xl text-[12px]">Upload Photos</div>
+                  <div class="font-medium text-[var(--royal-blue)] md:text-xl text-[12px]">
+                    Upload Photos
+                  </div>
                 </button>
               </div>
             </div>
@@ -134,9 +189,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { supabase } from '@/supabaseClient.js'
-import { useRouter } from 'vue-router'   // ← Added
+import { useRouter } from 'vue-router'
 import {
   House,
   MapPin,
@@ -145,11 +200,14 @@ import {
   Camera,
   Plus
 } from 'lucide-vue-next'
+import AnalyticsChart from '@/components/agent/AnalyticsChart.vue' // adjust path if needed
 
 const router = useRouter()
 
 const userProfile = ref({ full_name: 'Loading...' })
-const verificationStatus = ref(null) // 'approved' | 'pending' | null
+const verificationStatus = ref(null)
+const lastUpdated = ref('')
+const agentId = ref(null)
 
 const stats = ref({
   totalProperties: 0,
@@ -158,10 +216,15 @@ const stats = ref({
   inspections: 0
 })
 
+let channel = null
+let refreshTimer = null
+
 const fetchDashboardData = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
+
+    agentId.value = user.id
 
     // Profile
     const { data: profile } = await supabase
@@ -172,40 +235,103 @@ const fetchDashboardData = async () => {
 
     if (profile) userProfile.value = profile
 
-    // Verification Status
+    // Verification
     const { data: verif } = await supabase
       .from('agent_verifications')
       .select('verification_status')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
     verificationStatus.value = verif?.verification_status || null
 
-    // Stats...
+    // Total properties
     const { count: totalProps } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
-      .eq('listed_by', user.id)
+      .eq('agent_id', user.id)
 
+    // Active listings
     const { count: activeProps } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
-      .eq('listed_by', user.id)
+      .eq('agent_id', user.id)
       .eq('status', 'approved')
+
+    // New / pending requests
+    const { count: pendingRequests } = await supabase
+      .from('property_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('agent_id', user.id)
+      .eq('status', 'pending')
+
+    // Scheduled inspections
+    const { count: scheduledInspections } = await supabase
+      .from('inspections')
+      .select('*', { count: 'exact', head: true })
+      .eq('agent_id', user.id)
+      .in('status', ['scheduled', 'confirmed', 'accepted'])
 
     stats.value.totalProperties = totalProps || 0
     stats.value.activeListings = activeProps || 0
+    stats.value.newRequests = pendingRequests || 0
+    stats.value.inspections = scheduledInspections || 0
 
+    lastUpdated.value = new Date().toLocaleTimeString('en-NG', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
   } catch (error) {
     console.error('Error fetching dashboard:', error)
   }
 }
 
-const goToVerification = () => {
-  router.push('/agent/verification')   
+const queueRefresh = () => {
+  if (refreshTimer) clearTimeout(refreshTimer)
+  refreshTimer = setTimeout(() => {
+    fetchDashboardData()
+  }, 400)
 }
 
-onMounted(() => {
-  fetchDashboardData()
+const setupRealtime = (userId) => {
+  channel = supabase
+    .channel(`agent-dashboard-${userId}`)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'properties', filter: `agent_id=eq.${userId}` },
+      () => queueRefresh()
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'property_requests', filter: `agent_id=eq.${userId}` },
+      () => queueRefresh()
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'inspections', filter: `agent_id=eq.${userId}` },
+      () => queueRefresh()
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'agent_verifications', filter: `user_id=eq.${userId}` },
+      () => queueRefresh()
+    )
+    .subscribe((status) => {
+      console.log('Agent dashboard realtime:', status)
+    })
+}
+
+const goToVerification = () => {
+  router.push('/agent/verification')
+}
+
+onMounted(async () => {
+  await fetchDashboardData()
+  if (agentId.value) setupRealtime(agentId.value)
+})
+
+onBeforeUnmount(() => {
+  if (refreshTimer) clearTimeout(refreshTimer)
+  if (channel) supabase.removeChannel(channel)
 })
 </script>

@@ -31,8 +31,10 @@
         
         <!-- Images -->
         <div class="lg:col-span-7 space-y-6">
-          <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-white cursor-pointer" 
-               @click="showLightbox = true">
+          <div
+            class="relative rounded-3xl overflow-hidden shadow-2xl bg-white cursor-pointer" 
+            @click="showLightbox = true"
+          >
             <img 
               :src="mainImage" 
               class="w-full h-[520px] object-cover"
@@ -89,22 +91,40 @@
               {{ property.title }}
             </h1>
             
-            <p class="text-[var(--royal-blue)] mb-6">
+            <p class="text-[var(--royal-blue)] mb-4">
               📍 {{ property.area }}, {{ property.city }}, {{ property.state }}
             </p>
+
             <p class="text-[var(--royal-blue)] mb-6">
-              {{ property.inspection_fee 
-                  ? `Inspection Fee: ₦${Number(property.inspection_fee).toLocaleString()}` 
-                  : 'No Inspection Fee' }}
+              {{
+                property.inspection_fee
+                  ? `Inspection Fee: ₦${Number(property.inspection_fee).toLocaleString()}`
+                  : 'No Inspection Fee'
+              }}
             </p>
 
             <!-- Unique View Count -->
             <div class="flex items-center gap-2 text-medium-gray text-sm mb-6">
               <span>👁️</span>
-              <span>{{ uniqueViewCount }} {{ uniqueViewCount === 1 ? 'person' : 'people' }} viewed this property</span>
+              <span>
+                {{ uniqueViewCount }}
+                {{ uniqueViewCount === 1 ? 'person' : 'people' }} viewed this property
+              </span>
             </div>
 
-            <!-- Save Button (also here) -->
+            <!-- PRIMARY CTA: Request Inspection -->
+            <button
+              @click="requestInspection"
+              class="w-full mb-3 py-4 rounded-2xl font-semibold text-lg text-white bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] transition shadow-md"
+            >
+              Request Inspection
+            </button>
+
+            <p class="text-xs text-center text-gray-500 mb-6">
+              Choose a date & time{{ property.inspection_fee ? ', pay the inspection fee,' : '' }} then submit your request
+            </p>
+
+            <!-- Save Button -->
             <button
               @click="toggleSave"
               class="w-full mb-6 py-3.5 rounded-2xl font-medium transition flex items-center justify-center gap-2"
@@ -133,15 +153,15 @@
             <div class="space-y-4 text-sm">
               <div class="flex justify-between">
                 <span class="text-[var(--royal-blue)]">Property Type</span>
-                <strong>{{ property.property_type }}</strong>
+                <strong>{{ property.property_type || '—' }}</strong>
               </div>
               <div class="flex justify-between">
                 <span class="text-[var(--royal-blue)]">Condition</span>
-                <strong>{{ property.condition }}</strong>
+                <strong>{{ property.condition || '—' }}</strong>
               </div>
               <div class="flex justify-between">
                 <span class="text-[var(--royal-blue)]">Availability</span>
-                <strong>{{ property.availability }}</strong>
+                <strong>{{ property.availability || '—' }}</strong>
               </div>
             </div>
 
@@ -165,9 +185,20 @@
               </p>
             </div>
 
-            <div class="mt-10 pt-8 border-t">
-              <button class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] text-white py-4 rounded-2xl font-semibold text-lg transition">
-                Contact Admin
+            <!-- Secondary CTA -->
+            <div class="mt-10 pt-8 border-t space-y-3">
+              <button
+                @click="requestInspection"
+                class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] text-white py-4 rounded-2xl font-semibold text-lg transition"
+              >
+                Request Inspection
+              </button>
+
+              <button
+                @click="goToHelp"
+                class="w-full bg-white border border-gray-200 hover:bg-gray-50 text-[var(--royal-blue)] py-3.5 rounded-2xl font-medium transition"
+              >
+                Need Help?
               </button>
             </div>
           </div>
@@ -176,9 +207,11 @@
     </div>
 
     <!-- Lightbox -->
-    <div v-if="showLightbox" 
-         class="fixed inset-0 z-[100] bg-black flex items-center justify-center" 
-         @click.self="showLightbox = false">
+    <div
+      v-if="showLightbox" 
+      class="fixed inset-0 z-[100] bg-black flex items-center justify-center" 
+      @click.self="showLightbox = false"
+    >
       <div class="relative max-w-6xl w-full p-8">
         <img :src="mainImage" class="max-h-[90vh] mx-auto rounded-3xl shadow-2xl" />
         <button @click="showLightbox = false" class="absolute top-8 right-8 text-white text-5xl">
@@ -191,10 +224,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient'
 
 const route = useRoute()
+const router = useRouter()
+
 const property = ref<any>({})
 const loading = ref(true)
 const error = ref('')
@@ -232,14 +267,12 @@ const fetchProperty = async () => {
   loading.value = false
 }
 
-// Unique view tracking (like Facebook)
 const recordUniqueView = async () => {
   if (!property.value?.id) return
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  // Record unique view
   const { error: insertError } = await supabase
     .from('property_views')
     .upsert(
@@ -257,7 +290,6 @@ const recordUniqueView = async () => {
     console.error('View insert error:', insertError)
   }
 
-  // Count unique viewers
   const { count, error: countError } = await supabase
     .from('property_views')
     .select('*', { count: 'exact', head: true })
@@ -271,7 +303,6 @@ const recordUniqueView = async () => {
   uniqueViewCount.value = count || 0
 }
 
-// Check if already saved
 const checkIfSaved = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || !property.value?.id) {
@@ -293,13 +324,14 @@ const checkIfSaved = async () => {
 
   isSaved.value = !!data
 }
-// Toggle save / unsave
+
 const toggleSave = async () => {
   if (saving.value) return
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     alert('Please login to save properties')
+    router.push('/login')
     return
   }
 
@@ -334,6 +366,25 @@ const toggleSave = async () => {
     saving.value = false
   }
 }
+
+const requestInspection = async () => {
+  if (!property.value?.id) return
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    alert('Please login to request an inspection')
+    router.push('/login')
+    return
+  }
+
+  // Easy customer journey → request inspection page
+  router.push(`/customer/request-inspection/${property.value.id}`)
+}
+
+const goToHelp = () => {
+  router.push('/customer/help-support')
+}
+
 const allImages = computed(() => {
   const imgs: string[] = []
   if (property.value.cover_image) imgs.push(property.value.cover_image)

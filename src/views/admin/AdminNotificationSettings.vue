@@ -86,25 +86,42 @@
           </button>
         </div>
 
-        <!-- Push -->
-        <div class="flex items-center justify-between gap-4 pt-6 border-t border-gray-100">
-          <div>
-            <h3 class="text-sm sm:text-base font-semibold text-gray-900">Push Notifications</h3>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">
-              Browser push alerts (coming soon)
-            </p>
+        <!-- Browser Push -->
+        <div class="pt-6 border-t border-gray-100 space-y-4">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <h3 class="text-sm sm:text-base font-semibold text-gray-900">
+                Browser Push Notifications
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-500 mt-1">
+                Get system alerts even when the admin panel is in the background
+              </p>
+            </div>
+
+            <button
+              type="button"
+              @click="toggleBrowserPush"
+              class="relative w-14 h-8 rounded-full transition-colors"
+              :class="pushEnabled ? 'bg-[var(--royal-blue)]' : 'bg-gray-300'"
+            >
+              <span
+                class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow transition-transform"
+                :class="pushEnabled ? 'translate-x-6' : 'translate-x-0'"
+              />
+            </button>
           </div>
+
           <button
             type="button"
-            @click="togglePush"
-            class="relative w-14 h-8 rounded-full transition-colors"
-            :class="settings.push_notifications ? 'bg-[var(--royal-blue)]' : 'bg-gray-300'"
+            @click="toggleBrowserPush"
+            class="px-4 py-2 rounded-xl bg-[var(--royal-blue)] text-white text-sm hover:bg-[#001fa3] transition"
           >
-            <span
-              class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow transition-transform"
-              :class="settings.push_notifications ? 'translate-x-6' : 'translate-x-0'"
-            />
+            {{ pushEnabled ? 'Disable Browser Push' : 'Enable Browser Push' }}
           </button>
+
+          <p class="text-xs text-gray-400">
+            Status: {{ pushEnabled ? 'Enabled' : 'Disabled' }}
+          </p>
         </div>
 
         <p v-if="saveMessage" class="text-sm text-green-600">{{ saveMessage }}</p>
@@ -118,11 +135,16 @@ import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 import { playNotificationSound } from '@/utils/notificationSound'
+import {
+  enablePushNotifications,
+  disablePushNotifications,
+} from '@/utils/pushNotifications'
 
 const router = useRouter()
 const loading = ref(true)
 const saving = ref(false)
 const saveMessage = ref('')
+const pushEnabled = ref(false)
 
 const settings = reactive({
   notification_sound_enabled: true,
@@ -175,6 +197,14 @@ const loadSettings = async () => {
         push_notifications: true,
       })
     }
+
+    const { count } = await supabase
+      .from('push_subscriptions')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+
+    pushEnabled.value = (count || 0) > 0
   } catch (err) {
     console.error(err)
     alert('Failed to load settings')
@@ -240,9 +270,25 @@ const toggleEmail = async () => {
   await saveSettings()
 }
 
-const togglePush = async () => {
-  settings.push_notifications = !settings.push_notifications
-  await saveSettings()
+const toggleBrowserPush = async () => {
+  try {
+    if (pushEnabled.value) {
+      await disablePushNotifications()
+      pushEnabled.value = false
+      settings.push_notifications = false
+      await saveSettings()
+      alert('Browser push disabled')
+    } else {
+      await enablePushNotifications('admin')
+      pushEnabled.value = true
+      settings.push_notifications = true
+      await saveSettings()
+      alert('Browser push enabled')
+    }
+  } catch (err) {
+    console.error(err)
+    alert(err.message || 'Failed to update push settings')
+  }
 }
 
 onMounted(loadSettings)

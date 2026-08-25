@@ -205,10 +205,19 @@ const fetchProperties = async () => {
   try {
     let q = supabase
       .from('properties')
-      .select('*')
+      .select(`
+        *,
+        profiles:agent_id (
+          id,
+          full_name,
+          avatar_url,
+          agency_name,
+          verified
+        )
+      `)
       .eq('status', 'approved')
 
-    // Flexible filters (same style as the search input)
+    // Flexible filters
     if (filters.value.state) {
       q = q.ilike('state', `%${filters.value.state}%`)
     }
@@ -226,7 +235,6 @@ const fetchProperties = async () => {
     if (filters.value.maxPrice) q = q.lte('price', Number(filters.value.maxPrice))
     if (filters.value.bedrooms) q = q.eq('bedrooms', Number(filters.value.bedrooms))
 
-    // Free text search (flexible)
     if (searchQuery.value?.trim()) {
       const term = searchQuery.value.trim()
       q = q.or(
@@ -234,7 +242,6 @@ const fetchProperties = async () => {
       )
     }
 
-    // Sorting
     if (sortBy.value === 'newest') {
       q = q.order('created_at', { ascending: false })
     } else if (sortBy.value === 'price-low') {

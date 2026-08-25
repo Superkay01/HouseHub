@@ -127,21 +127,21 @@
           </button>
 
           <div class="flex flex-col sm:flex-row gap-3">
-            <button
+            <!-- <button
               type="button"
               class="flex-1 py-3.5 bg-[var(--royal-blue)] text-white rounded-2xl font-medium hover:bg-[var(--medium-blue)] transition"
               :class="needsCustomerConfirm ? 'sm:bg-white sm:text-[var(--royal-blue)] sm:border sm:border-[var(--royal-blue)]' : ''"
               @click="addToCalendar"
             >
               Add to Calendar
-            </button>
-            <button
+            </button> -->
+            <!-- <button
               type="button"
               class="flex-1 py-3.5 border border-gray-300 rounded-2xl font-medium hover:bg-gray-50 transition"
               @click="viewDirections"
             >
               View Directions
-            </button>
+            </button> -->
           </div>
 
           <div class="flex flex-col sm:flex-row gap-3">
