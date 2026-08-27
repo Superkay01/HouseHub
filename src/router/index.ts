@@ -32,6 +32,16 @@ const router = createRouter({
       name: 'PublicPropertyDetail',
       component: () => import('@/components/PublicPropertyDetail.vue'),
     },
+    {
+      path: '/ilorin',
+      name: 'IlorinProperties',
+      component: () => import('@/views/IlorinProperties.vue')
+    },
+    {
+      path: '/ijebu-ode',
+      name: 'IjebuOdeProperties',
+      component: () => import('@/views/IjebuOdeProperties.vue')
+    },
     // {
     //   path: '/states',
     //   name: 'states',

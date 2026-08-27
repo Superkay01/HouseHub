@@ -19,7 +19,7 @@ const mobileMenuOpen = ref(false)
             <img
               src="/Lodgenext_logo__3_-removebg-preview.png"
               alt="Lodgenext logo"
-              class="w-30 h-25 object-cover"
+              class="md:w-30 w-20 h-15 object-cover"
             />
           </div>
 
@@ -40,7 +40,7 @@ const mobileMenuOpen = ref(false)
             Find Homes
           </router-link>
 
-          <router-link to="#states" class="hover:text-[var(--bright-green)] text-[var(--white)]">
+          <router-link to="/states" class="hover:text-[var(--bright-green)] text-[var(--white)]">
             All States
           </router-link>
 
@@ -99,12 +99,12 @@ const mobileMenuOpen = ref(false)
           >
             <Menu
               v-if="!mobileMenuOpen"
-              class="w-7 h-7"
+              class="w-7 h-7 text-[var(--white)]"
             />
 
             <X
               v-else
-              class="w-7 h-7"
+              class="w-7 h-7 text-[var(--white)]"
             />
           </button>
 
@@ -123,55 +123,55 @@ const mobileMenuOpen = ref(false)
       >
         <div
           v-if="mobileMenuOpen"
-          class="lg:hidden py-5 border-t"
+          class="lg:hidden py-5 border-t border-[var(--white)]"
         >
 
           <!-- Mobile Search -->
           <div class="relative mb-5">
 
             <Search
-              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--white)]"
             />
 
             <input
               type="text"
               placeholder="Search houses..."
-              class="w-full rounded-xl border border-gray-200 py-3 pl-12 pr-4 focus:outline-none"
+              class="w-full rounded-xl border text-[var(--white)] border-gray-200 py-3 pl-12 pr-4 focus:outline-none"
             />
           </div>
 
           <!-- Links -->
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
 
             <router-link
-              to="/properties"
-              class="font-medium"
+              to="/property"
+              class="font-medium text-[var(--white)]"
             >
               Find Homes
             </router-link>
 
             <router-link
               to="/states"
-              class="font-medium"
+              class="font-medium text-[var(--white)]"
             >
               All States
             </router-link>
 
             <router-link
-              to="/for-agents"
-              class="font-medium"
+              to="about"
+              class="font-medium text-[var(--white)]"
             >
-              For Agents
+              About Us
             </router-link>
 
-            <div class="flex items-center gap-2 pt-2">
+            <!-- <div class="flex items-center gap-2 pt-2">
               <MapPin class="w-4 h-4 text-royal-blue" />
               Lagos
-            </div>
+            </div> -->
 
             <router-link
               to="/login"
-              class="w-full text-center border rounded-xl py-3"
+              class="w-full text-center border rounded-xl py-2 bg-[var(--white)] text-[var(--royal-blue)]"
             >
               Login
             </router-link>

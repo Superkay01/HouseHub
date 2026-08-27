@@ -8,7 +8,7 @@
       <div class="max-w-3xl mx-auto text-center">
         <h1 class="text-3xl sm:text-4xl font-bold text-white mb-3">Find Your Next Home</h1>
         <p class="text-white/90 mb-6 text-sm sm:text-base">
-          Browse verified houses and apartments — no account needed to explore
+          Browse verified houses and apartments, no account needed to explore
         </p>
         <div class="bg-white rounded-2xl shadow-xl p-2 sm:p-3 flex flex-col sm:flex-row gap-2">
           <div class="flex-1 relative">

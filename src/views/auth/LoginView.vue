@@ -145,7 +145,7 @@ const handleLogin = async () => {
     if (role === 'agent') {
       router.push('/agent/dashboard')
     } else {
-      router.push('/customer/dashboard')
+      router.push('/customer/browse')
     }
 
   } catch (error) {

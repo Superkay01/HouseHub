@@ -1,92 +1,116 @@
 <template>
   <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
-    
     <!-- Sliding Background Images -->
     <div class="absolute inset-0 z-0">
       <div
         v-for="(image, index) in heroImages"
         :key="index"
-        :class="['absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out', 
-                 currentSlide === index ? 'opacity-100' : 'opacity-0']"
+        :class="[
+          'absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out',
+          currentSlide === index ? 'opacity-100' : 'opacity-0'
+        ]"
         :style="{ backgroundImage: `url(${image.url})` }"
       >
-        <!-- Dark Overlay -->
         <div class="absolute inset-0 bg-black/55 md:bg-black/50"></div>
       </div>
     </div>
 
+    
+
     <!-- Content -->
-    <div class="relative z-10 w-full max-w-5xl mx-auto text-center px-5 sm:px-6 lg:px-8 pt-20 pb-16">
-      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tighter text-white mb-6 px-2">
-        Find Your Perfect Home<br class="hidden sm:block">Withn Ilorin and Ijebu Ode
+    <div class="relative z-10 w-full max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-14 sm:pb-16">
+      <!-- Heading - normal readable sizes -->
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-snug tracking-tight text-white mb-4 sm:mb-5">
+        Find Your Perfect Home<br class="hidden sm:block" />
+        Within Ilorin and Ijebu Ode
       </h1>
-      
-        <p class="text-lg sm:text-xl md:text-2xl text-[#ebf8ff] max-w-3xl mx-auto mb-10 px-4">
-          Find verified homes and apartments across Ilorin and Ijebu Ode.<br class="hidden md:block">
-          Browse trusted listings, connect with agents, and rent with confidence.
-        </p>
+
+      <p class="text-sm sm:text-base md:text-lg text-[#ebf8ff] max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+        Find verified homes and apartments across Ilorin and Ijebu Ode.
+        <br class="hidden md:block" />
+        Browse trusted listings, connect with agents, and rent with confidence.
+      </p>
 
       <!-- Search Bar -->
-      <div class="max-w-2xl mx-auto bg-white rounded-3xl p-2 shadow-2xl mx-4">
-        <div class="flex flex-col md:flex-row gap-3">
+      <div class="max-w-2xl mx-auto bg-white rounded-2xl sm:rounded-3xl p-2 shadow-2xl">
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <div class="flex-1 relative">
-            <span class="absolute left-5 top-1/2 -translate-y-1/2 text-2xl"><MapPin class="w-5 h-5" /></span>
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--royal-blue)] pointer-events-none">
+              <MapPin class="w-5 h-5" />
+            </span>
             <input
               type="text"
               v-model="searchLocation"
               placeholder="Enter city or state (e.g. Ilorin, Ijebu Ode)"
-              class="w-full pl-14 pr-6 py-1 md:py-2 rounded-3xl focus:outline-none text-[#424242] placeholder:text-medium-gray text-base"
+              class="w-full pl-12 pr-4 py-3 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0025cc] text-sm sm:text-base text-[#424242] placeholder:text-gray-400"
             />
           </div>
-          
-          <button 
+
+          <button
             @click="handleSearch"
-            class="bg-royal-blue hover:bg-medium-blue active:bg-medium-blue text-white px-8 md:px-12 py-1 md:py-2 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-all text-base whitespace-nowrap">
-            <span><Search class="w-5 h-5"/> </span>
+            class="bg-[#0025cc] hover:bg-[#001fa3] active:scale-95 text-white px-6 sm:px-8 py-3 rounded-xl sm:rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all text-sm sm:text-base whitespace-nowrap"
+          >
+            <Search class="w-4 h-4 sm:w-5 sm:h-5" />
             Search Homes
           </button>
         </div>
       </div>
 
-      <!-- Quick Stats -->
-      <div class="flex flex-wrap justify-center gap-6 sm:gap-10 md:gap-16 mt-12 text-white">
-        <div class="text-center">
-          <div class="text-3xl sm:text-4xl font-bold">50K+</div>
-          <div class="text-sm sm:text-base opacity-80">Properties</div>
+      <!-- Quick Stats (real data) -->
+      <div class="flex justify-center gap-8 sm:gap-12 md:gap-16 mt-10 sm:mt-12 text-white">
+        <div class="text-center min-w-[80px]">
+          <div class="text-2xl sm:text-3xl font-bold tabular-nums">
+            {{ statsLoading ? '…' : formatNumber(stats.properties) }}
+          </div>
+          <div class="text-xs sm:text-sm opacity-80 mt-1">Properties</div>
         </div>
-        <div class="text-center">
-          <div class="text-3xl sm:text-4xl font-bold">2</div>
-          <div class="text-sm sm:text-base opacity-80">States</div>
+
+        <div class="text-center min-w-[80px]">
+          <div class="text-2xl sm:text-3xl font-bold tabular-nums">
+            {{ statsLoading ? '…' : stats.states }}
+          </div>
+          <div class="text-xs sm:text-sm opacity-80 mt-1">States</div>
         </div>
-        <div class="text-center">
-          <div class="text-3xl sm:text-4xl font-bold">12K+</div>
-          <div class="text-sm sm:text-base opacity-80">Happy Tenants</div>
+
+        <div class="text-center min-w-[80px]">
+          <div class="text-2xl sm:text-3xl font-bold tabular-nums">
+            {{ statsLoading ? '…' : formatNumber(stats.tenants) }}
+          </div>
+          <div class="text-xs sm:text-sm opacity-80 mt-1">Happy Tenants</div>
         </div>
       </div>
+      <div class="">
+      <router-link
+        to="/login"
+        class="  gap-2 bg-[var(--royal-blue)] hover:bg-[var(--steel-blue)] backdrop-blur-md text-white text-sm font-medium px-4 py-2 sm:px-5 sm:py-2 rounded-full border border-white/30 transition-all"
+      >
+        Sign In
+      </router-link>
+    </div>
     </div>
 
     <!-- Slide Indicators -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2.5 z-20">
       <button
         v-for="(image, index) in heroImages"
         :key="index"
         @click="currentSlide = index"
-        :class="['w-3 h-3 rounded-full transition-all duration-300', 
-                 currentSlide === index ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80']"
+        :class="[
+          'w-2.5 h-2.5 rounded-full transition-all duration-300',
+          currentSlide === index ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'
+        ]"
       />
-    </div>
-
-    <!-- Scroll Down Indicator -->
-    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/70 text-2xl animate-bounce hidden sm:block">
-      ↓
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { MapPin, Home, Search } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
+import { MapPin, Search } from 'lucide-vue-next'
+import { supabase } from '@/supabaseClient.js'
 
+const router = useRouter()
 const searchLocation = ref('')
 
 const heroImages = ref([
@@ -102,20 +126,77 @@ const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % heroImages.value.length
 }
 
+// ---------- Stats from Supabase ----------
+const stats = ref({
+  properties: 0,
+  states: 0,
+  tenants: 0
+})
+const statsLoading = ref(true)
+
+const formatNumber = (num) => {
+  if (num >= 1000) {
+    return (num / 1000).toFixed(num % 1000 === 0 ? 0 : 1) + 'K+'
+  }
+  return num.toString()
+}
+
+const fetchStats = async () => {
+  try {
+    statsLoading.value = true
+
+    // 1. Total properties
+    const { count: propertiesCount } = await supabase
+      .from('properties')
+      .select('*', { count: 'exact', head: true })
+
+    // 2. Distinct states from profiles
+    const { data: profilesWithState } = await supabase
+      .from('profiles')
+      .select('state')
+      .not('state', 'is', null)
+
+    const uniqueStates = new Set(
+      (profilesWithState || [])
+        .map(p => p.state?.trim().toLowerCase())
+        .filter(Boolean)
+    )
+
+    // 3. Happy tenants (role = customer)
+    const { count: tenantsCount } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'customer')
+
+    stats.value = {
+      properties: propertiesCount || 0,
+      states: uniqueStates.size || 0,
+      tenants: tenantsCount || 0
+    }
+  } catch (err) {
+    console.error('Failed to load hero stats:', err)
+  } finally {
+    statsLoading.value = false
+  }
+}
+
+// ---------- Lifecycle ----------
 onMounted(() => {
   slideInterval = setInterval(nextSlide, 5000)
+  fetchStats()
 })
 
 onUnmounted(() => {
   if (slideInterval) clearInterval(slideInterval)
 })
 
+// ---------- Search ----------
 const handleSearch = () => {
-  if (searchLocation.value.trim()) {
-    console.log('Searching for:', searchLocation.value)
-    router.push(`/properties?search=${encodeURIComponent(searchLocation.value)}`)
+  const query = searchLocation.value.trim()
+  if (query) {
+    router.push(`/properties?search=${encodeURIComponent(query)}`)
   } else {
-    alert("Please enter a location to search")
+    alert('Please enter a location to search')
   }
 }
 </script>

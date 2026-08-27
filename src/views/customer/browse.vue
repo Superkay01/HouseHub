@@ -1,89 +1,136 @@
 <template>
   <div class="min-h-screen bg-[var(--light-blue)]">
-    <!-- Navbar -->
-    <nav class="bg-white border-b sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <img src="/Lodgenext_logo__2_-removebg-preview.png" alt="LodgeNext" class="h-10" />
-          <h1 class="text-2xl font-bold text-[var(--royal-blue)]">LodgeNext</h1>
-        </div>
-      </div>
-    </nav>
-
     <!-- Hero Section -->
-    <div class="relative h-[520px] flex items-center justify-center overflow-hidden">
+    <div class="relative min-h-[420px] sm:min-h-[480px] md:min-h-[520px] flex items-center justify-center overflow-hidden">
+      <!-- Background -->
       <div class="absolute inset-0 bg-gradient-to-br from-[#0025cc] via-[#2e4cd5] to-[#546cdd]">
         <div class="absolute inset-0 bg-[radial-gradient(at_center,#ffffff15_0%,transparent_70%)]"></div>
       </div>
 
-      <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <h1 class="text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight">
+      <!-- Content -->
+      <div class="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 text-center pt-10 pb-16 sm:pt-12 sm:pb-20">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
           Find Your Next Home
         </h1>
-        <p class="text-xl text-white/90 mb-10">
+        <p class="text-sm sm:text-base md:text-xl text-white/90 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto">
           Discover verified houses and apartments in Ilorin and Ijebu Ode
         </p>
 
         <!-- Search Bar -->
-        <div class="bg-white rounded-3xl shadow-2xl p-3 max-w-3xl mx-auto">
-          <div class="flex items-center gap-3">
+        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-2 sm:p-2.5 max-w-3xl mx-auto">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            <!-- Input -->
             <div class="flex-1 relative">
-              <Search class="absolute left-6 top-4 text-gray-400 w-5 h-5" />
+              <Search class="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-[var(--royal-blue)] w-5 h-5 pointer-events-none" />
               <input
                 v-model="searchQuery"
                 @input="debouncedSearch"
                 type="text"
                 placeholder="Search by area, property name, city, or address..."
-                class="w-full pl-14 pr-6 py-4 rounded-2xl border-0 focus:ring-2 focus:ring-[#0025cc] text-lg placeholder:text-gray-400"
+                class="w-full pl-12 sm:pl-14 pr-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl border-0 focus:ring-2 focus:ring-[#0025cc] text-base sm:text-lg placeholder:text-[var(--steel-blue)] bg-transparent"
               />
             </div>
+
+            <!-- Button -->
             <button
               @click="fetchProperties"
-              class="bg-[#0025cc] hover:bg-[#001fa3] text-white px-10 py-4 rounded-2xl font-semibold flex items-center gap-2 transition-all active:scale-95"
+              class="bg-[#0025cc] hover:bg-[#001fa3] text-white px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base rounded-xl sm:rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all active:scale-95 whitespace-nowrap"
             >
-              <Search class="w-5 h-5" /> Find Homes
+              <Search class="w-4 h-4" />
+              Find Homes
             </button>
           </div>
         </div>
 
         <!-- Quick Chips -->
-        <div class="flex flex-wrap justify-center gap-3 mt-8">
-          <button
-            v-for="area in quickAreas"
-            :key="`${area.city}-${area.name}`"
-            @click="selectQuickArea(area)"
-            class="bg-white/20 hover:bg-white/30 text-white px-5 py-2 rounded-full text-sm backdrop-blur-md transition-all"
+        <div class="mt-6 sm:mt-8 max-w-4xl mx-auto">
+          <!-- Mobile: horizontal scroll -->
+          <div
+            class="flex sm:hidden gap-2.5 overflow-x-auto pb-2 px-1 snap-x snap-mandatory
+                   [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {{ area.name }}
-          </button>
+            <button
+              v-for="area in quickAreas"
+              :key="`m-${area.city}-${area.name}`"
+              type="button"
+              @click="selectQuickArea(area)"
+              class="snap-start shrink-0 bg-white/20 hover:bg-white/30 active:bg-white/40 text-white px-4 py-2 rounded-full text-sm backdrop-blur-md transition-all whitespace-nowrap"
+            >
+              {{ area.name }}
+            </button>
+          </div>
+
+          <!-- Tablet / Desktop: wrap + view more / less -->
+          <div class="hidden sm:block">
+            <div
+              class="flex flex-wrap justify-center gap-2.5 sm:gap-3 overflow-hidden transition-all duration-300"
+              :class="areasExpanded ? 'max-h-[600px]' : 'max-h-[88px]'"
+            >
+              <button
+                v-for="area in visibleQuickAreas"
+                :key="`d-${area.city}-${area.name}`"
+                type="button"
+                @click="selectQuickArea(area)"
+                class="bg-white/20 hover:bg-white/30 text-white px-4 sm:px-5 py-2 rounded-full text-sm backdrop-blur-md transition-all"
+              >
+                {{ area.name }}
+              </button>
+            </div>
+
+            <div v-if="quickAreas.length > collapsedCount" class="flex justify-center mt-4">
+              <button
+                type="button"
+                @click="areasExpanded = !areasExpanded"
+                class="inline-flex items-center gap-1.5 text-white/90 hover:text-white text-sm font-medium px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-md transition"
+              >
+                <span>{{ areasExpanded ? 'View less' : 'View more' }}</span>
+                <svg
+                  class="w-4 h-4 transition-transform duration-300"
+                  :class="areasExpanded ? 'rotate-180' : ''"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
-      <div class="flex gap-8">
-        <!-- Filters Sidebar -->
-        <!-- <div class="w-60 hidden lg:block">
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20 pb-10">
+      <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <!-- Filters Sidebar (commented out) -->
+        <!--
+        <div class="w-full lg:w-60 shrink-0 hidden lg:block">
           <PropertyFilters
             v-model="filters"
             @change="fetchProperties"
           />
-        </div> -->
+        </div>
+        -->
 
-        <!-- Main Content -->
-        <div class="">
-          <div class="flex items-center justify-between mb-8">
-            <p class="text-2xl font-semibold text-gray-900 border border-[var(--steel-blue)] rounded-2xl px-6 py-3 focus:outline-none focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20 bg-white text-sm font-medium">
-              <span class="font-bold text-[var(--royal-blue)]">
+        <!-- Results -->
+        <div class="flex-1 min-w-0">
+          <!-- Results Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <!-- Count -->
+            <p class="inline-flex items-center bg-white border border-[var(--steel-blue)] rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-medium text-gray-900 shadow-sm">
+              <span class="font-bold text-[var(--royal-blue)] mr-1.5">
                 {{ properties.length }}
               </span>
               properties found
             </p>
 
+            <!-- Sort -->
             <select
               v-model="sortBy"
               @change="fetchProperties"
-              class="border border-gray-300 rounded-2xl px-6 py-3 focus:outline-none focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20 bg-white text-sm font-medium"
+              class="w-full sm:w-auto border border-gray-300 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 focus:outline-none focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20 bg-white text-sm font-medium shadow-sm"
             >
               <option value="newest">Newest Listings</option>
               <option value="price-low">Lowest Price</option>
@@ -91,12 +138,14 @@
             </select>
           </div>
 
+          <!-- Grid -->
           <PropertyGrid
             :properties="properties"
             :loading="loading"
             @view-details="viewPropertyDetails"
           />
 
+          <!-- Empty State -->
           <EmptyProperties
             v-if="!loading && properties.length === 0"
             @clear-filters="clearFilters"
@@ -121,7 +170,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 import { Search } from 'lucide-vue-next'
@@ -194,6 +243,14 @@ const filters = ref({
   maxPrice: null as number | null,
   bedrooms: null as number | null,
   amenities: [] as string[],
+})
+
+const areasExpanded = ref(false)
+const collapsedCount = 8 // chips shown when collapsed (~2 rows)
+
+const visibleQuickAreas = computed(() => {
+  if (areasExpanded.value) return quickAreas
+  return quickAreas.slice(0, collapsedCount)
 })
 
 let timeout: ReturnType<typeof setTimeout>
