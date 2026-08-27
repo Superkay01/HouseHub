@@ -36,16 +36,16 @@ const mobileMenuOpen = ref(false)
 
         <!-- Desktop Menu -->
         <div class="hidden lg:flex items-center gap-8 text-sm font-medium">
-          <router-link to="/properties" class="hover:text-[var(--bright-green)] text-[var(--white)]">
+          <router-link to="/property" class="hover:text-[var(--bright-green)] text-[var(--white)]">
             Find Homes
           </router-link>
 
-          <router-link to="/states" class="hover:text-[var(--bright-green)] text-[var(--white)]">
+          <router-link to="#states" class="hover:text-[var(--bright-green)] text-[var(--white)]">
             All States
           </router-link>
 
-          <router-link to="/for-agents" class="hover:text-[var(--bright-green)] text-[var(--white)]">
-            For Agents
+          <router-link to="#about" class="hover:text-[var(--bright-green)] text-[var(--white)]">
+            About Us
           </router-link>
         </div>
 

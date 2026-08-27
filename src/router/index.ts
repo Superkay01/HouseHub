@@ -23,7 +23,7 @@ const router = createRouter({
 
     
     {
-      path: '/properties',
+      path: '/property',
       name: 'properties',
       component: () => import('../views/properties.vue')
     },

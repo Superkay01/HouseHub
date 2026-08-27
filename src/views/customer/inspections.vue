@@ -8,9 +8,9 @@
           <h1 class="text-2xl font-bold text-[var(--royal-blue)]">LodgeNext</h1>
         </div>
         <div class="flex items-center gap-8">
-          <a href="/properties" class="font-medium text-medium-gray hover:text-[var(--royal-blue)] transition">Browse</a>
+          <a href="/customer/browse" class="font-medium text-medium-gray hover:text-[var(--royal-blue)] transition">Browse</a>
           <a href="/my-inspections" class="font-medium text-[var(--royal-blue)]">Inspections</a>
-          <a href="/saved" class="font-medium text-medium-gray hover:text-[var(--royal-blue)] transition">Saved</a>
+          <a href="/customer/saved/SavedProperties" class="font-medium text-medium-gray hover:text-[var(--royal-blue)] transition">Saved</a>
         </div>
       </div>
     </nav>
