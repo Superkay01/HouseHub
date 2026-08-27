@@ -234,9 +234,9 @@
   <section>
     <navbar/>
   
-  <dev class="py-12 sm:py-16 bg-light-blue mt-6">
+  <dev class="py-12 sm:py-16 bg-light-blue mt-16">
     
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
       
       <!-- Header -->
       <div class="text-center mb-10 sm:mb-12">

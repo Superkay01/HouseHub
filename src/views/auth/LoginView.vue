@@ -143,7 +143,7 @@ const handleLogin = async () => {
 
     // Redirect based on role
     if (role === 'agent') {
-      router.push('/agent/dashboard')
+      router.push('/agent/properties')
     } else {
       router.push('/customer/browse')
     }
