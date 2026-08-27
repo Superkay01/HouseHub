@@ -276,6 +276,7 @@
       </div>
 
       <!-- Actions -->
+            <!-- Actions -->
       <div class="sticky bottom-0 bg-white border-t p-6 space-y-3 z-20">
         <button
           v-if="['pending', 'accepted', 'declined'].includes(inspection.status) || !inspection.agent_id"
@@ -314,12 +315,22 @@
         </button>
 
         <button
-          v-if="!['completed', 'cancelled'].includes(inspection.status)"
+          v-if="!['completed', 'cancelled', 'archived'].includes(inspection.status)"
           type="button"
           @click.stop="emit('cancel', inspection)"
           class="w-full py-3.5 bg-red-500 text-white rounded-2xl font-medium hover:bg-red-600 transition"
         >
           Cancel Inspection
+        </button>
+
+        <!-- Approve / dismiss cancelled → parent sets status to archived -->
+        <button
+          v-if="inspection.status === 'cancelled'"
+          type="button"
+          @click.stop="emit('dismiss-cancelled', inspection)"
+          class="w-full py-3.5 bg-gray-900 text-white rounded-2xl font-semibold hover:bg-gray-800 transition"
+        >
+          Approve Cancellation (Hide from lists)
         </button>
 
         <button
@@ -367,7 +378,8 @@ const emit = defineEmits([
   'complete',
   'cancel',
   'approve-reschedule',
-  'reassign'
+  'reassign',
+  'dismiss-cancelled'
 ])
 
 const mediaItems = ref([])
@@ -454,7 +466,11 @@ const statusHelper = computed(() => {
     no_show: {
       title: 'No-show',
       body: 'Customer did not attend. Follow up if another visit is needed.'
-    }
+    },
+    archived: {
+  title: 'Archived',
+  body: 'This cancelled inspection was dismissed and is hidden from active lists.'
+}
   }
   return map[s] || { title: s || 'Inspection', body: '' }
 })

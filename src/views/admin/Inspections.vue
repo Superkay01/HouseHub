@@ -267,6 +267,7 @@
       @cancel="openCancel"
       @approve-reschedule="approveReschedule"
       @reassign="openSchedule"
+      @dismiss-cancelled="dismissCancelled"
     />
 
     <!-- Day Detail Popup -->
@@ -771,6 +772,32 @@ const setupRealtime = async () => {
     .subscribe((status) => {
       console.log('Admin inspection realtime:', status)
     })
+}
+const dismissCancelled = async (inspection) => {
+  if (!inspection?.id || inspection.status !== 'cancelled') return
+
+  try {
+    const { error } = await supabase
+      .from('inspections')
+      .update({
+        status: 'archived',
+        admin_notes: [
+          inspection.admin_notes,
+          `Cancellation approved by admin on ${new Date().toISOString()}`
+        ].filter(Boolean).join('\n'),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', inspection.id)
+
+    if (error) throw error
+
+    showToast('Cancellation approved. Inspection hidden from active lists.')
+    selectedInspection.value = null
+    await fetchInspections()
+  } catch (err) {
+    console.error(err)
+    showToast(err.message || 'Failed to dismiss cancellation', 'error')
+  }
 }
 
 onMounted(async () => {

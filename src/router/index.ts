@@ -22,11 +22,16 @@ const router = createRouter({
     
 
     
-    // {
-    //   path: '/properties',
-    //   name: 'properties',
-    //   component: () => import('../views/PropertiesView.vue')
-    // },
+    {
+      path: '/properties',
+      name: 'properties',
+      component: () => import('../views/properties.vue')
+    },
+    {
+      path: '/properties/:id',
+      name: 'PublicPropertyDetail',
+      component: () => import('@/components/PublicPropertyDetail.vue'),
+    },
     // {
     //   path: '/states',
     //   name: 'states',

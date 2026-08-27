@@ -1,5 +1,12 @@
 <template>
-  <div class="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-gray-200 flex flex-col h-full">
+  <div
+    role="button"
+    tabindex="0"
+    class="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-gray-200 flex flex-col h-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0025cc]"
+    @click="viewDetails"
+    @keydown.enter="viewDetails"
+    @keydown.space.prevent="viewDetails"
+  >
     <!-- Image Section -->
     <div class="relative h-48 sm:h-56 overflow-hidden">
       <img
@@ -16,8 +23,9 @@
         <span class="text-green-500">✓</span> Verified
       </div>
 
-      <!-- Save Button -->
+      <!-- Save Button — stop so it doesn't open details -->
       <button
+        type="button"
         @click.stop="toggleSave"
         :disabled="saving"
         class="absolute top-3 right-3 w-8 h-8 bg-white/90 hover:bg-white rounded-xl flex items-center justify-center shadow transition-all hover:scale-110 disabled:opacity-50"
@@ -116,6 +124,7 @@
           <img
             :src="property.profiles?.avatar_url || 'https://via.placeholder.com/40'"
             class="w-7 h-7 rounded-full object-cover border border-gray-200 flex-shrink-0"
+            alt=""
           />
           <div class="flex-1 min-w-0">
             <p class="text-xs font-medium text-gray-900 truncate">
@@ -128,6 +137,7 @@
         </button>
 
         <button
+          type="button"
           @click.stop="viewDetails"
           class="bg-[#0025cc] hover:bg-[#001fa3] text-white text-[10px] sm:text-xs font-medium px-3.5 sm:px-4 py-2 rounded-xl transition-all flex-shrink-0"
         >
@@ -144,8 +154,20 @@ import { Heart } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 
-const props = defineProps<{
-  property: any
+const PENDING_SAVES_KEY = 'lodgenext_pending_saves'
+
+const props = withDefaults(
+  defineProps<{
+    property: any
+    detailRouteName?: string
+  }>(),
+  {
+    detailRouteName: 'CustomerPropertyDetail'
+  }
+)
+
+const emit = defineEmits<{
+  (e: 'view-details', id: string): void
 }>()
 
 const router = useRouter()
@@ -164,16 +186,59 @@ const formatViews = (count: number) => {
   return count.toLocaleString()
 }
 
+const getPendingSaves = (): string[] => {
+  try {
+    const raw = localStorage.getItem(PENDING_SAVES_KEY)
+    const list = raw ? JSON.parse(raw) : []
+    return Array.isArray(list) ? list.map(String) : []
+  } catch {
+    return []
+  }
+}
+
+const setPendingSaves = (ids: string[]) => {
+  localStorage.setItem(PENDING_SAVES_KEY, JSON.stringify([...new Set(ids)]))
+}
+
+const addPendingSave = (propertyId: string) => {
+  const list = getPendingSaves()
+  if (!list.includes(propertyId)) {
+    list.push(propertyId)
+    setPendingSaves(list)
+  }
+}
+
+const removePendingSave = (propertyId: string) => {
+  setPendingSaves(getPendingSaves().filter((id) => id !== propertyId))
+}
+
 const toggleSave = async () => {
   if (saving.value) return
+  if (!props.property?.id) return
 
+  const propertyId = String(props.property.id)
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Guest: keep save in localStorage so it remains after login
   if (!user) {
-    alert('Please login to save properties')
+    if (isSaved.value) {
+      removePendingSave(propertyId)
+      isSaved.value = false
+    } else {
+      addPendingSave(propertyId)
+      isSaved.value = true
+      router.push({
+        path: '/login',
+        query: {
+          redirect:
+            props.detailRouteName === 'PublicPropertyDetail'
+              ? `/properties/${propertyId}`
+              : `/customer/properties/${propertyId}`
+        }
+      })
+    }
     return
   }
-
-  if (!props.property?.id) return
 
   saving.value = true
   try {
@@ -182,19 +247,21 @@ const toggleSave = async () => {
         .from('saved_properties')
         .delete()
         .eq('user_id', user.id)
-        .eq('property_id', props.property.id)
+        .eq('property_id', propertyId)
 
       if (error) throw error
+      removePendingSave(propertyId)
       isSaved.value = false
     } else {
       const { error } = await supabase
         .from('saved_properties')
         .insert({
           user_id: user.id,
-          property_id: props.property.id
+          property_id: propertyId
         })
 
       if (error) throw error
+      removePendingSave(propertyId)
       isSaved.value = true
     }
   } catch (err: any) {
@@ -218,24 +285,56 @@ const loadViewCount = async () => {
   }
 }
 
+const syncPendingSaves = async (userId: string) => {
+  const pending = getPendingSaves()
+  if (!pending.length) return
+
+  for (const propertyId of pending) {
+    const { error } = await supabase
+      .from('saved_properties')
+      .upsert(
+        {
+          user_id: userId,
+          property_id: propertyId
+        },
+        { onConflict: 'user_id,property_id', ignoreDuplicates: true }
+      )
+
+    if (!error) {
+      removePendingSave(propertyId)
+    }
+  }
+}
+
 const checkIfSaved = async () => {
+  if (!props.property?.id) return
+
+  const propertyId = String(props.property.id)
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || !props.property?.id) return
+
+  if (!user) {
+    isSaved.value = getPendingSaves().includes(propertyId)
+    return
+  }
+
+  await syncPendingSaves(user.id)
 
   const { data } = await supabase
     .from('saved_properties')
     .select('id')
     .eq('user_id', user.id)
-    .eq('property_id', props.property.id)
+    .eq('property_id', propertyId)
     .limit(1)
 
   isSaved.value = !!(data && data.length > 0)
 }
 
 const viewDetails = async () => {
+  if (!props.property?.id) return
+
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (user && props.property?.id) {
+  if (user) {
     await supabase
       .from('property_views')
       .upsert(
@@ -249,15 +348,27 @@ const viewDetails = async () => {
     await loadViewCount()
   }
 
+  const id = String(props.property.id)
+  emit('view-details', id)
+
   router.push({
-    name: 'CustomerPropertyDetail',
-    params: { id: props.property.id }
+    name: props.detailRouteName || 'CustomerPropertyDetail',
+    params: { id }
   })
 }
 
 const viewAgentProfile = () => {
   if (!agentId.value) {
     alert('Agent profile not available')
+    return
+  }
+
+  // Public pages may not have agent profile route — fall back to login if needed
+  if (props.detailRouteName === 'PublicPropertyDetail') {
+    router.push({
+      path: '/login',
+      query: { redirect: `/customer/agents/${agentId.value}` }
+    })
     return
   }
 
