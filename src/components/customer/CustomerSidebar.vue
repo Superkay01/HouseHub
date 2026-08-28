@@ -39,13 +39,13 @@
     <!-- Navigation -->
     <div class="flex-1 overflow-auto py-3 px-3">
       <nav class="space-y-1">
-        <SidebarLink 
+        <!-- <SidebarLink 
           icon="home" 
           label="Dashboard" 
           :to="'/customer/dashboard'" 
           :active="isActive('/customer/dashboard')"
           @click="closeSidebar"
-        />
+        /> -->
         <SidebarLink 
           icon="search" 
           label="Browse Properties" 

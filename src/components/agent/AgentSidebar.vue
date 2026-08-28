@@ -40,13 +40,13 @@
     <!-- Navigation -->
     <div class="flex-1 overflow-auto py-1 px-3">
       <nav class="space-y-1">
-        <SidebarLink 
+        <!-- <SidebarLink 
           icon="dashboard" 
           label="Dashboard" 
           :to="'/agent/dashboard'" 
           :active="isActive('/agent/dashboard')"
           @click="closeSidebar"
-        />
+        /> -->
         <SidebarLink 
           icon="verification" 
           label="Verification" 
