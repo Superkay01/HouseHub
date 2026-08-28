@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <div class="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-screen flex items-center justify-center overflow-hidden">
     <!-- Sliding Background Images -->
     <div class="absolute inset-0 z-0">
       <div
@@ -15,17 +15,15 @@
       </div>
     </div>
 
-    
-
     <!-- Content -->
-    <div class="relative z-10 w-full max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-14 sm:pb-16">
-      <!-- Heading - normal readable sizes -->
-      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-snug tracking-tight text-white mb-4 sm:mb-5">
+    <div class="relative z-10 w-full max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 md:pt-20 pb-10 sm:pb-14 md:pb-16">
+      <!-- Heading -->
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-snug tracking-tight text-white mb-3 sm:mb-5">
         Find Your Perfect Home<br class="hidden sm:block" />
         Within Ilorin and Ijebu Ode
       </h1>
 
-      <p class="text-sm sm:text-base md:text-lg text-[#ebf8ff] max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+      <p class="text-sm sm:text-base md:text-lg text-[#ebf8ff] max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed">
         Find verified homes and apartments across Ilorin and Ijebu Ode.
         <br class="hidden md:block" />
         Browse trusted listings, connect with agents, and rent with confidence.
@@ -41,7 +39,8 @@
             <input
               type="text"
               v-model="searchLocation"
-              placeholder="Enter city or state (e.g. Ilorin, Ijebu Ode)"
+              @keyup.enter="handleSearch"
+              placeholder="Enter city (e.g. Ilorin or Ijebu Ode)"
               class="w-full pl-12 pr-4 py-3 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0025cc] text-sm sm:text-base text-[#424242] placeholder:text-gray-400"
             />
           </div>
@@ -56,8 +55,8 @@
         </div>
       </div>
 
-      <!-- Quick Stats (real data) -->
-      <div class="flex justify-center gap-8 sm:gap-12 md:gap-16 mt-10 sm:mt-12 text-white">
+      <!-- Quick Stats -->
+      <div class="flex justify-center gap-8 sm:gap-12 md:gap-16 mt-8 sm:mt-12 text-white">
         <div class="text-center min-w-[80px]">
           <div class="text-2xl sm:text-3xl font-bold tabular-nums">
             {{ statsLoading ? '…' : formatNumber(stats.properties) }}
@@ -79,18 +78,20 @@
           <div class="text-xs sm:text-sm opacity-80 mt-1">Happy Tenants</div>
         </div>
       </div>
-      <div class="">
-      <router-link
-        to="/login"
-        class="  gap-2 bg-[var(--royal-blue)] hover:bg-[var(--steel-blue)] backdrop-blur-md text-white text-sm font-medium px-4 py-2 sm:px-5 sm:py-2 rounded-full border border-white/30 transition-all"
-      >
-        Sign In
-      </router-link>
-    </div>
+
+      <!-- Sign In Button -->
+      <div class="mt-6 sm:mt-10">
+        <router-link
+          to="/login"
+          class="inline-flex items-center justify-center gap-2 bg-[var(--royal-blue)] hover:bg-[var(--steel-blue)] text-white text-sm sm:text-base font-semibold px-8 py-3 sm:px-10 sm:py-3.5 rounded-full border border-white/20 shadow-lg transition-all hover:scale-[1.03] active:scale-95"
+        >
+          Sign In
+        </router-link>
+      </div>
     </div>
 
     <!-- Slide Indicators -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2.5 z-20">
+    <div class="absolute bottom-5 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2.5 z-20">
       <button
         v-for="(image, index) in heroImages"
         :key="index"
@@ -126,7 +127,7 @@ const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % heroImages.value.length
 }
 
-// ---------- Stats from Supabase ----------
+// ---------- Stats ----------
 const stats = ref({
   properties: 0,
   states: 0,
@@ -145,12 +146,10 @@ const fetchStats = async () => {
   try {
     statsLoading.value = true
 
-    // 1. Total properties
     const { count: propertiesCount } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
 
-    // 2. Distinct states from profiles
     const { data: profilesWithState } = await supabase
       .from('profiles')
       .select('state')
@@ -162,7 +161,6 @@ const fetchStats = async () => {
         .filter(Boolean)
     )
 
-    // 3. Happy tenants (role = customer)
     const { count: tenantsCount } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
@@ -180,6 +178,36 @@ const fetchStats = async () => {
   }
 }
 
+// ---------- Search Logic ----------
+const handleSearch = () => {
+  const query = searchLocation.value.trim().toLowerCase()
+
+  if (!query) {
+    alert('Please enter a location to search')
+    return
+  }
+
+  // Match Ilorin
+  if (query.includes('ilorin') || query.includes('kwara')) {
+    router.push('/ilorin')
+    return
+  }
+
+  // Match Ijebu Ode
+  if (
+    query.includes('ijebu') ||
+    query.includes('ijebu ode') ||
+    query.includes('ijebu-ode') ||
+    query.includes('ogun')
+  ) {
+    router.push('/ijebu-ode')
+    return
+  }
+
+  // Fallback – still go to one of the city pages or show message
+  alert('Please search for Ilorin or Ijebu Ode')
+}
+
 // ---------- Lifecycle ----------
 onMounted(() => {
   slideInterval = setInterval(nextSlide, 5000)
@@ -189,14 +217,4 @@ onMounted(() => {
 onUnmounted(() => {
   if (slideInterval) clearInterval(slideInterval)
 })
-
-// ---------- Search ----------
-const handleSearch = () => {
-  const query = searchLocation.value.trim()
-  if (query) {
-    router.push(`/properties?search=${encodeURIComponent(query)}`)
-  } else {
-    alert('Please enter a location to search')
-  }
-}
 </script>
