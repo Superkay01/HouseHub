@@ -7,10 +7,10 @@
           <i class="fas fa-star"></i>
           <span>PREMIUM SELECTION</span>
         </div>
-        <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--white)] tracking-tight mb-3 sm:mb-4 heading-font">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-[var(--white)] tracking-tight mb-3 sm:mb-4 heading-font">
           Featured Homes
         </h2>
-        <p class="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-[var(--white)] px-2">
+        <p class="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-[var(--white)] px-2">
           Explore some of the most sought-after rental properties within Ilorin and Ijebu Ode.
           Verified listings, trusted agents, and premium locations.
         </p>
@@ -70,15 +70,15 @@
           <div class="p-4 sm:p-6 md:p-8">
             <div class="flex justify-between items-start gap-2 mb-2 sm:mb-3">
               <div class="min-w-0 flex-1">
-                <h3 class="text-lg sm:text-xl md:text-2xl font-semibold text-[#424242] line-clamp-1">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-semibold text-[var(--royal-blue)] line-clamp-1">
                   {{ property.title }}
                 </h3>
-                <div class="flex items-center gap-1.5 text-[#707070] mt-1 sm:mt-2 text-sm sm:text-base">
-                  <i class="fas fa-map-marker-alt text-[#546cdd] text-xs sm:text-sm"></i>
+                <div class="flex items-center gap-1.5 text-[var(--royal-blue)] mt-1 sm:mt-2 text-sm sm:text-base">
+                  <i class="fas fa-map-marker-alt text-[var(--royal-blue)] text-xs sm:text-sm"></i>
                   <span class="truncate">{{ property.area || property.city }}, {{ property.city }}</span>
                 </div>
               </div>
-              <span class="shrink-0 inline-block bg-[#ebf8ff] text-[#0025cc] text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl">
+              <span class="shrink-0 inline-block bg-[#ebf8ff] text-[var(--royal-blue)] text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl">
                 {{ property.property_type }}
               </span>
             </div>
@@ -90,7 +90,7 @@
                   <Bed class="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <div class="text-[10px] sm:text-xs text-gray-500">BEDS</div>
+                  <div class="text-[10px] sm:text-xs text-[var(--medium-blue)]">BEDS</div>
                   <div class="font-semibold text-base sm:text-lg">{{ property.bedrooms ?? '—' }}</div>
                 </div>
               </div>
@@ -99,7 +99,7 @@
                   <Bath class="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <div class="text-[10px] sm:text-xs text-gray-500">BATHS</div>
+                  <div class="text-[10px] sm:text-xs text-[var(--medium-blue)]">BATHS</div>
                   <div class="font-semibold text-base sm:text-lg">{{ property.bathrooms ?? '—' }}</div>
                 </div>
               </div>
@@ -108,7 +108,7 @@
                   <Car class="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <div class="text-[10px] sm:text-xs text-gray-500">PARK</div>
+                  <div class="text-[10px] sm:text-xs text-[var(--medium-blue)]">PARK</div>
                   <div class="font-semibold text-base sm:text-lg">{{ property.parking_spaces ?? '—' }}</div>
                 </div>
               </div>
@@ -150,7 +150,7 @@
         <!-- Browse All → Sign Up -->
         <div>
           <button
-            @click="goToSignUp"
+            @click="goToProperty"
             class="group inline-flex items-center gap-2.5 sm:gap-3 bg-[#0025cc] hover:bg-[#9faffa] text-white font-semibold text-base sm:text-lg px-8 sm:px-10 py-3.5 sm:py-5 rounded-2xl sm:rounded-3xl transition-all duration-300 hover:shadow-xl hover:shadow-[#0025cc]/30"
           >
             Browse All Properties
@@ -199,9 +199,9 @@ const requireAuth = (redirectTo = '/properties') => {
   })
 }
 
-/** Browse All → Sign Up page */
-const goToSignUp = () => {
-  router.push('/signup') // change to your actual signup route if different
+/** Browse All → Property */
+const goToProperty = () => {
+  router.push('/property') 
 }
 
 const fetchFeaturedProperties = async () => {

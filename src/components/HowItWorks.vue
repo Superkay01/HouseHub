@@ -15,10 +15,10 @@
           <Info class="w-5 h-5"/>
           <span>3 SIMPLE STEPS</span>
         </div>
-        <h2 class="text-5xl md:text-6xl font-bold text-[#424242] tracking-tight mb-4 heading-font">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl lg-4xl font-bold text-[var(--royal-blue)] tracking-tight mb-4 heading-font">
           How LodgeNext Works
         </h2>
-        <p class="max-w-2xl mx-auto text-xl text-[#707070]">
+        <p class="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-[var(--royal-blue)]">
           Find your next home in just a few simple steps. Search, explore, and connect with trusted agents anywhere in Nigeria.
         </p>
       </div>
@@ -48,10 +48,10 @@
             </div>
 
             <!-- Content -->
-            <h3 class="text-2xl font-semibold text-[#424242] text-center mb-4">
+            <h3 class="text-2xl font-semibold text-[var(--royal-blue)] text-center mb-4">
               {{ step.title }}
             </h3>
-            <p class="text-[#707070] text-center leading-relaxed">
+            <p class="text-[var(--medium-blue)] text-center leading-relaxed">
               {{ step.description }}
             </p>
 
@@ -71,7 +71,7 @@
           Start Searching Homes
           <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
         </button>
-        <p class="text-sm text-[#707070] mt-4">Join thousands of happy renters within Ilorin and Ijebu Ode</p>
+        <p class="text-sm text-[var(--steel-blue)] mt-4">Join thousands of happy renters within Ilorin and Ijebu Ode</p>
       </div>
     </div>
   </section>

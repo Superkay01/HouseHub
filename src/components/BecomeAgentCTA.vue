@@ -19,11 +19,11 @@
             </span>
           </div>
 
-          <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
             Are You a Property Agent?
           </h2>
 
-          <p class="text-xl text-light-blue max-w-lg">
+          <p class="text-sm sm:text-base md:text-lg text-[var(--light-blue)] max-w-lg">
             Showcase your properties to serious renters in <span class="font-semibold">Ilorin</span> and 
             <span class="font-semibold">Ijebu Ode</span>. Grow your business with LodgeNext.
           </p>

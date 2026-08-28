@@ -4,10 +4,10 @@
       
       <!-- Header -->
       <div class="text-center mb-10 sm:mb-12">
-        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-[var(--royal-blue)] tracking-tight mb-3">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--royal-blue)] tracking-tight mb-3">
           Browse Homes in Ilorin and Ijebu Ode
         </h2>
-        <p class="text-sm sm:text-base text-[var(--royal-blue)] max-w-2xl mx-auto">
+        <p class="text-sm sm:text-base md:text-lg text-[var(--royal-blue)] max-w-2xl mx-auto">
           Explore verified rental properties across Nigeria's most popular cities.
         </p>
       </div>
@@ -54,8 +54,8 @@
       <!-- Explore Button -->
       <div class="text-center mt-10 sm:mt-12">
         <router-link
-          to="/properties"
-          class="inline-flex items-center gap-2 sm:gap-3 bg-mediumBlue hover:bg-steel-blue text-royal-blue px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all active:scale-95 shadow-lg hover:shadow-xl"
+          to="/property"
+          class="inline-flex items-center gap-2 sm:gap-3 bg-[var(--medium-blue)] hover:bg-[var(--steel-blue)] text-[var(--white)] px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all active:scale-95 shadow-lg hover:shadow-xl"
         >
           Explore Properties
           <span class="text-lg sm:text-xl">→</span>
