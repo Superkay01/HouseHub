@@ -50,7 +50,7 @@ const mobileMenuOpen = ref(false)
         </div>
 
         <!-- Desktop Search -->
-        <div class="hidden lg:block flex-1 max-w-md mx-6">
+        <!-- <div class="hidden lg:block flex-1 max-w-md mx-6">
           <div class="relative">
             <Search
               class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--royal-blue)]"
@@ -62,7 +62,7 @@ const mobileMenuOpen = ref(false)
               class="w-full rounded-full border border-[var(--light-blue)] bg-[var(--white)] text-[var(--royal-blue)] py-1 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-[var(--hover-blue)]"
             />
           </div>
-        </div>
+        </div> -->
 
         <!-- Right Side -->
         <div class="flex items-center gap-4">
@@ -127,7 +127,7 @@ const mobileMenuOpen = ref(false)
         >
 
           <!-- Mobile Search -->
-          <div class="relative mb-5">
+          <!-- <div class="relative mb-5">
 
             <Search
               class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--white)]"
@@ -138,7 +138,7 @@ const mobileMenuOpen = ref(false)
               placeholder="Search houses..."
               class="w-full rounded-xl border text-[var(--white)] border-gray-200 py-3 pl-12 pr-4 focus:outline-none"
             />
-          </div>
+          </div> -->
 
           <!-- Links -->
           <div class="flex flex-col gap-2">
