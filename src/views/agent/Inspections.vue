@@ -425,11 +425,15 @@
 
     <!-- ===================== INSPECTION REPORT MODAL ===================== -->
     <div v-if="showReportModal" class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl w-full max-w-2xl p-6 max-h-[92vh] overflow-y-auto">
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6 max-h-[92vh] overflow-y-auto">
         <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-1">Inspection Report</h3>
+        <p class="text-sm text-medium-gray mb-1">
+          Quick summary of the visit — photos optional (max 2), video optional.
+        </p>
         <p v-if="reportForm.draftSavedAt" class="text-xs text-medium-gray mb-4">
           Draft saved at {{ formatDateTime(reportForm.draftSavedAt) }}
         </p>
+        <p v-else class="mb-4"></p>
 
         <div class="space-y-4">
           <div>
@@ -472,23 +476,13 @@
           </div>
 
           <div>
-            <label class="text-sm font-medium mb-2 block">Area Conditions</label>
-            <div class="grid grid-cols-2 gap-3">
-              <div v-for="field in conditionFields" :key="field.key">
-                <label class="text-xs font-medium">{{ field.label }}</label>
-                <select v-model="reportForm.conditions[field.key]" class="w-full px-3 py-2 rounded-xl border mt-1 text-sm">
-                  <option value="">Not inspected</option>
-                  <option value="good">Good</option>
-                  <option value="fair">Fair</option>
-                  <option value="poor">Poor</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div>
             <label class="text-sm font-medium">Inspection Notes *</label>
-            <textarea v-model="reportForm.notes" rows="3" class="w-full px-4 py-3 rounded-2xl border mt-1" placeholder="e.g. Everywhere is good and conducive" />
+            <textarea
+              v-model="reportForm.notes"
+              rows="3"
+              class="w-full px-4 py-3 rounded-2xl border mt-1"
+              placeholder="e.g. Property is clean, good location, minor paint issues in bedroom..."
+            />
           </div>
 
           <div>
@@ -500,58 +494,77 @@
               <option value="neutral">Neutral</option>
               <option value="not_recommended">Not Recommended</option>
             </select>
-            <textarea v-model="reportForm.recommendationNotes" rows="2" class="w-full px-4 py-3 rounded-2xl border mt-2" placeholder="Recommendation notes..." />
           </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-sm font-medium">Customer interested?</label>
-              <select v-model="reportForm.feedback.interested" class="w-full px-4 py-3 rounded-2xl border mt-1">
-                <option value="">—</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-                <option value="maybe">Maybe</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-sm font-medium">Another viewing?</label>
-              <select v-model="reportForm.feedback.anotherViewing" class="w-full px-4 py-3 rounded-2xl border mt-1">
-                <option value="">—</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
-            </div>
-          </div>
-          <textarea v-model="reportForm.feedback.comments" rows="2" class="w-full px-4 py-3 rounded-2xl border" placeholder="Customer comments..." />
 
           <div>
-            <label class="text-sm font-medium">Inspection Photos (proof)</label>
-            <input type="file" accept="image/*" multiple class="mt-2 block w-full text-sm" @change="onPhotosSelected" />
+            <label class="text-sm font-medium">Photos (up to 2)</label>
+            <p class="text-xs text-medium-gray mt-0.5 mb-2">Optional proof of visit / condition</p>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              class="block w-full text-sm"
+              :disabled="reportForm.photos.length >= 2"
+              @change="onPhotosSelected"
+            />
             <div class="flex flex-wrap gap-2 mt-3">
               <div v-for="(p, idx) in reportForm.photos" :key="idx" class="relative">
-                <img :src="p.preview || p.url" class="w-20 h-20 object-cover rounded-xl" />
-                <button type="button" class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs" @click="removePhoto(Number(idx))">×</button>
+                <img :src="p.preview || p.url" class="w-20 h-20 object-cover rounded-xl" alt="" />
+                <button
+                  type="button"
+                  class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs"
+                  @click="removePhoto(Number(idx))"
+                >
+                  ×
+                </button>
               </div>
             </div>
-            <p v-if="uploadProgress" class="text-xs text-medium-gray mt-2">{{ uploadProgress }}</p>
+            <p v-if="reportForm.photos.length >= 2" class="text-xs text-medium-gray mt-2">
+              Maximum 2 photos reached
+            </p>
           </div>
 
           <div>
-            <label class="text-sm font-medium">Inspection Video (optional)</label>
-            <input type="file" accept="video/*" class="mt-2 block w-full text-sm" @change="onVideoSelected" />
+            <label class="text-sm font-medium">Video (optional)</label>
+            <p class="text-xs text-medium-gray mt-0.5 mb-2">One short clip, max 40MB</p>
+            <input
+              type="file"
+              accept="video/*"
+              class="block w-full text-sm"
+              :disabled="!!reportForm.video"
+              @change="onVideoSelected"
+            />
             <div v-if="reportForm.video" class="mt-2 flex items-center gap-3">
-              <span class="text-sm truncate">{{ reportForm.video.name || 'Video attached' }}</span>
-              <button type="button" class="text-red-600 text-sm" @click="reportForm.video = null">Remove</button>
+              <span class="text-sm truncate">
+                {{ reportForm.video.name || reportForm.video.url || 'Video attached' }}
+              </span>
+              <button type="button" class="text-red-600 text-sm shrink-0" @click="clearVideo">
+                Remove
+              </button>
             </div>
           </div>
+
+          <p v-if="uploadProgress" class="text-xs text-medium-gray">{{ uploadProgress }}</p>
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 mt-6">
-          <button type="button" @click="showReportModal = false" class="flex-1 py-3 border rounded-2xl">Close</button>
-          <button type="button" :disabled="saving" @click="saveDraftReport" class="flex-1 py-3 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl">
+          <button type="button" @click="showReportModal = false" class="flex-1 py-3 border rounded-2xl">
+            Close
+          </button>
+          <button
+            type="button"
+            :disabled="saving"
+            @click="saveDraftReport"
+            class="flex-1 py-3 border border-[var(--royal-blue)] text-[var(--royal-blue)] rounded-2xl disabled:opacity-50"
+          >
             {{ saving ? 'Saving...' : 'Save Draft' }}
           </button>
-          <button type="button" :disabled="saving || !canSubmitReport" @click="submitReport" class="flex-1 py-3 bg-green-600 text-white rounded-2xl disabled:opacity-50">
+          <button
+            type="button"
+            :disabled="saving || !canSubmitReport"
+            @click="submitReport"
+            class="flex-1 py-3 bg-green-600 text-white rounded-2xl disabled:opacity-50"
+          >
             {{ saving ? 'Submitting...' : 'Submit Report' }}
           </button>
         </div>
@@ -675,6 +688,7 @@ interface InspectionRow {
 const router = useRouter()
 const placeholderImg = 'https://via.placeholder.com/400x250?text=Property'
 const canContactCustomer = true
+const MAX_PHOTOS = 2
 
 const agentProfile = ref<{ city?: string; state?: string; id?: string }>({})
 const inspections = ref<InspectionRow[]>([])
@@ -697,7 +711,6 @@ const showCancelModal = ref(false)
 const showIssueModal = ref(false)
 const showReportModal = ref(false)
 
-// Agent App Review
 const showAgentReviewModal = ref(false)
 const savingAgentReview = ref(false)
 const agentReviewTarget = ref<InspectionRow | null>(null)
@@ -709,24 +722,13 @@ const noShowForm = ref({ waited: 20, note: '' })
 const cancelReason = ref('')
 const issueForm = ref({ type: '', note: '' })
 
-const conditionFields = [
-  { key: 'exterior', label: 'Exterior' }, { key: 'interior', label: 'Interior' },
-  { key: 'living', label: 'Living area' }, { key: 'bedrooms', label: 'Bedrooms' },
-  { key: 'bathrooms', label: 'Bathrooms' }, { key: 'kitchen', label: 'Kitchen' },
-  { key: 'utilities', label: 'Utilities' }, { key: 'security', label: 'Security' },
-  { key: 'surroundings', label: 'Surroundings' }
-]
-
 const reportForm = ref<any>({
   outcome: 'property_inspected',
   generalCondition: '',
   accessibility: '',
   customerAttended: true,
-  conditions: {},
   notes: '',
   recommendation: '',
-  recommendationNotes: '',
-  feedback: { interested: '', anotherViewing: '', comments: '' },
   photos: [] as any[],
   video: null as any,
   draftSavedAt: null as string | null
@@ -967,13 +969,11 @@ const canStart = (item: InspectionRow) => {
   return now >= earliest || isToday(item.inspection_date)
 }
 
-const cancelBlocked = computed(() => modalTarget.value?.status === 'in_progress')
-
 const canSubmitReport = computed(() => !!(
   reportForm.value.outcome &&
   reportForm.value.generalCondition &&
   reportForm.value.accessibility &&
-  reportForm.value.notes &&
+  reportForm.value.notes?.trim() &&
   reportForm.value.recommendation
 ))
 
@@ -1183,12 +1183,9 @@ const openReport = (item: InspectionRow) => {
     generalCondition: draft.generalCondition || item.general_condition || '',
     accessibility: draft.accessibility || '',
     customerAttended: draft.customerAttended ?? true,
-    conditions: draft.conditions || {},
     notes: draft.notes || '',
     recommendation: draft.recommendation || '',
-    recommendationNotes: draft.recommendationNotes || '',
-    feedback: draft.feedback || { interested: '', anotherViewing: '', comments: '' },
-    photos: draft.photos || [],
+    photos: (draft.photos || []).slice(0, MAX_PHOTOS),
     video: draft.video || null,
     draftSavedAt: item.report_draft_saved_at || null
   }
@@ -1198,27 +1195,57 @@ const openReport = (item: InspectionRow) => {
 const onPhotosSelected = (e: Event) => {
   const input = e.target as HTMLInputElement
   const files = Array.from(input.files || [])
-  for (const file of files) {
+  const remaining = MAX_PHOTOS - reportForm.value.photos.length
+
+  if (remaining <= 0) {
+    showToast('You can only upload up to 2 photos', 'error')
+    input.value = ''
+    return
+  }
+
+  for (const file of files.slice(0, remaining)) {
     if (file.size > 8 * 1024 * 1024) {
       showToast(`${file.name} is too large (max 8MB)`, 'error')
       continue
     }
-    reportForm.value.photos.push({ file, preview: URL.createObjectURL(file), category: 'other' })
+    reportForm.value.photos.push({
+      file,
+      preview: URL.createObjectURL(file),
+      category: 'other'
+    })
+  }
+
+  if (files.length > remaining) {
+    showToast('Only 2 photos allowed — extra files ignored', 'error')
   }
   input.value = ''
 }
 
-const removePhoto = (idx: number) => { reportForm.value.photos.splice(idx, 1) }
+const removePhoto = (idx: number) => {
+  const photo = reportForm.value.photos[idx]
+  if (photo?.preview?.startsWith?.('blob:')) {
+    URL.revokeObjectURL(photo.preview)
+  }
+  reportForm.value.photos.splice(idx, 1)
+}
 
 const onVideoSelected = (e: Event) => {
   const input = e.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
+
   if (file.size > 40 * 1024 * 1024) {
     showToast('Video too large (max 40MB)', 'error')
+    input.value = ''
     return
   }
+
   reportForm.value.video = file
+  input.value = ''
+}
+
+const clearVideo = () => {
+  reportForm.value.video = null
 }
 
 const compressImage = async (file: File, maxWidth = 1600, quality = 0.72): Promise<Blob> => {
@@ -1275,18 +1302,32 @@ const saveDraftReport = async () => {
   saving.value = true
   try {
     const draft = {
-      ...reportForm.value,
-      photos: reportForm.value.photos.map((p: any) => ({ url: p.url, path: p.path, category: p.category })),
+      outcome: reportForm.value.outcome,
+      generalCondition: reportForm.value.generalCondition,
+      accessibility: reportForm.value.accessibility,
+      customerAttended: reportForm.value.customerAttended,
+      notes: reportForm.value.notes,
+      recommendation: reportForm.value.recommendation,
+      photos: reportForm.value.photos.map((p: any) => ({
+        url: p.url,
+        path: p.path,
+        category: p.category || 'other'
+      })),
       video: null
     }
     const now = new Date().toISOString()
-    const data = await updateInspection(modalTarget.value.id, { report_draft: draft, report_draft_saved_at: now })
+    const data = await updateInspection(modalTarget.value.id, {
+      report_draft: draft,
+      report_draft_saved_at: now
+    })
     applyLocalUpdate(data)
     reportForm.value.draftSavedAt = now
     showToast(`Draft saved at ${formatDateTime(now)}`)
   } catch (e: any) {
     showToast(e.message || 'Failed to save draft', 'error')
-  } finally { saving.value = false }
+  } finally {
+    saving.value = false
+  }
 }
 
 const submitReport = async () => {
@@ -1320,10 +1361,7 @@ const submitReport = async () => {
       general_condition: reportForm.value.generalCondition,
       property_accessibility: reportForm.value.accessibility,
       customer_attended: reportForm.value.customerAttended,
-      condition_details: reportForm.value.conditions,
       agent_recommendation: reportForm.value.recommendation,
-      agent_recommendation_notes: reportForm.value.recommendationNotes,
-      customer_feedback: reportForm.value.feedback,
       agent_notes: reportForm.value.notes,
       completion_notes: reportForm.value.notes,
       report_draft: null,
@@ -1334,7 +1372,6 @@ const submitReport = async () => {
     showReportModal.value = false
     showToast('Inspection report submitted successfully.')
 
-    // Show App Review popup
     agentReviewTarget.value = data || modalTarget.value
     agentReviewForm.value = { rating: 0, review: '' }
     showAgentReviewModal.value = true

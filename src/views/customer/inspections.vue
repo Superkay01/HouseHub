@@ -490,59 +490,87 @@
     </div>
 
     <!-- ==================== REPORT MODAL ==================== -->
-    <div
-      v-if="showReportModal"
-      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
-    >
-      <div class="bg-white rounded-3xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-2">Submit Report to Admin</h3>
-        <p class="text-sm text-medium-gray mb-5">
-          Please share your feedback about the inspection before proceeding to payment.
-        </p>
+  <!-- ==================== REPORT MODAL ==================== -->
+<div
+  v-if="showReportModal"
+  class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+>
+  <div class="bg-white rounded-3xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+    <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-2">
+      How was the property?
+    </h3>
+    <p class="text-sm text-medium-gray mb-5">
+      A quick check so we know if you’re satisfied before you pay.
+    </p>
 
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-2">How interested are you in this property?</label>
-            <select v-model="reportForm.interest_level" class="w-full px-4 py-3 rounded-2xl border">
-              <option value="">Select interest level</option>
-              <option value="very_interested">Very Interested</option>
-              <option value="interested">Interested</option>
-              <option value="somewhat_interested">Somewhat Interested</option>
-              <option value="not_interested">Not Interested</option>
-            </select>
-          </div>
+    <div class="space-y-4">
+      <!-- Interest / satisfaction -->
+      <div>
+        <label class="block text-sm font-medium mb-2">
+          How interested are you in this property? *
+        </label>
+        <select
+          v-model="reportForm.interest_level"
+          class="w-full px-4 py-3 rounded-2xl border"
+        >
+          <option value="">Select</option>
+          <option value="very_interested">Very interested — I’d take it</option>
+          <option value="interested">Interested</option>
+          <option value="somewhat_interested">Somewhat interested</option>
+          <option value="not_interested">Not interested</option>
+        </select>
+      </div>
 
-          <div>
-            <label class="block text-sm font-medium mb-2">Your Report / Feedback *</label>
-            <textarea
-              v-model="reportForm.report"
-              rows="5"
-              class="w-full px-4 py-3 rounded-2xl border resize-none"
-              placeholder="Tell us about the inspection experience, property condition, agent, etc..."
-              required
-            ></textarea>
-          </div>
-        </div>
+      <!-- Overall feel (maps into the report text) -->
+      <div>
+        <label class="block text-sm font-medium mb-2">
+          Overall condition *
+        </label>
+        <select
+          v-model="reportForm.general_condition"
+          class="w-full px-4 py-3 rounded-2xl border"
+        >
+          <option value="">Select</option>
+          <option value="excellent">Excellent</option>
+          <option value="good">Good</option>
+          <option value="fair">Fair</option>
+          <option value="poor">Poor</option>
+        </select>
+      </div>
 
-        <div class="flex gap-3 mt-6">
-          <button
-            type="button"
-            class="flex-1 py-3 border rounded-2xl"
-            @click="showReportModal = false"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold disabled:opacity-50"
-            :disabled="!reportForm.report || !reportForm.interest_level || savingReport"
-            @click="submitReport"
-          >
-            {{ savingReport ? 'Submitting...' : 'Submit Report' }}
-          </button>
-        </div>
+      <!-- Short feedback -->
+      <div>
+        <label class="block text-sm font-medium mb-2">
+          Anything else we should know? (optional)
+        </label>
+        <textarea
+          v-model="reportForm.report"
+          rows="3"
+          class="w-full px-4 py-3 rounded-2xl border resize-none"
+          placeholder="e.g. liked the location, issues with water, agent was helpful…"
+        ></textarea>
       </div>
     </div>
+
+    <div class="flex gap-3 mt-6">
+      <button
+        type="button"
+        class="flex-1 py-3 border rounded-2xl"
+        @click="showReportModal = false"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold disabled:opacity-50"
+        :disabled="!canSubmitReport || savingReport"
+        @click="submitReport"
+      >
+        {{ savingReport ? 'Submitting...' : 'Submit Report' }}
+      </button>
+    </div>
+  </div>
+</div>
 
     <!-- ==================== AGENT REVIEW MODAL ==================== -->
     <div
@@ -767,6 +795,7 @@ const reportTarget = ref(null)
 const savingReport = ref(false)
 const reportForm = ref({
   interest_level: '',
+  general_condition: '',
   report: ''
 })
 
@@ -1061,11 +1090,20 @@ const fetchInspections = async () => {
 }
 
 // ==================== REPORT ====================
+
 const openReportModal = (inspection) => {
   reportTarget.value = inspection
-  reportForm.value = { interest_level: '', report: '' }
+  reportForm.value = {
+    interest_level: '',
+    general_condition: '',
+    report: ''
+  }
   showReportModal.value = true
 }
+
+const canSubmitReport = computed(() =>
+  !!reportForm.value.interest_level && !!reportForm.value.general_condition
+)
 
 const openReportOrPay = (inspection) => {
   if (!hasReported(inspection.id)) {
@@ -1076,12 +1114,20 @@ const openReportOrPay = (inspection) => {
 }
 
 const submitReport = async () => {
-  if (!reportTarget.value || !reportForm.value.report || !reportForm.value.interest_level) return
+  if (!reportTarget.value || !canSubmitReport.value) return
 
   savingReport.value = true
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Please login')
+
+    // Build a single report string so we don't depend on extra DB columns
+    const conditionLabel = reportForm.value.general_condition
+    const extra = (reportForm.value.report || '').trim()
+    const fullReport = [
+      `Condition: ${conditionLabel}`,
+      extra || null
+    ].filter(Boolean).join('\n\n')
 
     const { error } = await supabase
       .from('customer_reports')
@@ -1089,7 +1135,7 @@ const submitReport = async () => {
         inspection_id: reportTarget.value.id,
         customer_id: user.id,
         property_id: reportTarget.value.property?.id,
-        report: reportForm.value.report,
+        report: fullReport,
         interest_level: reportForm.value.interest_level
       })
 

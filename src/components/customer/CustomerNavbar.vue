@@ -41,10 +41,10 @@
         <!-- Notification Dropdown -->
         <div
           v-if="showNotifDropdown"
-          class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
+          class="absolute right-0 mt-2 w-60 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
         >
           <div class="px-4 py-3 border-b flex items-center justify-between">
-            <h3 class="font-semibold text-gray-900">Notifications</h3>
+            <h3 class="font-semibold text-[var(--royal-blue)]">Notifications</h3>
             <button
               v-if="unreadCount > 0"
               @click="markAllAsRead"
@@ -55,13 +55,13 @@
           </div>
 
           <div class="max-h-96 overflow-y-auto">
-            <div v-if="loadingNotifications" class="p-6 text-center text-sm text-gray-500">
+            <div v-if="loadingNotifications" class="p-6 text-center text-sm text-[var(--steel-blue)]">
               Loading...
             </div>
 
             <div v-else-if="recentNotifications.length === 0" class="p-8 text-center">
               <p class="text-2xl mb-2">🔔</p>
-              <p class="text-sm text-gray-500">No notifications yet</p>
+              <p class="text-sm text-[var(--hover-blue)]">No notifications yet</p>
             </div>
 
             <button
@@ -79,9 +79,9 @@
                   {{ typeIcon(item.type) }}
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 line-clamp-1">{{ item.title }}</p>
-                  <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ item.message }}</p>
-                  <p class="text-[10px] text-gray-400 mt-1">{{ formatTime(item.created_at) }}</p>
+                  <p class="text-sm font-medium text-[var(--royal-blue)] line-clamp-1">{{ item.title }}</p>
+                  <p class="text-xs text-[var(--royal-blue)] mt-0.5 line-clamp-2">{{ item.message }}</p>
+                  <p class="text-[10px] text-[var(--steel-blue)] mt-1">{{ formatTime(item.created_at) }}</p>
                 </div>
                 <span
                   v-if="!item.is_read"
@@ -141,7 +141,7 @@
               />
               <div>
                 <p class="font-semibold">{{ userProfile.full_name }}</p>
-                <p class="text-xs text-medium-gray">Renter</p>
+                <p class="text-xs text-[var(--medium-gray)]">Renter</p>
               </div>
             </div>
           </div>
@@ -150,35 +150,35 @@
             <router-link
               to="/customer/settings"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"
+              class="flex items-center gap-3 px-4 py-3 hover:bg-[var(--hover-blue)]"
             >
               ⚙️ Settings
             </router-link>
             <router-link
               to="/customer/saved/SavedProperties"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"
+              class="flex items-center gap-3 px-4 py-3 hover:bg-[var(--hover-blue)]"
             >
               ❤️ Saved Properties
             </router-link>
             <router-link
               to="/customer/request"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"
+              class="flex items-center gap-3 px-4 py-3 hover:bg-[var(--hover-blue)]"
             >
               📋 My Requests
             </router-link>
             <router-link
               to="/customer/inspections"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"
+              class="flex items-center gap-3 px-4 py-3 hover:bg-[var(--hover-blue)]"
             >
               🏠 My Inspections
             </router-link>
             <router-link
               to="/customer/notifications"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"
+              class="flex items-center gap-3 px-4 py-3 hover:bg-[var(--hover-blue)]"
             >
               🔔 Notifications
             </router-link>
