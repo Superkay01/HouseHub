@@ -75,14 +75,14 @@
       <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm mb-6 sm:mb-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div class="sm:col-span-2">
-            <label class="block text-xs sm:text-sm font-medium text-medium-gray mb-1.5 sm:mb-2">
+            <label class="block text-xs sm:text-sm font-medium text-[var(--royal-blue)] mb-1.5 sm:mb-2">
               Search Properties
             </label>
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search by title, address, or area..."
-              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 
+              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-[var(--royal-blue)] placeholder:text-[var(--steel-blue)]
                      rounded-xl sm:rounded-2xl 
                      border border-[var(--royal-blue)]/40 
                      focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
@@ -92,7 +92,7 @@
           </div>
 
           <div>
-            <label class="block text-xs sm:text-sm font-medium text-medium-gray mb-1.5 sm:mb-2">
+            <label class="block text-xs sm:text-sm font-medium text-[var(--royal-blue)] mb-1.5 sm:mb-2">
               Status
             </label>
             <select 
@@ -102,7 +102,7 @@
                      border border-[var(--royal-blue)]/40 
                      focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
                      focus:outline-none text-sm sm:text-base
-                     bg-white">
+                     bg-white text-[var(--royal-blue)]">
               <option value="">All Status</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
@@ -112,7 +112,7 @@
           </div>
 
           <div>
-            <label class="block text-xs sm:text-sm font-medium text-medium-gray mb-1.5 sm:mb-2">
+            <label class="block text-xs sm:text-sm font-medium text-[var(--royal-blue)] mb-1.5 sm:mb-2">
               Property Type
             </label>
             <select 
@@ -122,7 +122,7 @@
                      border border-[var(--royal-blue)]/40 
                      focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
                      focus:outline-none text-sm sm:text-base
-                     bg-white">
+                     bg-white text-[var(--royal-blue)]">
               <option value="">All Types</option>
               <option value="Apartment">Apartment</option>
               <option value="Duplex">Duplex</option>

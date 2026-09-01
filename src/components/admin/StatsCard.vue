@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-transparent hover:border-[var(--light-blue)] group">
+  <div class="bg-white rounded-3xl md:p-6 p-3 shadow-sm hover:shadow-md transition-all duration-300 border border-transparent hover:border-[var(--light-blue)] group">
     <div class="flex items-start justify-between">
       <!-- Icon -->
-      <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-3xl mb-4 transition-transform group-hover:scale-110"
+      <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-3xl mb-2 md:mb-4 transition-transform group-hover:scale-110"
          :class="`bg-[var(--${color})]/10 text-[var(--${color})]`">
         <component :is="icon" class="w-7 h-7" v-if="typeof icon !=='string'"/>
         <span v-else>{{ icon }}</span>
@@ -16,12 +16,12 @@
     </div>
 
     <!-- Value -->
-    <div class="text-4xl font-bold text-dark-gray mb-1 tracking-tighter">
+    <div class="md:text-4xl text-2xl font-bold text-[var(--royal-blue)]  tracking-tighter">
       {{ displayValue.toLocaleString() }}
     </div>
 
     <!-- Title -->
-    <div class="text-medium-gray font-medium">
+    <div class="md:text-lg text-sm text-[var(--royal-blue)] font-medium">
       {{ title }}
     </div>
   </div>

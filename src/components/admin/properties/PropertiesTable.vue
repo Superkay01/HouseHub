@@ -36,7 +36,7 @@
           class="h-25 w-55 object-contain m-auto"
         />
       </div>
-      <p class="text-lg text-medium-gray">
+      <p class="text-lg text-[var(--steel-blue)]">
         No properties found matching your criteria
       </p>
     </div>
@@ -44,7 +44,7 @@
     <div v-else class="overflow-x-auto">
       <table class="w-full">
         <thead>
-          <tr class="border-b border-[var(--hover-blue)] text-left text-sm font-medium text-medium-gray">
+          <tr class="border-b border-[var(--hover-blue)] text-left text-sm font-medium text-[var(--royal-blue)]">
             <th class="py-4 px-4">Property</th>
             <th class="py-4 px-4">Price</th>
             <th class="py-4 px-4">Location</th>
@@ -67,13 +67,13 @@
                   class="w-16 h-12 object-cover rounded-xl"
                 />
                 <div>
-                  <div class="font-semibold text-[var(--royal-blue)]">{{ property.title }}</div>
+                  <div class="font-semibold text-xs text-[var(--royal-blue)]">{{ property.title }}</div>
                   <div class="text-sm text-[var(--steel-blue)]">{{ property.property_type }}</div>
                 </div>
               </div>
             </td>
             <td class="py-5 px-4">
-              <div class="font-semibold text-xs sm:text-[15px] text-[var(--royal-blue)]">₦{{ Number(property.price || 0).toLocaleString() }}</div>
+              <div class="font-semibold text-xs sm:text-[12px] text-[var(--royal-blue)]">₦{{ Number(property.price || 0).toLocaleString() }}</div>
             </td>
             <td class="py-5 px-4 text-sm text-[var(--royal-blue)]">
               📍 {{ property.city }}, {{ property.state }}

@@ -4,8 +4,8 @@
       <!-- Header -->
       <div class="flex justify-between items-start mb-10">
         <div>
-          <h1 class="text-4xl font-bold text-[var(--royal-blue)]">Add New Property</h1>
-          <p class="text-[var(--medium-blue)] mt-2 text-lg">
+          <h1 class="md:text-4xl text-xl font-bold text-[var(--royal-blue)]">Add New Property</h1>
+          <p class="text-[var(--medium-blue)] mt-2 md:text-xl text-sm">
             List your property and connect with potential tenants
           </p>
         </div>
