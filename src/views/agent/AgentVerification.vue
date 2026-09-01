@@ -91,6 +91,10 @@
               <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Business Registration Number</label>
               <input v-model="form.business_registration_number" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
             </div>
+            <div>
+              <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">National Identity Number (NIN)</label>
+              <input v-model="form.national_identity_number" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-2xl text-[var(--royal-blue)]">
+            </div>
             <div class="md:col-span-2">
               <label class="block text-sm font-medium mb-1 text-[var(--royal-blue)]">Areas of Operation</label>
               <input 
@@ -155,6 +159,7 @@
               <p>Government ID: {{ uploadedFiles.government_id ? 'Uploaded' : 'Missing' }}</p>
               <p>Passport Photo: {{ uploadedFiles.passport_photo ? 'Uploaded' : 'Missing' }}</p>
               <p>Proof of Address: {{ uploadedFiles.proof_of_address ? 'Uploaded' : 'Missing' }}</p>
+              <p>National Identity Number (NIN): {{ form.national_identity_number || 'N/A' }}</p>
             </div>
           </div>
 
@@ -179,13 +184,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { supabase } from '@/supabaseClient'
-import { useRouter } from 'vue-router'   // ← Added for navigation
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const currentStep = ref<number>(1)
 const isSubmitting = ref<boolean>(false)
-const isSubmitted = ref<boolean>(false)   // ← New state
+const isSubmitted = ref<boolean>(false)
 
 const profile = ref<any>({})
 
@@ -198,6 +203,7 @@ const form = ref({
   city: '',
   lga: '',
   business_registration_number: '',
+  national_identity_number: '',
   areas_of_operation: [] as string[],
 })
 
@@ -215,31 +221,51 @@ onMounted(async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  const { data: pData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-  if (pData) profile.value = pData
+  // 1. Fetch profile
+  const { data: pData } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
 
+  if (pData) {
+    profile.value = pData
+  }
+
+  // 2. Fetch existing verification (if any)
   const { data: verif } = await supabase
     .from('agent_verifications')
     .select('*')
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (verif) {
     currentStep.value = verif.current_step || 1
-    isSubmitted.value = verif.verification_status === 'pending' || verif.verification_status === 'approved'
+    isSubmitted.value =
+      verif.verification_status === 'pending' ||
+      verif.verification_status === 'approved'
 
+    // Prefer verification data, fall back to profile for shared fields
     form.value = {
-      agency_name: verif.agency_name || '',
-      office_address: verif.office_address || '',
+      agency_name: verif.agency_name || pData?.agency_name || '',
+      office_address: verif.office_address || pData?.office_address || '',
       date_of_birth: verif.date_of_birth || '',
-      years_of_experience: verif.years_of_experience,
-      state: verif.state || '',
-      city: verif.city || '',
-      lga: verif.lga || '',
+      years_of_experience: verif.years_of_experience ?? null,
+      state: verif.state || pData?.state || '',
+      city: verif.city || pData?.city || '',
+      lga: verif.lga || pData?.lga || '',
       business_registration_number: verif.business_registration_number || '',
+      national_identity_number: verif.national_identity_number || '',
       areas_of_operation: verif.areas_of_operation || [],
     }
     areasInput.value = form.value.areas_of_operation.join(', ')
+  } else if (pData) {
+    // No verification row yet → pre-fill shared fields from profile
+    form.value.agency_name = pData.agency_name || ''
+    form.value.office_address = pData.office_address || ''
+    form.value.state = pData.state || ''
+    form.value.city = pData.city || ''
+    form.value.lga = pData.lga || ''
   }
 })
 
@@ -250,8 +276,13 @@ watch(areasInput, (val: string) => {
     .filter(Boolean)
 })
 
-const nextStep = () => { if (currentStep.value < 4) currentStep.value++ }
-const prevStep = () => { if (currentStep.value > 1) currentStep.value-- }
+const nextStep = () => {
+  if (currentStep.value < 4) currentStep.value++
+}
+
+const prevStep = () => {
+  if (currentStep.value > 1) currentStep.value--
+}
 
 const submitVerification = async () => {
   isSubmitting.value = true
@@ -259,32 +290,55 @@ const submitVerification = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
-    const { error } = await supabase.from('agent_verifications').upsert({
-      user_id: user.id,
-      ...form.value,
-      verification_status: 'pending',
-      current_step: 4,
-    }, { onConflict: 'user_id' })
+    // 1. Upsert into agent_verifications
+    const { error: verifError } = await supabase
+      .from('agent_verifications')
+      .upsert(
+        {
+          user_id: user.id,
+          ...form.value,
+          verification_status: 'pending',
+          current_step: 4,
+        },
+        { onConflict: 'user_id' }
+      )
 
-    if (error) throw error
+    if (verifError) throw verifError
+
+    // 2. Sync overlapping fields to profiles
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({
+        agency_name: form.value.agency_name || null,
+        office_address: form.value.office_address || null,
+        state: form.value.state || null,
+        city: form.value.city || null,
+        lga: form.value.lga || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id)
+
+    if (profileError) {
+      console.warn('Failed to sync to profiles:', profileError)
+      // Optionally throw if you want the whole submit to fail
+      // throw profileError
+    }
 
     isSubmitted.value = true
-    // Optional: You can also show a toast instead of alert
-    alert("✅ Verification submitted successfully!")
-
+    alert('✅ Verification submitted successfully!')
   } catch (error: any) {
     console.error(error)
-    alert("Submission failed: " + error.message)
+    alert('Submission failed: ' + error.message)
   } finally {
     isSubmitting.value = false
   }
 }
 
 const goToDashboard = () => {
-  router.push('/agent/dashboard')   // Change this path if your dashboard route is different
+  router.push('/agent/dashboard')
 }
 
-// File Upload Functions (unchanged)
+// ---------- File Upload Functions ----------
 const triggerFileInput = (type: 'government_id' | 'passport_photo' | 'proof_of_address') => {
   const input = document.createElement('input')
   input.type = 'file'
@@ -308,36 +362,35 @@ const handleDrop = async (e: any, type: 'government_id' | 'passport_photo' | 'pr
   }
 }
 
-const uploadToSupabase = async (file: File, type: 'government_id' | 'passport_photo' | 'proof_of_address') => {
+const uploadToSupabase = async (
+  file: File,
+  type: 'government_id' | 'passport_photo' | 'proof_of_address'
+) => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
 
-    // Strong filename sanitization
     const timestamp = Date.now()
     const random = Math.floor(Math.random() * 10000)
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-    
     const cleanName = `doc-${timestamp}-${random}.${fileExt}`
-
     const filePath = `verification/${user.id}/${type}/${cleanName}`
 
-    console.log("📤 Uploading to path:", filePath)
+    console.log('📤 Uploading to path:', filePath)
 
     const { error: uploadError } = await supabase.storage
       .from('agent-documents')
       .upload(filePath, file, {
         upsert: true,
         contentType: file.type || 'application/octet-stream',
-        cacheControl: '3600'
+        cacheControl: '3600',
       })
 
     if (uploadError) {
-      console.error("Upload Error Details:", uploadError)
+      console.error('Upload Error Details:', uploadError)
       throw new Error(uploadError.message || 'Upload failed')
     }
 
-    // Get public URL
     const { data: urlData } = supabase.storage
       .from('agent-documents')
       .getPublicUrl(filePath)
@@ -345,26 +398,25 @@ const uploadToSupabase = async (file: File, type: 'government_id' | 'passport_ph
     const fieldMap = {
       government_id: 'government_id_url',
       passport_photo: 'passport_photo_url',
-      proof_of_address: 'proof_of_address_url'
+      proof_of_address: 'proof_of_address_url',
     }
 
-    // Save URL to database
     const { error: dbError } = await supabase
       .from('agent_verifications')
-      .upsert({
-        user_id: user.id,
-        [fieldMap[type]]: urlData.publicUrl
-      }, { onConflict: 'user_id' })
+      .upsert(
+        {
+          user_id: user.id,
+          [fieldMap[type]]: urlData.publicUrl,
+        },
+        { onConflict: 'user_id' }
+      )
 
-    if (dbError) console.warn("Failed to save URL to DB:", dbError)
+    if (dbError) console.warn('Failed to save URL to DB:', dbError)
 
     alert(`✅ ${type.replace(/_/g, ' ')} uploaded successfully!`)
-    
-    // Optional: Refresh the component
     uploadedFiles.value[type] = file
-
   } catch (err: any) {
-    console.error("Full Upload Error:", err)
+    console.error('Full Upload Error:', err)
     alert(`Upload failed: ${err.message || 'Unknown error'}`)
   }
 }

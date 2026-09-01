@@ -13,7 +13,7 @@
                 <h2 class="text-xl md:text-3xl font-bold text-[var(--royal-blue)] tracking-tight mb-4 heading-font">
                 My Properties
                </h2>
-               <p class="max-w-2xl mx-auto text-xl text-[var(--royal-blue)] opacity-90">
+               <p class="max-w-2xl mx-auto md:text-xl text-sm text-[var(--royal-blue)] opacity-90">
                Manage all your property listings in one place
                </p>
             </div>
@@ -22,9 +22,9 @@
             <div class="flex justify-end mb-10">
                 <button 
                 @click="goToAddProperty"
-                class="group inline-flex items-center gap-3 bg-[#0025cc] hover:bg-[#546cdd] text-white font-semibold text-lg px-8 py-4 rounded-3xl transition-all duration-300 hover:shadow-xl hover:shadow-[#0025cc]/30"
+                class="group inline-flex items-center gap-3 md:text-lg text-sm bg-[#0025cc] hover:bg-[#546cdd] text-white font-semibold md:px-8 px-4 md:py-4 py-2 rounded-3xl transition-all duration-300 hover:shadow-xl hover:shadow-[#0025cc]/30"
                 >
-                <span class="text-2xl leading-none">+</span>
+                <span class="md:text-lg text-sm leading-none">+</span>
                 Add New Property
                 </button>
             </div>
@@ -39,12 +39,12 @@
 
       <!-- Empty State -->
       <div v-else-if="properties.length === 0" class="text-center py-32">
-        <div class="text-7xl mb-6 opacity-50">🏠</div>
-        <h3 class="text-3xl font-semibold text-white mb-3">No Properties Listed Yet</h3>
-        <p class="text-xl text-white/70 mb-8">Start building your portfolio by adding your first property</p>
+        <img src="/lodgelink-logo.png" alt="No properties" class="mx-auto mb-6 w-48 h-20 "/>
+        <h3 class="md:text-2xl text-lg font-semibold text-[var(--royal-blue)] mb-3">No Properties Listed Yet</h3>
+        <p class="md:text-xl text-sm text-[var(--steel-blue)] mb-8">Start building your portfolio by adding your first property</p>
         <button 
           @click="goToAddProperty"
-          class="bg-white text-[#0025cc] font-semibold px-10 py-4 rounded-3xl text-lg hover:bg-gray-100 transition"
+          class="bg-[var(--royal-blue)] text-[var(--white)] font-semibold md:px-10 px-8 py-3 md:py-4 rounded-3xl text-sm hover:bg-[var(--steel-blue)] transition"
         >
           Add Your First Property
         </button>

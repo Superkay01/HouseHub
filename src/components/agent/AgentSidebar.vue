@@ -53,19 +53,19 @@
           :to="'/agent/verification'"
           @click="closeSidebar"
         />
-        <SidebarLink 
-          icon="add" 
-          label="Add New Property" 
-          :to="'/agent/add-property'"
-          @click="closeSidebar"
-        />
+        
         <SidebarLink 
           icon="properties" 
           label="My Properties" 
           :to="'/agent/properties'"
           @click="closeSidebar"
         />
-        
+        <SidebarLink 
+          icon="add" 
+          label="Add New Property" 
+          :to="'/agent/add-property'"
+          @click="closeSidebar"
+        />
         <SidebarLink 
           icon="requests" 
           label="Property Requests" 
