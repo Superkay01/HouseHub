@@ -17,6 +17,75 @@
       </div>
 
       <form v-else @submit.prevent="saveProfile" class="space-y-5 sm:space-y-6">
+        <!-- Profile Image -->
+        <section class="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 p-5 sm:p-6 shadow-sm">
+          <h2 class="text-base sm:text-lg font-semibold text-[var(--royal-blue)] mb-4">
+            Profile Photo
+          </h2>
+
+          <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+            <!-- Avatar Preview -->
+            <div class="relative">
+              <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-[var(--royal-blue)]/20 bg-gray-100 flex items-center justify-center">
+                <img
+                  v-if="previewUrl || form.avatar_url"
+                  :src="previewUrl || form.avatar_url"
+                  alt="Profile"
+                  class="w-full h-full object-cover"
+                />
+                <span v-else class="text-4xl text-gray-400 font-medium">
+                  {{ form.full_name?.charAt(0)?.toUpperCase() || 'A' }}
+                </span>
+              </div>
+
+              <!-- Camera button -->
+              <button
+                type="button"
+                @click="triggerFileInput"
+                class="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-[var(--royal-blue)] text-white flex items-center justify-center shadow-md hover:opacity-90 transition"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="flex-1 text-center sm:text-left">
+              <p class="text-sm text-gray-600 mb-3">
+                Upload a clear photo of yourself. JPG or PNG, max 2MB.
+              </p>
+
+              <div class="flex flex-wrap justify-center sm:justify-start gap-3">
+                <button
+                  type="button"
+                  @click="triggerFileInput"
+                  class="px-4 py-2 text-sm rounded-xl border border-[var(--royal-blue)] text-[var(--royal-blue)] hover:bg-[var(--royal-blue)] hover:text-white transition"
+                >
+                  Choose Photo
+                </button>
+
+                <button
+                  v-if="previewUrl || form.avatar_url"
+                  type="button"
+                  @click="removeAvatar"
+                  class="px-4 py-2 text-sm rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition"
+                >
+                  Remove
+                </button>
+              </div>
+
+              <input
+                ref="fileInput"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="hidden"
+                @change="onFileSelected"
+              />
+            </div>
+          </div>
+        </section>
+
         <!-- Basic Information -->
         <section class="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 p-5 sm:p-6 shadow-sm space-y-4 sm:space-y-5">
           <h2 class="text-base sm:text-lg font-semibold text-[var(--royal-blue)]">
@@ -192,12 +261,12 @@
 
           <button
             type="submit"
-            :disabled="saving"
+            :disabled="saving || uploading"
             class="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl sm:rounded-2xl
               bg-[var(--royal-blue)] hover:bg-[#001fa3] disabled:bg-gray-400
               text-white font-semibold transition"
           >
-            {{ saving ? 'Saving...' : 'Save Changes' }}
+            {{ saving || uploading ? 'Saving...' : 'Save Changes' }}
           </button>
         </div>
 
@@ -217,8 +286,13 @@ const router = useRouter()
 
 const loading = ref(true)
 const saving = ref(false)
+const uploading = ref(false)
 const message = ref('')
 const errorMessage = ref('')
+
+const fileInput = ref(null)
+const previewUrl = ref(null)
+const selectedFile = ref(null)
 
 const form = ref({
   id: '',
@@ -230,6 +304,7 @@ const form = ref({
   state: '',
   city: '',
   lga: '',
+  avatar_url: '',
   permissions: [],
   is_active: true,
   last_login: null,
@@ -252,10 +327,78 @@ const formatDate = (date) => {
   })
 }
 
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const onFileSelected = (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+
+  // Validate size (max 2MB)
+  if (file.size > 2 * 1024 * 1024) {
+    errorMessage.value = 'Image must be less than 2MB'
+    return
+  }
+
+  // Validate type
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    errorMessage.value = 'Only JPG, PNG or WebP images are allowed'
+    return
+  }
+
+  selectedFile.value = file
+  previewUrl.value = URL.createObjectURL(file)
+  errorMessage.value = ''
+}
+
+const removeAvatar = () => {
+  selectedFile.value = null
+  previewUrl.value = null
+  form.value.avatar_url = ''
+  if (fileInput.value) fileInput.value.value = ''
+}
+
+const uploadAvatar = async (userId) => {
+  if (!selectedFile.value) return form.value.avatar_url || null
+
+  uploading.value = true
+  try {
+    const file = selectedFile.value
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${userId}/avatar.${fileExt}`
+    const filePath = `admins/${fileName}`
+
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('avatars') // ← Make sure this bucket exists
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true, // overwrite previous avatar
+      })
+
+    if (uploadError) throw uploadError
+
+    // Get public URL
+    const { data } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath)
+
+    return data.publicUrl
+  } catch (err) {
+    console.error('Upload error:', err)
+    throw new Error('Failed to upload profile image')
+  } finally {
+    uploading.value = false
+  }
+}
+
 const loadProfile = async () => {
   loading.value = true
   errorMessage.value = ''
   message.value = ''
+  previewUrl.value = null
+  selectedFile.value = null
 
   try {
     const { data: { user } } = await supabase.auth.getUser()
@@ -282,6 +425,7 @@ const loadProfile = async () => {
       state: data.state || '',
       city: data.city || '',
       lga: data.lga || '',
+      avatar_url: data.avatar_url || '',
       permissions: data.permissions || [],
       is_active: data.is_active ?? true,
       last_login: data.last_login,
@@ -305,6 +449,12 @@ const saveProfile = async () => {
     if (!user) {
       router.push('/login')
       return
+    }
+
+    // Upload new avatar if selected
+    let avatarUrl = form.value.avatar_url
+    if (selectedFile.value) {
+      avatarUrl = await uploadAvatar(user.id)
     }
 
     const phone = form.value.phone?.trim() || null
@@ -331,6 +481,7 @@ const saveProfile = async () => {
       state: form.value.state || null,
       city: form.value.city || null,
       lga: form.value.lga || null,
+      avatar_url: avatarUrl,
       updated_at: new Date().toISOString(),
     }
 
@@ -347,6 +498,11 @@ const saveProfile = async () => {
       }
       return
     }
+
+    // Update local form
+    form.value.avatar_url = avatarUrl
+    selectedFile.value = null
+    previewUrl.value = null
 
     message.value = 'Profile updated successfully'
     setTimeout(() => {

@@ -1,35 +1,70 @@
 <template>
   <div class="min-h-screen bg-[var(--light-blue)]">
-    <div class="max-w-7xl mx-auto p-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
       <!-- Header -->
-      <div class="flex justify-between items-start mb-8">
-        <div>
-          <h1 class="text-4xl font-bold text-[var(--royal-blue)]">Properties Management</h1>
-          <p class="text-medium-gray mt-2">
-            Managing properties in <span class="font-semibold">{{ adminProfile.city }}, {{ adminProfile.state }}</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button 
-            @click="exportCSV"
-            class="px-5 py-3 bg-white border border-[var(--light-blue)] rounded-2xl hover:bg-gray-50 flex items-center gap-2 text-sm">
-            📥 CSV
-          </button>
-          <button 
-            @click="exportPDF"
-            class="px-5 py-3 bg-white border border-[var(--light-blue)] rounded-2xl hover:bg-gray-50 flex items-center gap-2 text-sm">
-            📄 PDF
-          </button>
-          <button 
-            @click="refreshAll"
-            class="px-6 py-3 bg-[var(--royal-blue)] text-white rounded-2xl hover:bg-[var(--medium-blue)] flex items-center gap-2">
-            Refresh All
-          </button>
+      <div class="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+          <div class="min-w-0">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--royal-blue)] leading-tight">
+              Properties Management
+            </h1>
+            <p class="text-sm sm:text-base text-medium-gray mt-1 sm:mt-2">
+              Managing properties in 
+              <span class="font-semibold text-[var(--royal-blue)]">
+                {{ adminProfile.city }}, {{ adminProfile.state }}
+              </span>
+            </p>
+          </div>
+
+          <!-- Action Buttons - responsive -->
+          <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <button 
+              @click="exportCSV"
+              class="flex-1 sm:flex-none px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 
+                     bg-white border border-[var(--royal-blue)] text-[var(--royal-blue)]
+                     rounded-xl sm:rounded-2xl 
+                     hover:bg-[var(--royal-blue)] hover:text-white
+                     flex items-center justify-center gap-1.5 sm:gap-2 
+                     text-xs sm:text-sm font-medium
+                     transition-colors duration-200
+                     min-h-[44px]">
+              <span class="text-base">📥</span>
+              <span>CSV</span>
+            </button>
+
+            <button 
+              @click="exportPDF"
+              class="flex-1 sm:flex-none px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 
+                     bg-white border border-[var(--royal-blue)] text-[var(--royal-blue)]
+                     rounded-xl sm:rounded-2xl 
+                     hover:bg-[var(--royal-blue)] hover:text-white
+                     flex items-center justify-center gap-1.5 sm:gap-2 
+                     text-xs sm:text-sm font-medium
+                     transition-colors duration-200
+                     min-h-[44px]">
+              <span class="text-base">📄</span>
+              <span>PDF</span>
+            </button>
+
+            <button 
+              @click="refreshAll"
+              class="flex-1 sm:flex-none px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 
+                     bg-[var(--royal-blue)] text-white 
+                     rounded-xl sm:rounded-2xl 
+                     hover:opacity-90 active:opacity-80
+                     flex items-center justify-center gap-1.5 sm:gap-2 
+                     text-xs sm:text-sm font-medium
+                     transition-opacity duration-200
+                     min-h-[44px] shadow-sm">
+              <span class="hidden xs:inline">Refresh All</span>
+              <span class="xs:hidden">Refresh</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-10">
         <StatsCard title="Total Properties" :value="stats.total" :icon="Building2" color="royal-blue" />
         <StatsCard title="Pending Review" :value="stats.pending" :icon="Clock" color="periwinkle" />
         <StatsCard title="Approved Listings" :value="stats.approved" :icon="CheckCircle" color="bright-green" />
@@ -37,21 +72,37 @@
       </div>
 
       <!-- Filters -->
-      <div class="bg-white rounded-3xl p-6 shadow-sm mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="lg:col-span-2">
-            <label class="block text-sm font-medium text-medium-gray mb-2">Search Properties</label>
+      <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm mb-6 sm:mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs sm:text-sm font-medium text-medium-gray mb-1.5 sm:mb-2">
+              Search Properties
+            </label>
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search by title, address, or area..."
-              class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)] focus:outline-none"
+              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 
+                     rounded-xl sm:rounded-2xl 
+                     border border-[var(--royal-blue)]/40 
+                     focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
+                     focus:outline-none text-sm sm:text-base
+                     transition-colors"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-medium-gray mb-2">Status</label>
-            <select v-model="statusFilter" class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)]">
+            <label class="block text-xs sm:text-sm font-medium text-medium-gray mb-1.5 sm:mb-2">
+              Status
+            </label>
+            <select 
+              v-model="statusFilter" 
+              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 
+                     rounded-xl sm:rounded-2xl 
+                     border border-[var(--royal-blue)]/40 
+                     focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
+                     focus:outline-none text-sm sm:text-base
+                     bg-white">
               <option value="">All Status</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
@@ -61,8 +112,17 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-medium-gray mb-2">Property Type</label>
-            <select v-model="typeFilter" class="w-full px-4 py-3 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)]">
+            <label class="block text-xs sm:text-sm font-medium text-medium-gray mb-1.5 sm:mb-2">
+              Property Type
+            </label>
+            <select 
+              v-model="typeFilter" 
+              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 
+                     rounded-xl sm:rounded-2xl 
+                     border border-[var(--royal-blue)]/40 
+                     focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
+                     focus:outline-none text-sm sm:text-base
+                     bg-white">
               <option value="">All Types</option>
               <option value="Apartment">Apartment</option>
               <option value="Duplex">Duplex</option>
@@ -73,15 +133,15 @@
       </div>
 
       <!-- Properties Table -->
-      <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
-        <PropertiesTable 
-          :properties="filteredProperties"
-          @view="viewProperty"
-          @approve="approveProperty"
-          @reject="rejectProperty"
-          
-        />
-        
+      <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <PropertiesTable 
+            :properties="filteredProperties"
+            @view="viewProperty"
+            @approve="approveProperty"
+            @reject="rejectProperty"
+          />
+        </div>
       </div>
     </div>
 

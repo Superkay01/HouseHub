@@ -1,30 +1,41 @@
 <template>
   <div class="min-h-screen bg-[var(--light-blue)] flex">
-    <!-- Sidebar -->
+    <!-- Sidebar (kept as is) -->
    
-    <div class="flex-1">
-      <!-- Top Navigation -->
+    <div class="flex-1 min-w-0">
+      <!-- Top Navigation (kept as is) -->
      
-      <div class="p-8">
+      <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         <!-- Header -->
-        <div class="flex justify-between items-end mb-10">
-          <div>
-            <h1 class="text-4xl font-bold text-dark-gray">Property Agents</h1>
-            <p class="text-medium-gray mt-2 text-lg">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6 mb-6 sm:mb-8 lg:mb-10">
+          <div class="min-w-0">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-dark-gray leading-tight">
+              Property Agents
+            </h1>
+            <p class="text-sm sm:text-base md:text-lg text-medium-gray mt-1 sm:mt-2">
               Manage, verify and monitor all property agents in your state
             </p>
           </div>
+
           <button
             @click="openAddAgentModal"
-            class="bg-[var(--royal-blue)] hover:bg-[var(--mediumBlue)] text-white px-6 py-3.5 rounded-2xl flex items-center gap-3 font-medium transition-all"
+            class="w-full sm:w-auto 
+                   bg-[var(--royal-blue)] hover:bg-[var(--mediumBlue)] 
+                   text-white 
+                   px-4 sm:px-5 md:px-6 py-3 sm:py-3.5 
+                   rounded-xl sm:rounded-2xl 
+                   flex items-center justify-center gap-2 sm:gap-3 
+                   font-medium text-sm sm:text-base
+                   transition-all duration-200
+                   min-h-[44px] shadow-sm"
           >
-            <Plus class="w-5 h-5" />
-            Add New Agent
+            <Plus class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <span>Add New Agent</span>
           </button>
         </div>
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-10">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 lg:mb-10">
           <StatsCard
             v-for="stat in stats"
             :key="stat.label"
@@ -35,45 +46,90 @@
           />
         </div>
 
-        <!-- Search & Filters + Rest of template remains the same -->
-        <div class="bg-white rounded-3xl p-6 mb-8 shadow-sm">
-          <div class="flex flex-wrap gap-4 items-center">
-            <div class="flex-1 min-w-[320px]">
+        <!-- Search & Filters -->
+        <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-sm">
+          <div class="flex flex-col lg:flex-row flex-wrap gap-3 sm:gap-4 items-stretch lg:items-center">
+            
+            <!-- Search -->
+            <div class="flex-1 min-w-0 lg:min-w-[280px]">
               <div class="relative">
-                <Search class="absolute left-5 top-4 text-gray-400" />
+                <Search class="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   v-model="searchQuery"
                   type="text"
                   placeholder="Search by agent name, agency, phone or email..."
-                  class="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-200 focus:border-[var(--royal-blue)] focus:outline-none"
+                  class="w-full pl-11 sm:pl-14 pr-4 sm:pr-6 py-3 sm:py-4 
+                         rounded-xl sm:rounded-2xl 
+                         border border-gray-200 
+                         focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
+                         focus:outline-none text-sm sm:text-base
+                         transition-colors"
                 />
               </div>
             </div>
-            <select v-model="cityFilter" class="border border-gray-200 rounded-2xl px-6 py-4 focus:border-[var(--royal-blue)]">
-              <option value="">All Cities</option>
-              <option value="Ilorin">Ilorin</option>
-              <option value="Ijebu Ode">Ijebu Ode</option>
-            </select>
-            <select v-model="statusFilter" class="border border-gray-200 rounded-2xl px-6 py-4 focus:border-[var(--royal-blue)]">
-              <option value="">All Status</option>
-              <option value="verified">Verified</option>
-              <option value="pending">Pending</option>
-              <option value="rejected">Rejected</option>
-              <option value="suspended">Suspended</option>
-            </select>
-            <select v-model="sortBy" class="border border-gray-200 rounded-2xl px-6 py-4 focus:border-[var(--royal-blue)]">
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="listings">Most Listings</option>
-              <option value="alphabetical">Alphabetical</option>
-            </select>
-            <button @click="exportData" class="px-6 py-4 border border-gray-200 rounded-2xl hover:bg-gray-50 flex items-center gap-2">
-              <Download class="w-5 h-5" />
-              Export
+
+            <!-- Filters -->
+            <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:flex gap-3 sm:gap-4 w-full lg:w-auto">
+              <select 
+                v-model="cityFilter" 
+                class="w-full lg:w-auto border border-gray-200 rounded-xl sm:rounded-2xl 
+                       px-4 sm:px-5 md:px-6 py-3 sm:py-4 
+                       focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
+                       focus:outline-none text-sm sm:text-base bg-white min-h-[44px]"
+              >
+                <option value="">All Cities</option>
+                <option value="Ilorin">Ilorin</option>
+                <option value="Ijebu Ode">Ijebu Ode</option>
+              </select>
+
+              <select 
+                v-model="statusFilter" 
+                class="w-full lg:w-auto border border-gray-200 rounded-xl sm:rounded-2xl 
+                       px-4 sm:px-5 md:px-6 py-3 sm:py-4 
+                       focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
+                       focus:outline-none text-sm sm:text-base bg-white min-h-[44px]"
+              >
+                <option value="">All Status</option>
+                <option value="verified">Verified</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+                <option value="suspended">Suspended</option>
+              </select>
+
+              <select 
+                v-model="sortBy" 
+                class="w-full lg:w-auto border border-gray-200 rounded-xl sm:rounded-2xl 
+                       px-4 sm:px-5 md:px-6 py-3 sm:py-4 
+                       focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
+                       focus:outline-none text-sm sm:text-base bg-white min-h-[44px]"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="listings">Most Listings</option>
+                <option value="alphabetical">Alphabetical</option>
+              </select>
+            </div>
+
+            <!-- Export Button -->
+            <button 
+              @click="exportData" 
+              class="w-full sm:w-auto lg:w-auto
+                     px-4 sm:px-5 md:px-6 py-3 sm:py-4 
+                     border border-[var(--royal-blue)] text-[var(--royal-blue)]
+                     rounded-xl sm:rounded-2xl 
+                     hover:bg-[var(--royal-blue)] hover:text-white
+                     flex items-center justify-center gap-2 
+                     text-sm sm:text-base font-medium
+                     transition-colors duration-200
+                     min-h-[44px]"
+            >
+              <Download class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span>Export</span>
             </button>
           </div>
         </div>
 
+        <!-- Bulk Actions -->
         <BulkActionToolbar
           v-if="selectedAgents.length > 0"
           :count="selectedAgents.length"
@@ -82,22 +138,28 @@
           @delete="bulkDelete"
         />
 
-        <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
-          <AgentTable
-            :agents="filteredAgents"
-            :loading="loading"
-            @view="openAgentDrawer"
-            @edit="editAgent"
-            v-model:selected="selectedAgents"
-          />
+        <!-- Agents Table -->
+        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <AgentTable
+              :agents="filteredAgents"
+              :loading="loading"
+              @view="openAgentDrawer"
+              @edit="editAgent"
+              v-model:selected="selectedAgents"
+            />
+          </div>
         </div>
 
-        <Pagination
-          v-if="totalPages > 1"
-          :current-page="currentPage"
-          :total-pages="totalPages"
-          @change="changePage"
-        />
+        <!-- Pagination -->
+        <div class="mt-6 sm:mt-8">
+          <Pagination
+            v-if="totalPages > 1"
+            :current-page="currentPage"
+            :total-pages="totalPages"
+            @change="changePage"
+          />
+        </div>
       </div>
     </div>
 
