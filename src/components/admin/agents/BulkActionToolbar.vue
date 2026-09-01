@@ -4,7 +4,7 @@
       <div class="bg-[var(--royal-blue)] text-white text-sm font-medium px-5 py-2.5 rounded-2xl flex items-center gap-2">
         <span>{{ count }} selected</span>
       </div>
-      <p class="text-medium-gray text-sm">Agents selected for bulk action</p>
+      <p class="text-[var(--royal-blue)] text-sm">Agents selected for bulk action</p>
     </div>
 
     <div class="flex items-center gap-3">

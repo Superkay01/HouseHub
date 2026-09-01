@@ -132,20 +132,20 @@ onMounted(() => {
     <div class="flex items-start justify-between">
       <div 
         :class="[
-          'w-14 h-14 rounded-3xl flex items-center justify-center transition-all group-hover:scale-110',
+          'w-9 h-9 rounded-3xl flex items-center justify-center transition-all group-hover:scale-110',
           colorClasses
         ]"
       >
-        <component :is="iconComponent" class="w-7 h-7" />
+        <component :is="iconComponent" class="w-5 h-5" />
       </div>
 
       <div class="text-right">
-        <p class="text-4xl font-bold text-dark-gray tracking-tighter">{{ formattedValue }}</p>
+        <p class="text-4xl font-bold text-[var(--royal-blue)] tracking-tighter">{{ formattedValue }}</p>
       </div>
     </div>
 
     <div class="mt-8">
-      <p class="text-medium-gray font-medium">{{ label }}</p>
+      <p class="text-[var(--steel-blue)] text-xs md:text-xs font-medium">{{ label }}</p>
     </div>
   </div>
 </template>

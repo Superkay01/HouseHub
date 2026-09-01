@@ -9,10 +9,10 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6 mb-6 sm:mb-8 lg:mb-10">
           <div class="min-w-0">
-            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-dark-gray leading-tight">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--royal-blue)] leading-tight">
               Property Agents
             </h1>
-            <p class="text-sm sm:text-base md:text-lg text-medium-gray mt-1 sm:mt-2">
+            <p class="text-sm sm:text-base md:text-lg text-[var(--steel-blue)] mt-1 sm:mt-2">
               Manage, verify and monitor all property agents in your state
             </p>
           </div>
@@ -20,7 +20,7 @@
           <button
             @click="openAddAgentModal"
             class="w-full sm:w-auto 
-                   bg-[var(--royal-blue)] hover:bg-[var(--mediumBlue)] 
+                   bg-[var(--royal-blue)] hover:bg-[var(--medium-Blue)] 
                    text-white 
                    px-4 sm:px-5 md:px-6 py-3 sm:py-3.5 
                    rounded-xl sm:rounded-2xl 

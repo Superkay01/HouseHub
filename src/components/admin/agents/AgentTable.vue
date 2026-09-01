@@ -8,9 +8,9 @@
           v-model="allSelected"
           class="w-5 h-5 accent-[var(--royal-blue)]"
         />
-        <span>AGENT</span>
+        <span class="text-[var(--royal-blue)]">AGENT</span>
       </div>
-      <div class="grid grid-cols-12 flex-1 px-8">
+      <div class="grid grid-cols-12 flex-1 px-8 text-[var(--royal-blue)] font-medium text-sm gap-4">
         <div class="col-span-2">Agency</div>
         <div class="col-span-2">Contact</div>
         <div class="col-span-2">City</div>
@@ -37,10 +37,10 @@
     <!-- Empty State -->
     <div v-else class="py-20 text-center">
       <div class="mx-auto w-16 h-16 bg-gray-100 rounded-3xl flex items-center justify-center mb-6">
-        <Users class="w-8 h-8 text-gray-400" />
+        <img src="/lodgelink-logo.png" alt="No agents" class="w-48 h-20" />
       </div>
-      <h3 class="text-xl font-semibold text-dark-gray">No agents found</h3>
-      <p class="text-medium-gray mt-2">Try adjusting your search or filters</p>
+      <h3 class="text-xl font-semibold text-[var(--royal-blue)]">No agents found</h3>
+      <p class="text-[var(--steel-blue)] mt-2">Try adjusting your search or filters</p>
     </div>
   </div>
 </template>

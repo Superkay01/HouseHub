@@ -15,24 +15,30 @@
         class="w-11 h-11 rounded-2xl object-cover border border-gray-200"
       />
       <div>
-        <p class="font-semibold text-gray-900">{{ agent.full_name }}</p>
-        <p class="text-sm text-medium-gray">{{ agent.email }}</p>
-      </div>
+  <p class="font-semibold text-xs text-[var(--royal-blue)] leading-tight">
+    <span class="block">{{ agent.full_name.split(' ')[0] }}</span>
+    <span class="block">{{ agent.full_name.split(' ').slice(1).join(' ') }}</span>
+  </p>
+
+  <p class="text-[10px] text-[var(--steel-blue)] truncate">
+    {{ agent.email }}
+  </p>
+</div>
     </div>
 
     <!-- Agency -->
     <div class="flex-1">
-      <p class="font-medium">{{ agent.agency_name || '—' }}</p>
+      <p class="font-medium text-sm text-[var(--steel-blue)]">{{ agent.agency_name || '—' }}</p>
     </div>
 
     <!-- Contact -->
     <div class="flex-1">
-      <p class="font-medium text-sm">{{ agent.phone }}</p>
+      <p class="font-medium text-sm text-[var(--steel-blue)]">{{ agent.phone }}</p>
     </div>
 
     <!-- City -->
     <div class="flex-1">
-      <p>{{ agent.city || '—' }}</p>
+      <p class="text-sm text-[var(--steel-blue)]">{{ agent.city || '—' }}</p>
     </div>
 
     <!-- Listings -->
@@ -44,28 +50,28 @@
     <div class="flex-1">
       <span 
         :class="getStatusClass(agent.verification_status)"
-        class="inline-block px-4 py-1.5 text-xs font-medium rounded-2xl"
+        class="inline-block px-4 py-1.5 text-xs font-medium rounded-2xl text-[var(--royal-blue)]"
       >
         {{ formatStatus(agent.verification_status) }}
       </span>
     </div>
 
     <!-- Joined -->
-    <div class="flex-1 text-sm text-medium-gray">
+    <div class="flex-1 text-sm text-[var(--steel-blue)]">
       {{ new Date(agent.created_at).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) }}
     </div>
 
     <!-- Actions -->
-    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+    <div class="flex items-center gap-2  group-hover:opacity-100 transition-all">
       <button 
         @click.stop="$emit('view', agent)"
-        class="px-4 py-2 text-sm hover:bg-gray-100 rounded-2xl transition-colors"
+        class="px-4 py-2 text-sm hover:bg-[var(--hover-blue)] rounded-2xl transition-colors text-[var(--bright-green)] hover:text-white"
       >
         View
       </button>
       <button 
         @click.stop="$emit('edit', agent)"
-        class="px-4 py-2 text-sm hover:bg-gray-100 rounded-2xl transition-colors"
+        class="px-4 py-2 text-sm hover:bg-gray-100 rounded-2xl transition-colors text-[var(--steel-blue)]"
       >
         Edit
       </button>
