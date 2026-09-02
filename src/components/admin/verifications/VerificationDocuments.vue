@@ -12,7 +12,7 @@
         </div>
         <div>
           <p class="font-medium">{{ doc.label }}</p>
-          <p class="text-xs text-medium-gray">{{ doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : '—' }}</p>
+          <p class="text-xs text-[var(--steel-blue)]">{{ doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : '—' }}</p>
         </div>
       </div>
 
@@ -77,6 +77,12 @@ const documentsList = computed(() => {
       url: docs.proof_of_address_url,
       uploadedAt: docs.submitted_at 
     },
+    { 
+      key: 'national_identity_number_url', 
+      label: 'National ID', 
+      url: docs.national_identity_number_url,
+      uploadedAt: docs.submitted_at 
+    }
     // Add more document fields as needed
   ].filter(doc => doc.url)
 })

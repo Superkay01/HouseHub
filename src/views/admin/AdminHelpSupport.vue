@@ -20,15 +20,15 @@
               <a href="tel:09030031328" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50">
                 <span>📞</span>
                 <div>
-                  <p class="font-medium text-gray-900">Phone</p>
-                  <p class="text-gray-500">0903 003 1328</p>
+                  <p class="font-medium text-[var(--steel-blue)]">Phone</p>
+                  <p class="text-[var(--steel-blue)]">0903 003 1328</p>
                 </div>
               </a>
               <a href="https://wa.me/2349030031328" target="_blank" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50">
                 <span>💬</span>
                 <div>
-                  <p class="font-medium text-gray-900">WhatsApp</p>
-                  <p class="text-gray-500">Ilorin support line</p>
+                  <p class="font-medium text-[var(--royal-blue)]">WhatsApp</p>
+                  <p class="text-[var(--steel-blue)]">Ilorin support line</p>
                 </div>
               </a>
             </div>
@@ -42,15 +42,15 @@
               <a href="tel:07059537201" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50">
                 <span>📞</span>
                 <div>
-                  <p class="font-medium text-gray-900">Phone</p>
-                  <p class="text-gray-500">0705 953 7201</p>
+                  <p class="font-medium text-[var(--steel-blue)]">Phone</p>
+                  <p class="text-[var(--steel-blue)]">0705 953 7201</p>
                 </div>
               </a>
               <a href="https://wa.me/2347059537201" target="_blank" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50">
                 <span>💬</span>
                 <div>
-                  <p class="font-medium text-gray-900">WhatsApp</p>
-                  <p class="text-gray-500">Ijebu Ode support line</p>
+                  <p class="font-medium text-[var(--royal-blue)]">WhatsApp</p>
+                  <p class="text-[var(--steel-blue)]">Ijebu Ode support line</p>
                 </div>
               </a>
             </div>
@@ -64,15 +64,15 @@
               <a href="mailto:adegbesanoluwakayode52@gmail.com" class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50">
                 <span>📧</span>
                 <div class="min-w-0">
-                  <p class="font-medium text-gray-900">Primary</p>
-                  <p class="text-gray-500 break-all">adegbesanoluwakayode52@gmail.com</p>
+                  <p class="font-medium text-[var(--royal-blue)]">Primary</p>
+                  <p class="text-[var(--steel-blue)] break-all">adegbesanoluwakayode52@gmail.com</p>
                 </div>
               </a>
-              <a href="mailto:adegbesansamuel9@gmail.com" class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50">
+              <a href="mailto:salamilukman100@gmail.com" class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50">
                 <span>📧</span>
                 <div class="min-w-0">
-                  <p class="font-medium text-gray-900">Secondary</p>
-                  <p class="text-gray-500 break-all">adegbesansamuel9@gmail.com</p>
+                  <p class="font-medium text-[var(--royal-blue)]">Secondary</p>
+                  <p class="text-[var(--steel-blue)] break-all">salamilukman100@gmail.com</p>
                 </div>
               </a>
             </div>
@@ -95,7 +95,7 @@
                   @click="openIndex = openIndex === index ? null : index"
                   class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50"
                 >
-                  <span class="text-sm font-medium text-gray-900">{{ item.q }}</span>
+                  <span class="text-sm font-medium text-[var(--steel-blue)]">{{ item.q }}</span>
                   <span class="text-gray-400">{{ openIndex === index ? '−' : '+' }}</span>
                 </button>
                 <div v-if="openIndex === index" class="px-4 pb-4 text-sm text-gray-600 leading-relaxed">
@@ -109,7 +109,7 @@
             <h2 class="text-base sm:text-lg font-semibold text-[var(--royal-blue)] mb-2">
               Operational Notes
             </h2>
-            <ul class="list-disc pl-5 space-y-2 text-sm text-gray-600">
+            <ul class="list-disc pl-5 space-y-2 text-sm text-[var(--steel-blue)]">
               <li>Review property listings before approval.</li>
               <li>Monitor pending inspection requests daily.</li>
               <li>Verify agent documents carefully before approval.</li>

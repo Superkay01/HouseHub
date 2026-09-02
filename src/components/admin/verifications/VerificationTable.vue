@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex justify-between items-center px-8 py-5 border-b bg-white rounded-t-3xl">
+    <div class="flex justify-between items-center px-8 py-5 border-b border-[var(--royal-blue)] bg-white rounded-t-3xl">
       <h3 class="font-semibold text-lg text-[var(--royal-blue)]">
         Verification Requests ({{ verifications.length }})
       </h3>
@@ -14,9 +14,9 @@
     <div class="overflow-x-auto bg-white rounded-b-3xl">
       <table class="w-full min-w-full">
         <thead>
-          <tr class="border-b text-left text-sm font-medium text-medium-gray">
+          <tr class="border-b text-left text-sm font-medium text-[var(--royal-blue)]">
             <th class="px-8 py-5 w-10">
-              <input type="checkbox" class="rounded" />
+              <input type="checkbox" class="rounded text-[var(--royal-blue)]" />
             </th>
             <th class="px-6 py-5">Agent</th>
             <th class="px-6 py-5">Agency</th>
@@ -27,11 +27,11 @@
             <th class="px-6 py-5 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-[var(--hover-blue)] text-[var(--royal-blue)]">
           <tr 
             v-for="item in verifications" 
             :key="item.id"
-            class="hover:bg-gray-50 transition-colors"
+            class="hover:bg-[var(--hover-blue)] transition-colors"
           >
             <td class="px-8 py-5">
               <input type="checkbox" class="rounded" />
@@ -50,19 +50,19 @@
               </div>
             </td>
 
-            <td class="px-6 py-5 font-medium">
+            <td class="px-6 py-5 font-medium text-[var(--royal-blue)]">
               {{ item.agency_name || '—' }}
             </td>
 
-            <td class="px-6 py-5 text-sm">
+            <td class="px-6 py-5 text-sm text-[var(--royal-blue)]">
               {{ item.profiles?.phone || '—' }}
             </td>
 
-            <td class="px-6 py-5 text-sm">
+            <td class="px-6 py-5 text-sm text-[var(--royal-blue)]">
               {{ item.city }} <span class="text-xs text-medium-gray">({{ item.lga }})</span>
             </td>
 
-            <td class="px-6 py-5 text-sm text-medium-gray">
+            <td class="px-6 py-5 text-sm text-[var(--royal-blue)]">
               {{ formatDate(item.submitted_at || item.created_at) }}
             </td>
 
@@ -85,8 +85,8 @@
     <!-- Empty State -->
     <div v-if="verifications.length === 0" class="bg-white rounded-3xl py-20 text-center">
       <div class="text-6xl mb-4">📋</div>
-      <p class="text-xl font-medium text-medium-gray">No verification requests found</p>
-      <p class="text-medium-gray mt-2">All caught up in your state!</p>
+      <p class="text-xl font-medium text-[var(--royal-blue)]">No verification requests found</p>
+      <p class="text-[var(--steel-blue)] mt-2">All caught up in your state!</p>
     </div>
   </div>
 </template>

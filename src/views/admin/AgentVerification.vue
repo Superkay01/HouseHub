@@ -2,24 +2,24 @@
   <div class="min-h-screen bg-[var(--light-blue)]">
     <div class="max-w-7xl mx-auto p-6">
       <h1 class="text-4xl font-bold text-[var(--royal-blue)] mb-2">Agent Verification</h1>
-      <p class="text-medium-gray">State: {{ adminProfile.state || 'Loading...' }}</p>
+      <p class="text-[var(--royal-blue)]">State: {{ adminProfile.state || 'Loading...' }}</p>
 
       <!-- Stats -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
         <div class="bg-white p-6 rounded-3xl">
-          <p class="text-sm text-medium-gray">Total</p>
+          <p class="text-sm text-[var(--royal-blue)]">Total</p>
           <p class="text-4xl font-bold">{{ stats.total }}</p>
         </div>
         <div class="bg-white p-6 rounded-3xl">
-          <p class="text-sm text-medium-gray">Pending</p>
+          <p class="text-sm text-[var(--royal-blue)]">Pending</p>
           <p class="text-4xl font-bold text-yellow-600">{{ stats.pending }}</p>
         </div>
         <div class="bg-white p-6 rounded-3xl">
-          <p class="text-sm text-medium-gray">Approved</p>
+          <p class="text-sm text-[var(--royal-blue)]">Approved</p>
           <p class="text-4xl font-bold text-green-600">{{ stats.approved }}</p>
         </div>
         <div class="bg-white p-6 rounded-3xl">
-          <p class="text-sm text-medium-gray">Rejected</p>
+          <p class="text-sm text-[var(--royal-blue)]">Rejected</p>
           <p class="text-4xl font-bold text-red-600">{{ stats.rejected }}</p>
         </div>
       </div>
@@ -73,6 +73,7 @@ const fetchData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
+  // 1. Get admin state
   const { data: profile } = await supabase
     .from('admin_profiles')
     .select('state')
@@ -81,11 +82,11 @@ const fetchData = async () => {
 
   if (profile) adminProfile.value = profile
 
-  // Match both "Kwara" and "Kwara State" if needed
   const adminState = profile?.state || ''
   const shortState = adminState.replace(' State', '')
 
-  const { data, error } = await supabase
+  // 2. Fetch verifications
+  const { data: verificationsData, error } = await supabase
     .from('agent_verifications')
     .select('*')
     .or(`state.eq.${adminState},state.eq.${shortState}`)
@@ -96,8 +97,42 @@ const fetchData = async () => {
     return
   }
 
-  verifications.value = data || []
+  if (!verificationsData || verificationsData.length === 0) {
+    verifications.value = []
+    stats.value = { total: 0, pending: 0, approved: 0, rejected: 0 }
+    return
+  }
 
+  // 3. Get all related user_ids
+  const userIds = verificationsData.map(v => v.user_id)
+
+  // 4. Fetch profiles for those users
+  const { data: profilesData, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, full_name, phone, email, avatar_url')
+    .in('id', userIds)
+
+  if (profilesError) {
+    console.error('Fetch profiles error:', profilesError)
+  }
+
+  // 5. Merge profiles into verifications
+  const profilesMap = {}
+  profilesData?.forEach(p => {
+    profilesMap[p.id] = p
+  })
+
+  verifications.value = verificationsData.map(v => ({
+    ...v,
+    profiles: profilesMap[v.user_id] || null,
+    // Optional: also put the values at the top level for easier access in the drawer
+    full_name: profilesMap[v.user_id]?.full_name || null,
+    phone: profilesMap[v.user_id]?.phone || null,
+    email: profilesMap[v.user_id]?.email || null,
+    avatar_url: profilesMap[v.user_id]?.avatar_url || null,
+  }))
+
+  // 6. Calculate stats
   stats.value = {
     total: verifications.value.length,
     pending: verifications.value.filter(v =>
@@ -117,7 +152,8 @@ const filteredVerifications = computed(() => {
   const term = searchQuery.value.toLowerCase()
   return verifications.value.filter(v =>
     v.agency_name?.toLowerCase().includes(term) ||
-    v.full_name?.toLowerCase().includes(term)
+    v.full_name?.toLowerCase().includes(term) ||
+    v.profiles?.full_name?.toLowerCase().includes(term)
   )
 })
 
@@ -153,7 +189,6 @@ const approveAgent = async (verificationId) => {
         .eq('id', verification.user_id)
 
       if (profileError) {
-        console.warn('Profile update warning:', profileError)
         // try alternate column name
         await supabase
           .from('profiles')

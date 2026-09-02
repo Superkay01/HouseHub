@@ -14,14 +14,14 @@
       </button>
 
       <!-- Search -->
-      <div class="relative hidden md:block w-96">
+      <!-- <div class="relative hidden md:block w-96">
         <input 
           type="text"
           placeholder="Search properties, agents, or customers..."
           class="w-full bg-gray-100 border border-transparent focus:border-[var(--royal-blue)] rounded-2xl py-3 pl-12 text-sm focus:outline-none transition-all"
         />
         <Search class="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-      </div>
+      </div> -->
     </div>
 
     <!-- Right Side -->
@@ -107,7 +107,7 @@
           <!-- Footer -->
           <div class="px-4 py-3 border-t border-gray-100 text-center">
             <router-link 
-              to="/admin/support-tickets"
+              to="/admin/support"
               @click="showNotifications = false"
               class="text-sm font-medium text-[var(--royal-blue)] hover:underline"
             >
