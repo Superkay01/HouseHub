@@ -42,13 +42,13 @@
               v-model="searchQuery"
               type="text"
               placeholder="Search customer, property, request ID..."
-              class="w-full px-5 py-3.5 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)] outline-none"
+              class="w-full px-5 py-3.5 rounded-2xl border border-[var(--hover-blue)] focus:border-[var(--royal-blue)] outline-none text-[var(--royal-blue)] placeholder:text-[var(--steel-blue)] text-sm sm:text-base transition-colors duration-200"
             />
           </div>
 
           <select
             v-model="statusFilter"
-            class="px-4 py-3.5 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)]"
+            class="px-4 py-3.5 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)] text-[var(--royal-blue)] placeholder:text-[var(--steel-blue)] text-sm sm:text-base transition-colors duration-200"
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -62,7 +62,7 @@
 
           <select
             v-model="typeFilter"
-            class="px-4 py-3.5 rounded-2xl border border-[var(--light-blue)] focus:border-[var(--royal-blue)]"
+            class="px-4 py-3.5 rounded-2xl border border-[var(--hover-blue)] text-[var(--royal-blue)] focus:border-[var(--royal-blue)]"
           >
             <option value="">All Types</option>
             <option value="property">Property Request</option>

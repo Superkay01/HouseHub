@@ -84,7 +84,11 @@
   label="Analytics"
   to="/admin/analytics"
 />
-
+<SidebarMenuItem
+  icon="Support"
+  label="Support Tickets"
+  to="/admin/support"
+/>
         <!-- Head Admin Only -->
         <div v-if="isHeadAdmin">
           <div class="px-5 py-2 text-xs text-white/50 font-medium mt-6">SYSTEM MANAGEMENT</div>

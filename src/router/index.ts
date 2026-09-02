@@ -299,6 +299,16 @@ const router = createRouter({
   name: 'AdminAnalytics',
   component: () => import('@/views/admin/AdminDashboardAnalytics.vue'),
 },
+{
+  path: '/admin/reports',
+  name: 'AdminReports',
+  component: () => import('@/views/admin/AdminReports.vue'),
+},
+{
+  path: '/admin/support',
+  name: 'AdminSupport',
+  component: () => import('@/views/admin/AdminSupportTickets.vue'),
+},
     
   ]
 }

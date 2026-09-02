@@ -4,7 +4,7 @@
     <div class="hidden md:block overflow-x-auto">
       <table class="w-full">
         <thead>
-          <tr class="border-b border-gray-200 bg-gray-50 text-left text-sm text-medium-gray">
+          <tr class="border-b border-gray-200 bg-gray-50 text-left text-sm text-[var(--royal-blue)]">
             <th class="py-4 px-5">Customer</th>
             <th class="py-4 px-5">Property</th>
             <th class="py-4 px-5">Type</th>
@@ -25,11 +25,11 @@
               <div class="font-medium text-[var(--royal-blue)]">
                 {{ request.customer?.full_name || 'N/A' }}
               </div>
-              <div class="text-xs text-medium-gray">{{ request.customer?.phone }}</div>
+              <div class="text-xs text-[var(--steel-blue)]">{{ request.customer?.phone }}</div>
             </td>
             <td class="py-4 px-5">
-              <div class="font-medium">{{ request.property?.title || 'N/A' }}</div>
-              <div class="text-xs text-medium-gray">{{ request.property?.property_type }}</div>
+              <div class="font-medium text-[var(--royal-blue)]">{{ request.property?.title || 'N/A' }}</div>
+              <div class="text-xs text-[var(--steel-blue)]">{{ request.property?.property_type }}</div>
             </td>
             <td class="py-4 px-5 capitalize">{{ request.request_type || 'inspection' }}</td>
             <td class="py-4 px-5">{{ request.city }}, {{ request.state }}</td>
@@ -65,7 +65,7 @@
             <p class="font-semibold text-[var(--royal-blue)]">
               {{ request.customer?.full_name || 'N/A' }}
             </p>
-            <p class="text-xs text-medium-gray mt-1">
+            <p class="text-xs text-[var(--steel-blue)] mt-1">
               {{ request.request_code || request.id?.slice(0, 8) }}
             </p>
           </div>
@@ -74,23 +74,23 @@
 
         <div class="space-y-2 text-sm mb-4">
           <p>
-            <span class="text-medium-gray">Property:</span>
+            <span class="text-[var(--steel-blue)]">Property:</span>
             {{ request.property?.title || 'N/A' }}
           </p>
           <p>
-            <span class="text-medium-gray">Type:</span>
-            <span class="capitalize">{{ request.request_type || 'inspection' }}</span>
+            <span class="text-[var(--steel-blue)]">Type:</span>
+            <span class="capitalize text-[var(--royal-blue)]">{{ request.request_type || 'inspection' }}</span>
           </p>
-          <p>
-            <span class="text-medium-gray">Location:</span>
+          <p class="text-sm text-[var(--steel-blue)]">
+            <span class="text-[var(--steel-blue)]">Location:</span>
             {{ request.city }}, {{ request.state }}
           </p>
-          <p>
-            <span class="text-medium-gray">Date:</span>
+          <p class="text-sm text-[var(--steel-blue)]">
+            <span class="text-[var(--steel-blue)]">Date:</span>
             {{ formatDate(request.created_at) }}
           </p>
           <p>
-            <span class="text-medium-gray">Agent:</span>
+            <span class="text-[var(--steel-blue)]">Agent:</span>
             {{ request.agent?.full_name || 'Not assigned' }}
           </p>
         </div>
@@ -107,10 +107,12 @@
     <!-- Empty State -->
     <div
       v-if="!loading && requests.length === 0"
-      class="text-center py-20 text-medium-gray"
+      class="text-center py-20 text-[var(--steel-blue)]"
     >
-      <p class="text-lg font-medium">No Requests Yet</p>
-      <p class="mt-2">There are currently no customer requests in your assigned location.</p>
+      <p class="text-lg font-medium text-[var(--royal-blue)]">No Requests Yet</p>
+      <p class="mt-2 text-[var(--steel-blue)]">
+        There are currently no customer requests in your assigned location.
+      </p>
     </div>
   </div>
 </template>

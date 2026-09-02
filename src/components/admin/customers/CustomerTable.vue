@@ -3,12 +3,12 @@
     <table class="w-full">
       <thead>
         <tr class="border-b border-gray-200 bg-gray-50">
-          <th class="text-left py-5 px-6 font-medium text-medium-gray">Customer</th>
-          <th class="text-left py-5 px-6 font-medium text-medium-gray">Contact</th>
-          <th class="text-left py-5 px-6 font-medium text-medium-gray">City</th>
-          <th class="text-left py-5 px-6 font-medium text-medium-gray">Joined</th>
-          <th class="text-left py-5 px-6 font-medium text-medium-gray">Requests</th>
-          <th class="text-left py-5 px-6 font-medium text-medium-gray">Status</th>
+          <th class="text-left py-5 px-6 font-medium text-[var(--royal-blue)]">Customer</th>
+          <th class="text-left py-5 px-6 font-medium text-[var(--royal-blue)]">Contact</th>
+          <th class="text-left py-5 px-6 font-medium text-[var(--royal-blue)]">City</th>
+          <th class="text-left py-5 px-6 font-medium text-[var(--royal-blue)]">Joined</th>
+          <th class="text-left py-5 px-6 font-medium text-[var(--royal-blue)]">Requests</th>
+          <th class="text-left py-5 px-6 font-medium text-[var(--royal-blue)]">Status</th>
           <th class="w-32"></th>
         </tr>
       </thead>
@@ -23,16 +23,16 @@
                 alt="Profile"
               >
               <div>
-                <p class="font-semibold text-[var(--royal-blue)]">{{ customer.full_name }}</p>
-                <p class="text-sm text-medium-gray">{{ customer.email }}</p>
+                <p class="font-semibold text-[var(--royal-blue)] text-sm md:text-[15px]">{{ customer.full_name }}</p>
+                <p class="text-sm text-[var(--steel-blue)] text-sm md:text-[15px]">{{ customer.email }}</p>
               </div>
             </div>
           </td>
           <td class="py-5 px-6">
-            <p class="font-medium">{{ customer.phone }}</p>
+            <p class="font-medium text-[var(--steel-blue)] text-sm md:text-[15px]">{{ customer.phone }}</p>
           </td>
-          <td class="py-5 px-6 text-medium-gray">{{ customer.city || '—' }}</td>
-          <td class="py-5 px-6 text-medium-gray">
+          <td class="py-5 px-6 text-[var(--steel-blue)] text-sm md:text-[15px]">{{ customer.city || '—' }}</td>
+          <td class="py-5 px-6 text-[var(--steel-blue)] text-sm md:text-[15px]">
             {{ new Date(customer.created_at).toLocaleDateString() }}
           </td>
           <td class="py-5 px-6">
@@ -49,7 +49,7 @@
           <td class="py-5 px-6 text-right">
             <button 
               @click="$emit('view', customer)"
-              class="text-[var(--royal-blue)] hover:bg-[var(--hover-blue)] px-5 py-2 rounded-2xl transition-all">
+              class="text-[var(--royal-blue)] hover:bg-[var(--hover-blue)] text-sm md:text-[15px]  px-5 py-2 rounded-2xl transition-all">
               View
             </button>
           </td>

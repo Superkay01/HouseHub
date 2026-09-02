@@ -78,7 +78,7 @@
           <!-- Search -->
           <div class="flex-1 min-w-0 lg:min-w-[280px]">
             <div class="relative">
-              <Search class="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+              <Search class="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-[var(--steel-blue)] w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 v-model="searchQuery"
                 type="text"
@@ -87,7 +87,7 @@
                        rounded-xl sm:rounded-2xl 
                        border border-gray-200 
                        focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
-                       focus:outline-none text-sm sm:text-base
+                       focus:outline-none text-sm sm:text-base text-[var(--royal-blue)] placeholder:text-[var(--steel-blue)] transition-colors duration-200
                        transition-colors"
               />
             </div>
@@ -100,7 +100,7 @@
               class="w-full lg:w-auto border border-gray-200 rounded-xl sm:rounded-2xl 
                      px-4 sm:px-5 md:px-6 py-3 sm:py-4 
                      focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
-                     focus:outline-none text-sm sm:text-base bg-white min-h-[44px]"
+                     focus:outline-none text-sm sm:text-base bg-white min-h-[44px] text-[var(--royal-blue)] placeholder:text-[var(--steel-blue)]"
             >
               <option value="">All Cities</option>
               <option value="Ilorin">Ilorin</option>
@@ -112,7 +112,7 @@
               class="w-full lg:w-auto border border-gray-200 rounded-xl sm:rounded-2xl 
                      px-4 sm:px-5 md:px-6 py-3 sm:py-4 
                      focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/20
-                     focus:outline-none text-sm sm:text-base bg-white min-h-[44px]"
+                     focus:outline-none text-sm sm:text-base bg-white min-h-[44px] text-[var(--royal-blue)] placeholder:text-[var(--steel-blue)]"
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
@@ -178,8 +178,6 @@ const customers = ref([])
 const selectedCustomer = ref(null)
 const loading = ref(true)
 
-
-
 // Fetch Admin Profile + Customers
 const fetchData = async () => {
   loading.value = true
@@ -196,7 +194,7 @@ const fetchData = async () => {
 
     if (profile) adminProfile.value = profile
 
-    // Fetch Customers (without problematic join)
+    // Fetch Customers
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -237,12 +235,16 @@ const filteredCustomers = computed(() => {
   return result
 })
 
-const handleView = (customer) => {
-  console.log("View button clicked for:", customer)
-  emit('view', customer)
+// ✅ Correct handler
+const openCustomerDrawer = (customer) => {
+  console.log('Opening drawer with customer:', customer)
+  selectedCustomer.value = customer
+  console.log('selectedCustomer is now:', selectedCustomer.value)
 }
 
 const exportData = () => alert("Export functionality coming soon")
+const exportCSV = () => alert("CSV export coming soon")
+const exportPDF = () => alert("PDF export coming soon")
 const refreshAll = () => fetchData()
 
 onMounted(fetchData)

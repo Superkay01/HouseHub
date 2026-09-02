@@ -1,50 +1,107 @@
 <template>
   <div>
-    <!-- Desktop Table -->
+    <!-- ================= DESKTOP TABLE ================= -->
     <div class="hidden md:block overflow-x-auto">
       <table class="w-full">
         <thead>
-          <tr class="border-b border-gray-200 bg-gray-50 text-left text-sm text-medium-gray">
-            <th class="py-4 px-5">Inspection ID</th>
-            <th class="py-4 px-5">Customer</th>
-            <th class="py-4 px-5">Property</th>
-            <th class="py-4 px-5">Location</th>
-            <th class="py-4 px-5">Date / Time</th>
-            <th class="py-4 px-5">Agent</th>
-            <th class="py-4 px-5">Status</th>
-            <th class="py-4 px-5 text-right">Actions</th>
+          <tr class="border-b border-gray-200 bg-gray-50 text-left">
+            <th class="py-4 px-5 text-xs lg:text-sm font-medium text-[var(--steel-blue)]">
+              Inspection ID
+            </th>
+            <th class="py-4 px-5 text-xs lg:text-sm font-medium text-[var(--steel-blue)]">
+              Customer
+            </th>
+            <th class="py-4 px-5 text-xs lg:text-sm font-medium text-[var(--steel-blue)]">
+              Property
+            </th>
+            <th class="py-4 px-5 text-xs lg:text-sm font-medium text-[var(--steel-blue)]">
+              Location
+            </th>
+            <th class="py-4 px-5 text-xs lg:text-sm font-medium text-[var(--steel-blue)]">
+              Date / Time
+            </th>
+            <th class="py-4 px-5 text-xs lg:text-sm font-medium text-[var(--steel-blue)]">
+              Agent
+            </th>
+            <th class="py-4 px-5 text-xs lg:text-sm font-medium text-[var(--steel-blue)]">
+              Status
+            </th>
+            <th class="py-4 px-5 text-xs lg:text-sm font-medium text-[var(--steel-blue)] text-right">
+              Actions
+            </th>
           </tr>
         </thead>
+
         <tbody>
           <tr
             v-for="item in inspections"
             :key="item.id"
-            class="border-b border-gray-100 hover:bg-gray-50 transition"
+            class="border-b border-gray-100 hover:bg-gray-50/80 transition-colors"
           >
-            <td class="py-4 px-5 font-medium text-[var(--royal-blue)]">
-              {{ item.inspection_code || item.id?.slice(0, 8) }}
-            </td>
+            <!-- Inspection ID -->
             <td class="py-4 px-5">
-              <div class="font-medium">{{ item.customer?.full_name || 'N/A' }}</div>
-              <div class="text-xs text-medium-gray">{{ item.customer?.phone }}</div>
+              <span class="font-medium text-sm text-[var(--royal-blue)]">
+                {{ item.inspection_code || item.id?.slice(0, 8) }}
+              </span>
             </td>
+
+            <!-- Customer -->
             <td class="py-4 px-5">
-              <div class="font-medium">{{ item.property?.title || 'N/A' }}</div>
-              <div class="text-xs text-medium-gray">{{ item.property?.property_type }}</div>
+              <div class="font-medium text-sm text-[var(--royal-blue)]">
+                {{ item.customer?.full_name || 'N/A' }}
+              </div>
+              <div class="text-xs text-[var(--steel-blue)] mt-0.5">
+                {{ item.customer?.phone || '—' }}
+              </div>
             </td>
-            <td class="py-4 px-5 text-sm">{{ item.city }}, {{ item.state }}</td>
-            <td class="py-4 px-5 text-sm">
-              <div>{{ formatDate(item.inspection_date) }}</div>
-              <div class="text-xs text-medium-gray">{{ item.inspection_time || '—' }}</div>
+
+            <!-- Property -->
+            <td class="py-4 px-5">
+              <div class="font-medium text-sm text-[var(--royal-blue)] line-clamp-1">
+                {{ item.property?.title || 'N/A' }}
+              </div>
+              <div class="text-xs text-[var(--steel-blue)] mt-0.5 capitalize">
+                {{ item.property?.property_type || '—' }}
+              </div>
             </td>
-            <td class="py-4 px-5 text-sm">{{ item.agent?.full_name || '—' }}</td>
+
+            <!-- Location -->
+            <td class="py-4 px-5">
+              <span class="text-sm text-[var(--steel-blue)]">
+                {{ item.city || '—' }}, {{ item.state || '—' }}
+              </span>
+            </td>
+
+            <!-- Date / Time -->
+            <td class="py-4 px-5">
+              <div class="text-sm text-[var(--royal-blue)]">
+                {{ formatDate(item.inspection_date) }}
+              </div>
+              <div class="text-xs text-[var(--steel-blue)] mt-0.5">
+                {{ item.inspection_time || '—' }}
+              </div>
+            </td>
+
+            <!-- Agent -->
+            <td class="py-4 px-5">
+              <span class="text-sm text-[var(--steel-blue)]">
+                {{ item.agent?.full_name || '—' }}
+              </span>
+            </td>
+
+            <!-- Status -->
             <td class="py-4 px-5">
               <InspectionStatusBadge :status="item.status" />
             </td>
+
+            <!-- Actions -->
             <td class="py-4 px-5 text-right">
               <button
                 @click="$emit('view', item)"
-                class="px-4 py-2 text-sm bg-[var(--light-blue)] hover:bg-[var(--hover-blue)] rounded-xl text-[var(--royal-blue)]"
+                class="px-4 py-2 text-sm font-medium rounded-xl
+                       bg-[var(--royal-blue)]/10 text-[var(--royal-blue)]
+                       hover:bg-[var(--royal-blue)] hover:text-white
+                       transition-colors"
               >
                 View
               </button>
@@ -54,45 +111,66 @@
       </table>
     </div>
 
-    <!-- Mobile Cards -->
+    <!-- ================= MOBILE CARDS ================= -->
     <div class="md:hidden space-y-4 p-4">
       <div
         v-for="item in inspections"
         :key="item.id"
-        class="border border-gray-100 rounded-3xl p-5"
+        class="border border-gray-100 rounded-2xl sm:rounded-3xl p-4 sm:p-5 bg-white shadow-sm"
       >
-        <div class="flex justify-between items-start mb-3">
-          <div>
-            <p class="font-semibold text-[var(--royal-blue)]">
-              {{ item.customer?.full_name }}
+        <!-- Top: Customer + Status -->
+        <div class="flex justify-between items-start gap-3 mb-3">
+          <div class="min-w-0">
+            <p class="font-semibold text-sm sm:text-base text-[var(--royal-blue)] truncate">
+              {{ item.customer?.full_name || 'N/A' }}
             </p>
-            <p class="text-xs text-medium-gray">{{ item.inspection_code }}</p>
+            <p class="text-xs text-[var(--steel-blue)] mt-0.5">
+              {{ item.inspection_code || item.id?.slice(0, 8) }}
+            </p>
           </div>
           <InspectionStatusBadge :status="item.status" />
         </div>
 
-        <div class="text-sm space-y-1 mb-4">
-          <p>{{ item.property?.title }}</p>
-          <p class="text-medium-gray">📍 {{ item.city }}, {{ item.state }}</p>
-          <p>{{ formatDate(item.inspection_date) }} • {{ item.inspection_time || '—' }}</p>
-          <p>Agent: {{ item.agent?.full_name || 'Not assigned' }}</p>
+        <!-- Details -->
+        <div class="space-y-1.5 text-xs sm:text-sm mb-4">
+          <p class="font-medium text-[var(--royal-blue)] line-clamp-2">
+            {{ item.property?.title || 'N/A' }}
+          </p>
+          <p class="text-[var(--steel-blue)]">
+            📍 {{ item.city || '—' }}, {{ item.state || '—' }}
+          </p>
+          <p class="text-[var(--steel-blue)]">
+            {{ formatDate(item.inspection_date) }} • {{ item.inspection_time || '—' }}
+          </p>
+          <p class="text-[var(--steel-blue)]">
+            Agent: <span class="text-[var(--royal-blue)]">{{ item.agent?.full_name || 'Not assigned' }}</span>
+          </p>
         </div>
 
+        <!-- Action -->
         <button
           @click="$emit('view', item)"
-          class="w-full py-3 bg-[var(--light-blue)] rounded-2xl text-[var(--royal-blue)] font-medium text-sm"
+          class="w-full py-3 rounded-2xl text-sm font-medium
+                 bg-[var(--royal-blue)]/10 text-[var(--royal-blue)]
+                 hover:bg-[var(--royal-blue)] hover:text-white
+                 transition-colors"
         >
           View Details
         </button>
       </div>
     </div>
 
+    <!-- Empty State -->
     <div
       v-if="!loading && inspections.length === 0"
-      class="text-center py-20 text-medium-gray"
+      class="text-center py-16 sm:py-20 px-4"
     >
-      <p class="text-lg font-medium">No Inspections Yet</p>
-      <p class="mt-2">There are currently no property inspections in your assigned location.</p>
+      <p class="text-base sm:text-lg font-medium text-[var(--royal-blue)]">
+        No Inspections Yet
+      </p>
+      <p class="mt-2 text-sm text-[var(--steel-blue)] max-w-md mx-auto">
+        There are currently no property inspections in your assigned location.
+      </p>
     </div>
   </div>
 </template>
