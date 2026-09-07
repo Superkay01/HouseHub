@@ -42,6 +42,12 @@ const router = createRouter({
       name: 'IjebuOdeProperties',
       component: () => import('@/views/IjebuOdeProperties.vue')
     },
+    {
+      path: '/privacy-policy',
+      name: 'PrivacyPolicy',
+      component: () => import('@/views/PrivacyPolicy.vue')
+    },
+    
     // {
     //   path: '/states',
     //   name: 'states',

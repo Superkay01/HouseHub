@@ -16,7 +16,7 @@ import { Facebook, Instagram } from 'lucide-vue-next'
               <img
               src="/Lodgenext_logo__3_-removebg-preview.png"
               alt="Lodgenext logo"
-              class="w-50 h-35 object-cover"
+              class="w-50 h-20 md:w-20 md:h-30 object-cover"
             />
             </div>
             <!-- <span class="font-bold text-3xl tracking-tight">LodgeNext</span> -->
@@ -54,9 +54,9 @@ import { Facebook, Instagram } from 'lucide-vue-next'
         <div class="lg:col-span-2">
           <h3 class="font-semibold text-lg mb-5 text-white">Quick Links</h3>
           <ul class="space-y-3 text-white/80">
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Home</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Browse Properties</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Featured Homes</a></li>
+            <li><a href="/" class="hover:text-[var(--light-blue)] transition-colors">Home</a></li>
+            <li><a href="/properties" class="hover:text-[var(--light-blue)] transition-colors">Browse Properties</a></li>
+            <li><a href="/featured" class="hover:text-[var(--light-blue)] transition-colors">Featured Homes</a></li>
             <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">How It Works</a></li>
             <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">FAQ</a></li>
           </ul>
@@ -68,7 +68,7 @@ import { Facebook, Instagram } from 'lucide-vue-next'
           <ul class="space-y-3 text-white/80">
             <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">About Us</a></li>
             <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Contact Us</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Privacy Policy</a></li>
+            <li><a href="/privacy-policy" class="hover:text-[var(--light-blue)] transition-colors">Privacy Policy</a></li>
             <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Terms & Conditions</a></li>
           </ul>
         </div>
