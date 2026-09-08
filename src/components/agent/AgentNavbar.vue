@@ -1,5 +1,5 @@
 <template>
-  <nav class="h-16 bg-white border-b flex items-center px-6 md:px-8 justify-between">
+  <nav class="h-16 bg-white border-b flex items-center px-6 md:px-8 justify-between relative">
     
     <!-- Left Side: Hamburger + Search -->
     <div class="flex items-center gap-4">
@@ -214,6 +214,73 @@
         </div>
       </div>
     </div>
+
+    <!-- ========== NOTIFICATION POPUP (expires in 10 seconds) ========== -->
+    <Transition name="notif-pop">
+      <div
+        v-if="popupNotification"
+        class="fixed top-20 right-4 sm:right-6 z-[80] w-[calc(100%-2rem)] max-w-sm
+               bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+      >
+        <div class="p-4 sm:p-5">
+          <div class="flex items-start gap-3">
+            <div
+              class="w-10 h-10 rounded-xl bg-[var(--royal-blue)] text-white
+                     flex items-center justify-center flex-shrink-0 text-lg"
+            >
+              {{ typeIcon(popupNotification.type) }}
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold text-[var(--royal-blue)]">
+                {{ popupNotification.title }}
+              </p>
+              <p class="text-xs sm:text-sm text-[var(--steel-blue)] mt-1 leading-relaxed">
+                {{ popupNotification.message }}
+              </p>
+
+              <div class="mt-3 rounded-xl bg-[var(--light-blue)] px-3 py-2.5">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-[var(--royal-blue)] mb-1">
+                  What to do next
+                </p>
+                <p class="text-xs sm:text-sm text-[var(--steel-blue)] leading-relaxed">
+                  {{ nextStepText(popupNotification) }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              @click="closePopup"
+              class="text-[var(--steel-blue)] hover:text-[var(--royal-blue)] text-xl leading-none"
+            >
+              ×
+            </button>
+          </div>
+
+          <!-- Progress bar: 10 seconds -->
+          <div class="mt-3 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-[var(--royal-blue)] popup-progress" />
+          </div>
+
+          <div class="mt-4 flex gap-2">
+            <button
+              @click="handlePopupAction"
+              class="flex-1 py-2.5 rounded-xl bg-[var(--royal-blue)] text-white text-sm font-medium
+                     hover:opacity-90 transition-opacity"
+            >
+              {{ actionLabel(popupNotification) }}
+            </button>
+            <button
+              @click="closePopup"
+              class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[var(--steel-blue)]
+                     hover:bg-gray-50 transition-colors"
+            >
+              Later
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </nav>
 </template>
 
@@ -236,9 +303,15 @@ const showDropdown = ref(false)
 const showNotifDropdown = ref(false)
 const loadingNotifications = ref(false)
 const recentNotifications = ref([])
+const popupNotification = ref(null)
 
 const notifWrapper = ref(null)
 const profileWrapper = ref(null)
+
+let popupTimer = null
+let notifChannel = null
+
+const POPUP_DURATION_MS = 10000 // 10 seconds
 
 const {
   unreadCount,
@@ -268,6 +341,77 @@ const formatTime = (date) => {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+const nextStepText = (item) => {
+  if (!item) return 'Open your notifications for more details.'
+
+  const type = item.type || item.related_type
+
+  if (type === 'inspection_update' || item.related_type === 'inspection') {
+    return 'Go to Inspections to review the update, confirm timing, or update the inspection status.'
+  }
+  if (type === 'request_update' || item.related_type === 'property_request') {
+    return 'Open Requests to review this customer request and respond if action is needed.'
+  }
+  if (type === 'property_update' || item.related_type === 'property') {
+    return 'Open My Properties to review the listing update or approval status.'
+  }
+  if (type === 'review' || item.related_type === 'review') {
+    return 'Open Reviews to see the latest feedback from a customer.'
+  }
+  if (type === 'payment' || item.related_type === 'payment') {
+    return 'Check your payments or related request for the latest payment update.'
+  }
+  return 'Open Notifications for full details, then follow the related page.'
+}
+
+const actionLabel = (item) => {
+  if (!item) return 'View'
+  const type = item.type || item.related_type
+  if (type === 'inspection_update' || item.related_type === 'inspection') return 'View Inspection'
+  if (type === 'request_update' || item.related_type === 'property_request') return 'View Request'
+  if (type === 'property_update' || item.related_type === 'property') return 'View Property'
+  if (type === 'review' || item.related_type === 'review') return 'View Review'
+  if (type === 'payment' || item.related_type === 'payment') return 'View Payment'
+  return 'View Details'
+}
+
+const getNotificationRoute = (item) => {
+  if (item.related_type === 'inspection') return '/agent/inspections'
+  if (item.related_type === 'property_request') return '/agent/requests'
+  if (item.related_type === 'property') return '/agent/properties'
+  if (item.related_type === 'review') return '/agent/reviews'
+  if (item.related_type === 'payment') return '/agent/requests'
+  return '/agent/notifications'
+}
+
+const showNotificationPopup = (notification) => {
+  popupNotification.value = notification
+
+  if (popupTimer) clearTimeout(popupTimer)
+  popupTimer = setTimeout(() => {
+    popupNotification.value = null
+  }, POPUP_DURATION_MS)
+}
+
+const closePopup = () => {
+  popupNotification.value = null
+  if (popupTimer) clearTimeout(popupTimer)
+}
+
+const handlePopupAction = async () => {
+  const item = popupNotification.value
+  if (!item) return
+
+  if (!item.is_read) {
+    await markAsRead(item.id)
+  }
+
+  const route = getNotificationRoute(item)
+  closePopup()
+  showNotifDropdown.value = false
+  router.push(route)
 }
 
 const fetchUserProfile = async () => {
@@ -360,21 +504,37 @@ const openNotification = async (item) => {
     await markAsRead(item.id)
   }
 
-  if (item.related_type === 'inspection') {
-    router.push('/agent/inspections')
-  } else if (item.related_type === 'property_request') {
-    router.push('/agent/requests')
-  } else if (item.related_type === 'property') {
-    router.push('/agent/properties')
-  } else if (item.related_type === 'review') {
-    router.push('/agent/reviews')
-  } else {
-    router.push('/agent/notifications')
-  }
+  // Show popup with next-step guidance (expires in 10s)
+  showNotificationPopup(item)
+}
+
+const listenForNewNotifications = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  notifChannel = supabase
+    .channel(`agent-notif-popup-${user.id}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'agent_notifications',
+        filter: `agent_id=eq.${user.id}`,
+      },
+      async (payload) => {
+        const row = payload.new
+        recentNotifications.value = [row, ...recentNotifications.value].slice(0, 8)
+        showNotificationPopup(row)
+        await refreshUnreadCount(user.id)
+      }
+    )
+    .subscribe()
 }
 
 const logout = async () => {
   stopNotificationListener()
+  if (notifChannel) supabase.removeChannel(notifChannel)
   await supabase.auth.signOut()
   router.push('/login')
 }
@@ -395,11 +555,44 @@ const toggleSidebar = () => {
 onMounted(async () => {
   await fetchUserProfile()
   await startNotificationListener()
+  await listenForNewNotifications()
   document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   stopNotificationListener()
+  if (notifChannel) supabase.removeChannel(notifChannel)
   document.removeEventListener('click', handleClickOutside)
+  if (popupTimer) clearTimeout(popupTimer)
 })
 </script>
+
+<style scoped>
+.notif-pop-enter-active,
+.notif-pop-leave-active {
+  transition: all 0.3s ease;
+}
+.notif-pop-enter-from,
+.notif-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-12px) scale(0.98);
+}
+
+/* 10-second progress bar */
+.popup-progress {
+  width: 100%;
+  animation: popupShrink 10s linear forwards;
+}
+
+@keyframes popupShrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup-progress {
+    animation: none;
+    width: 100%;
+  }
+}
+</style>

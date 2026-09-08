@@ -325,19 +325,45 @@
             </div>
           </section>
 
-          <section class="bg-gray-50 rounded-3xl p-5">
-            <p class="text-sm text-medium-gray">Customer</p>
-            <p class="font-semibold mt-1">{{ maskName(selected.customer?.full_name) }}</p>
-            <p class="text-sm mt-2">
-              Customer Confirmation:
-              <span class="font-medium">{{ customerConfirmationLabel(selected) }}</span>
-            </p>
-            <div v-if="canContactCustomer" class="flex flex-wrap gap-2 mt-3">
-              <a v-if="selected.customer?.phone" :href="`tel:${selected.customer.phone}`" class="px-4 py-2 bg-green-600 text-white rounded-2xl text-sm">Call</a>
-              <a v-if="selected.customer?.phone" :href="`https://wa.me/${normalizePhone(selected.customer.phone)}`" target="_blank" class="px-4 py-2 bg-[#25D366] text-white rounded-2xl text-sm">WhatsApp</a>
-              <button v-if="selected.customer?.phone" type="button" @click="copyText(selected.customer.phone, 'Phone copied')" class="px-4 py-2 border rounded-2xl text-sm">Copy phone</button>
-            </div>
-          </section>
+<section class="bg-gray-50 rounded-3xl p-5">
+  <p class="text-sm text-medium-gray">Customer</p>
+  <p class="font-semibold mt-1">{{ maskName(selected.customer?.full_name) }}</p>
+  <p class="text-sm mt-2">
+    Customer Confirmation:
+    <span class="font-medium">{{ customerConfirmationLabel(selected) }}</span>
+  </p>
+
+  <!-- Admin / Support contact only -->
+  <div class="mt-4 rounded-2xl bg-white border border-gray-100 p-4">
+    <p class="text-xs font-semibold uppercase tracking-wide text-[var(--royal-blue)] mb-1">
+      Contact Admin
+    </p>
+    <p class="text-xs text-medium-gray mb-3">
+      For coordination, use the admin line only. Customer phone numbers are hidden for privacy.
+    </p>
+    <div class="flex flex-wrap gap-2">
+      <a
+        v-if="adminContact.phone"
+        :href="`tel:${adminContact.phone}`"
+        class="px-4 py-2 bg-green-600 text-white rounded-2xl text-sm font-medium"
+      >
+        Call Admin
+      </a>
+      <a
+        v-if="adminContact.phone"
+        :href="`https://wa.me/${normalizePhone(adminContact.phone)}`"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="px-4 py-2 bg-[#25D366] text-white rounded-2xl text-sm font-medium"
+      >
+        WhatsApp Admin
+      </a>
+    </div>
+    <p v-if="adminContact.label" class="text-xs text-medium-gray mt-2">
+      {{ adminContact.label }}: {{ adminContact.display }}
+    </p>
+  </div>
+</section>
 
           <section>
             <h4 class="font-semibold mb-4">Inspection Timeline</h4>
@@ -682,12 +708,37 @@ interface InspectionRow {
   report_draft_saved_at?: string
   issue_reports?: any[]
   property?: any
-  customer?: { id: string; full_name?: string; phone?: string } | null
+  
+  customer?: { id: string; full_name?: string } | null
 }
+
+// Admin / support numbers by location (not customer numbers)
+const ADMIN_CONTACTS: Record<string, { phone: string; label: string }> = {
+  'Kwara State': { phone: '09030031328', label: 'Ilorin Admin' },
+  'Kwara': { phone: '09030031328', label: 'Ilorin Admin' },
+  'Ogun State': { phone: '07059537201', label: 'Ijebu Ode Admin' },
+  'Ogun': { phone: '07059537201', label: 'Ijebu Ode Admin' },
+}
+
+const DEFAULT_ADMIN = { phone: '09030031328', label: 'LODGENEXT Support' }
+
+const adminContact = computed(() => {
+  const state = normalizeState(
+    selected.value?.state ||
+    selected.value?.property?.state ||
+    agentProfile.value.state
+  )
+  const found = ADMIN_CONTACTS[state] || DEFAULT_ADMIN
+  return {
+    phone: found.phone,
+    label: found.label,
+    display: found.phone.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3'),
+  }
+})
 
 const router = useRouter()
 const placeholderImg = 'https://via.placeholder.com/400x250?text=Property'
-const canContactCustomer = true
+
 const MAX_PHOTOS = 2
 
 const agentProfile = ref<{ city?: string; state?: string; id?: string }>({})
@@ -1019,7 +1070,7 @@ const fetchInspections = async () => {
       .select(`
         *,
         property:properties!property_id (id, title, cover_image, area, city, state, address, price, bedrooms, bathrooms, property_type, status),
-        customer:profiles!customer_id (id, full_name, phone)
+        customer:profiles!customer_id (id, full_name)
       `)
       .eq('agent_id', user.id)
       .order('inspection_date', { ascending: true, nullsFirst: false })
@@ -1059,7 +1110,7 @@ const updateInspection = async (id: string, payload: Record<string, any>) => {
     .select(`
       *,
       property:properties!property_id (id, title, cover_image, area, city, state, address, price, bedrooms, bathrooms, property_type, status),
-      customer:profiles!customer_id (id, full_name, phone)
+      customer:profiles!customer_id (id, full_name)
     `)
     .maybeSingle()
 

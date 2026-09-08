@@ -7,11 +7,6 @@
           <img src="/Lodgenext_logo__2_-removebg-preview.png" alt="LodgeNext" class="h-10" />
           <h1 class="text-2xl font-bold text-[var(--royal-blue)]">LodgeNext</h1>
         </div>
-        <div class="flex items-center gap-8">
-          <a href="/customer/browse" class="font-medium text-medium-gray hover:text-[var(--royal-blue)] transition">Browse</a>
-          <a href="/my-inspections" class="font-medium text-[var(--royal-blue)]">Inspections</a>
-          <a href="/customer/saved/SavedProperties" class="font-medium text-medium-gray hover:text-[var(--royal-blue)] transition">Saved</a>
-        </div>
       </div>
     </nav>
 
@@ -59,13 +54,18 @@
 
       <!-- Action Required -->
       <div v-if="actionRequiredInspections.length" class="mb-12">
-        <div class="flex items-center gap-3 mb-5">
-          <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold tracking-wide">
-            ACTION REQUIRED
-          </span>
-          <h3 class="font-semibold text-xl text-[var(--royal-blue)]">
-            Confirm or respond to these inspections
-          </h3>
+        <div class="mb-5">
+          <div class="flex items-center gap-3">
+            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold tracking-wide">
+              ACTION REQUIRED
+            </span>
+            <h3 class="font-semibold text-xl text-[var(--royal-blue)]">
+              These inspections need your response
+            </h3>
+          </div>
+          <p class="text-sm text-medium-gray mt-2">
+            Confirm attendance so the agent and admin know you will be present.
+          </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -95,15 +95,19 @@
                   📅 {{ formatDate(inspection.inspection_date) }}
                   · ⏰ {{ inspection.inspection_time || 'TBD' }}
                 </p>
-                <p class="text-sm text-medium-gray mt-1">
-                  Status: <span class="capitalize font-medium">{{ displayStatus(inspection.status) }}</span>
-                </p>
               </div>
             </div>
 
-            <p class="text-sm mt-4 text-medium-gray">
-              {{ customerStatusMessage(inspection) }}
-            </p>
+            <div
+              class="mt-4 rounded-2xl px-4 py-3 text-sm border"
+              :class="statusBannerClass(inspection.status)"
+            >
+              <p class="font-semibold capitalize">{{ displayStatus(inspection.status) }}</p>
+              <p class="mt-1 leading-relaxed">{{ customerStatusMessage(inspection) }}</p>
+              <p class="mt-2 text-xs font-medium opacity-90">
+                Next: {{ customerNextStep(inspection) }}
+              </p>
+            </div>
 
             <div class="flex flex-wrap gap-2 mt-4">
               <button
@@ -153,6 +157,16 @@
           :targetDate="nextInspection.inspection_date"
           :targetTime="nextInspection.inspection_time"
         />
+        <div
+          class="mt-4 rounded-2xl px-4 py-3 text-sm border"
+          :class="statusBannerClass(nextInspection.status)"
+        >
+          <p class="font-semibold capitalize">{{ displayStatus(nextInspection.status) }}</p>
+          <p class="mt-1 leading-relaxed">{{ customerStatusMessage(nextInspection) }}</p>
+          <p class="mt-2 text-xs font-medium opacity-90">
+            Next: {{ customerNextStep(nextInspection) }}
+          </p>
+        </div>
       </div>
 
       <!-- Filters / Tabs -->
@@ -230,8 +244,15 @@
             :targetTime="inspection.inspection_time"
           />
 
-          <div class="bg-white rounded-2xl px-4 py-3 text-sm text-medium-gray border border-gray-100">
-            {{ customerStatusMessage(inspection) }}
+          <div
+            class="rounded-2xl px-4 py-3 text-sm border"
+            :class="statusBannerClass(inspection.status)"
+          >
+            <p class="font-semibold capitalize">{{ displayStatus(inspection.status) }}</p>
+            <p class="mt-1 leading-relaxed">{{ customerStatusMessage(inspection) }}</p>
+            <p class="mt-2 text-xs font-medium opacity-90">
+              Next: {{ customerNextStep(inspection) }}
+            </p>
           </div>
         </div>
       </div>
@@ -272,13 +293,35 @@
             </p>
           </div>
 
-          <div class="bg-blue-50 rounded-2xl p-4 text-sm">
-            <p class="font-semibold text-[var(--royal-blue)]">
-              {{ displayStatus(selectedInspection.status) }}
-            </p>
-            <p class="text-medium-gray mt-1">
+          <!-- Clear status banner -->
+          <div
+            class="rounded-2xl p-4 text-sm border"
+            :class="statusBannerClass(selectedInspection.status)"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <p class="font-semibold capitalize">
+                {{ displayStatus(selectedInspection.status) }}
+              </p>
+              <span
+                v-if="needsCustomerConfirm(selectedInspection) || (selectedInspection.status === 'completed' && !hasReported(selectedInspection.id))"
+                class="text-[10px] px-2 py-1 rounded-full bg-red-100 text-red-700 font-bold"
+              >
+                ACTION NEEDED
+              </span>
+            </div>
+
+            <p class="mt-2 leading-relaxed">
               {{ customerStatusMessage(selectedInspection) }}
             </p>
+
+            <div class="mt-3 pt-3 border-t border-black/5">
+              <p class="text-xs font-semibold uppercase tracking-wide opacity-80">
+                What to do next
+              </p>
+              <p class="mt-1 font-medium">
+                {{ customerNextStep(selectedInspection) }}
+              </p>
+            </div>
           </div>
 
           <div class="bg-gray-50 rounded-3xl p-5 space-y-3 text-sm">
@@ -301,7 +344,6 @@
               <span class="font-medium">{{ customerConfirmationLabel(selectedInspection) }}</span>
             </div>
 
-            <!-- Agent + rating (safe) -->
             <div v-if="selectedInspection.agent" class="flex justify-between gap-3 items-start">
               <span class="text-medium-gray">Agent</span>
               <div class="text-right">
@@ -351,7 +393,7 @@
             </p>
           </div>
 
-          <!-- ========== COMPLETED FLOW: REPORT → PAY → RENEW ========== -->
+          <!-- COMPLETED FLOW -->
           <div v-if="selectedInspection.status === 'completed'" class="space-y-3">
             <div v-if="!hasReported(selectedInspection.id)">
               <button
@@ -489,101 +531,82 @@
       </div>
     </div>
 
-    <!-- ==================== REPORT MODAL ==================== -->
-  <!-- ==================== REPORT MODAL ==================== -->
-<div
-  v-if="showReportModal"
-  class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
->
-  <div class="bg-white rounded-3xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-    <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-2">
-      How was the property?
-    </h3>
-    <p class="text-sm text-medium-gray mb-5">
-      A quick check so we know if you’re satisfied before you pay.
-    </p>
+    <!-- REPORT MODAL -->
+    <div
+      v-if="showReportModal"
+      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+    >
+      <div class="bg-white rounded-3xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-2">
+          How was the property?
+        </h3>
+        <p class="text-sm text-medium-gray mb-5">
+          A quick check so we know if you’re satisfied before you pay.
+        </p>
 
-    <div class="space-y-4">
-      <!-- Interest / satisfaction -->
-      <div>
-        <label class="block text-sm font-medium mb-2">
-          How interested are you in this property? *
-        </label>
-        <select
-          v-model="reportForm.interest_level"
-          class="w-full px-4 py-3 rounded-2xl border"
-        >
-          <option value="">Select</option>
-          <option value="very_interested">Very interested — I’d take it</option>
-          <option value="interested">Interested</option>
-          <option value="somewhat_interested">Somewhat interested</option>
-          <option value="not_interested">Not interested</option>
-        </select>
-      </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">
+              How interested are you in this property? *
+            </label>
+            <select v-model="reportForm.interest_level" class="w-full px-4 py-3 rounded-2xl border">
+              <option value="">Select</option>
+              <option value="very_interested">Very interested — I’d take it</option>
+              <option value="interested">Interested</option>
+              <option value="somewhat_interested">Somewhat interested</option>
+              <option value="not_interested">Not interested</option>
+            </select>
+          </div>
 
-      <!-- Overall feel (maps into the report text) -->
-      <div>
-        <label class="block text-sm font-medium mb-2">
-          Overall condition *
-        </label>
-        <select
-          v-model="reportForm.general_condition"
-          class="w-full px-4 py-3 rounded-2xl border"
-        >
-          <option value="">Select</option>
-          <option value="excellent">Excellent</option>
-          <option value="good">Good</option>
-          <option value="fair">Fair</option>
-          <option value="poor">Poor</option>
-        </select>
-      </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Overall condition *</label>
+            <select v-model="reportForm.general_condition" class="w-full px-4 py-3 rounded-2xl border">
+              <option value="">Select</option>
+              <option value="excellent">Excellent</option>
+              <option value="good">Good</option>
+              <option value="fair">Fair</option>
+              <option value="poor">Poor</option>
+            </select>
+          </div>
 
-      <!-- Short feedback -->
-      <div>
-        <label class="block text-sm font-medium mb-2">
-          Anything else we should know? (optional)
-        </label>
-        <textarea
-          v-model="reportForm.report"
-          rows="3"
-          class="w-full px-4 py-3 rounded-2xl border resize-none"
-          placeholder="e.g. liked the location, issues with water, agent was helpful…"
-        ></textarea>
+          <div>
+            <label class="block text-sm font-medium mb-2">
+              Anything else we should know? (optional)
+            </label>
+            <textarea
+              v-model="reportForm.report"
+              rows="3"
+              class="w-full px-4 py-3 rounded-2xl border resize-none"
+              placeholder="e.g. liked the location, issues with water, agent was helpful…"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex gap-3 mt-6">
+          <button type="button" class="flex-1 py-3 border rounded-2xl" @click="showReportModal = false">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold disabled:opacity-50"
+            :disabled="!canSubmitReport || savingReport"
+            @click="submitReport"
+          >
+            {{ savingReport ? 'Submitting...' : 'Submit Report' }}
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="flex gap-3 mt-6">
-      <button
-        type="button"
-        class="flex-1 py-3 border rounded-2xl"
-        @click="showReportModal = false"
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-2xl font-semibold disabled:opacity-50"
-        :disabled="!canSubmitReport || savingReport"
-        @click="submitReport"
-      >
-        {{ savingReport ? 'Submitting...' : 'Submit Report' }}
-      </button>
-    </div>
-  </div>
-</div>
-
-    <!-- ==================== AGENT REVIEW MODAL ==================== -->
+    <!-- AGENT REVIEW MODAL -->
     <div
       v-if="showAgentReviewModal"
       class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
     >
       <div class="bg-white rounded-3xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
         <h3 class="text-xl font-bold text-[var(--royal-blue)] mb-2">Rate the Agent</h3>
-        <p class="text-sm text-medium-gray mb-6">
-          How was your experience with the agent?
-        </p>
+        <p class="text-sm text-medium-gray mb-6">How was your experience with the agent?</p>
 
-        <!-- Overall rating -->
         <div class="mb-5">
           <label class="block text-sm font-medium mb-2">Overall Rating *</label>
           <div class="flex justify-center gap-2">
@@ -600,7 +623,6 @@
           </div>
         </div>
 
-        <!-- Punctuality -->
         <div class="mb-5">
           <label class="block text-sm font-medium mb-2">Punctuality</label>
           <div class="flex justify-center gap-2">
@@ -617,7 +639,6 @@
           </div>
         </div>
 
-        <!-- Professionalism -->
         <div class="mb-5">
           <label class="block text-sm font-medium mb-2">Professionalism</label>
           <div class="flex justify-center gap-2">
@@ -642,11 +663,7 @@
         ></textarea>
 
         <div class="flex gap-3">
-          <button
-            type="button"
-            class="flex-1 py-3 border rounded-2xl"
-            @click="skipAgentReview"
-          >
+          <button type="button" class="flex-1 py-3 border rounded-2xl" @click="skipAgentReview">
             Skip
           </button>
           <button
@@ -661,7 +678,7 @@
       </div>
     </div>
 
-    <!-- ==================== APP REVIEW MODAL ==================== -->
+    <!-- APP REVIEW MODAL -->
     <div
       v-if="showReviewModal"
       class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
@@ -693,11 +710,7 @@
         ></textarea>
 
         <div class="flex gap-3">
-          <button
-            type="button"
-            class="flex-1 py-3 border rounded-2xl"
-            @click="skipReview"
-          >
+          <button type="button" class="flex-1 py-3 border rounded-2xl" @click="skipReview">
             Skip
           </button>
           <button
@@ -774,7 +787,6 @@ import InspectionCountdown from '@/components/customer/inspection/InspectionCoun
 
 const placeholderImg = 'https://via.placeholder.com/400x250?text=Property'
 
-// ==================== STATE ====================
 const inspections = ref([])
 const paidPropertyIds = ref(new Set())
 const reportedInspectionIds = ref(new Set())
@@ -789,7 +801,6 @@ const savingId = ref(null)
 const payingPropertyId = ref(null)
 const toast = ref(null)
 
-// Report Modal
 const showReportModal = ref(false)
 const reportTarget = ref(null)
 const savingReport = ref(false)
@@ -799,7 +810,6 @@ const reportForm = ref({
   report: ''
 })
 
-// App Review Modal
 const showReviewModal = ref(false)
 const reviewTarget = ref(null)
 const savingReview = ref(false)
@@ -808,7 +818,6 @@ const reviewForm = ref({
   review: ''
 })
 
-// Agent Review Modal
 const showAgentReviewModal = ref(false)
 const agentReviewTarget = ref(null)
 const savingAgentReview = ref(false)
@@ -819,16 +828,12 @@ const agentReviewForm = ref({
   review: ''
 })
 
-// Agent Ratings
 const agentRatings = ref({})
-
-// Drawer media
 const drawerMedia = ref([])
 const drawerMediaLoading = ref(false)
 
 let channel = null
 
-// ==================== CONSTANTS ====================
 const tabs = [
   { label: 'All', value: '' },
   { label: 'Action Required', value: 'action' },
@@ -841,7 +846,6 @@ const tabs = [
 const ACTIVE_UPCOMING = ['accepted', 'scheduled', 'confirmed', 'reschedule_requested', 'rescheduled']
 const TERMINAL = ['completed', 'cancelled', 'no_show', 'declined']
 
-// ==================== HELPERS ====================
 const showToast = (message, type = 'success') => {
   toast.value = { message, type }
   setTimeout(() => { toast.value = null }, 3200)
@@ -871,11 +875,6 @@ const canCustomerCancel = (i) =>
 
 const isActionRequired = (i) => needsCustomerConfirm(i)
 
-const customerActionBadge = (i) => {
-  if (needsCustomerConfirm(i)) return 'CONFIRM ATTENDANCE'
-  return 'ACTION REQUIRED'
-}
-
 const hasPaidForProperty = (propertyId) => {
   if (!propertyId) return false
   return paidPropertyIds.value.has(propertyId)
@@ -886,42 +885,99 @@ const hasReported = (inspectionId) => {
   return reportedInspectionIds.value.has(inspectionId)
 }
 
+const customerActionBadge = (i) => {
+  if (needsCustomerConfirm(i)) return 'ACTION NEEDED · CONFIRM ATTENDANCE'
+  if (i.status === 'pending') return 'WAITING FOR REVIEW'
+  if (i.status === 'in_progress') return 'INSPECTION IN PROGRESS'
+  if (i.status === 'completed') {
+    if (!hasReported(i.id)) return 'ACTION NEEDED · SUBMIT REPORT'
+    if (!hasPaidForProperty(i.property?.id)) return 'READY TO PAY'
+    return 'COMPLETED'
+  }
+  return 'UPDATE'
+}
+
 const customerStatusMessage = (i) => {
   switch (i.status) {
     case 'pending':
-      return 'Your inspection request is with the LodgeNext team. An agent will be assigned soon.'
+      return 'Your request is under review by the LodgeNext team. An agent will be assigned soon. No action is needed from you right now.'
     case 'accepted':
-      return 'An agent has accepted your inspection. Final date and time will be confirmed shortly.'
+      return 'An agent has accepted your inspection. The schedule is being finalized. We’ll notify you when the date and time are confirmed.'
     case 'scheduled':
       return needsCustomerConfirm(i)
-        ? 'Your inspection is scheduled. Please confirm that you can attend.'
-        : 'Inspection scheduled. Waiting for final confirmations.'
+        ? 'Your inspection is scheduled. Please confirm that you can attend on the selected date and time.'
+        : 'Inspection is scheduled. Waiting for final confirmation. You’ll get updates here.'
     case 'confirmed':
       return needsCustomerConfirm(i)
-        ? 'Agent is confirmed. Please confirm your attendance.'
-        : 'You and the agent are confirmed. See you at the property.'
+        ? 'The agent is confirmed. Please confirm your attendance so everyone is ready for the visit.'
+        : 'You’re all set. You and the agent are confirmed. Arrive at the property at the scheduled time.'
     case 'reschedule_requested':
     case 'rescheduled':
-      return 'A reschedule has been requested. We will update you with the new time.'
+      return 'A reschedule has been requested. LodgeNext will update you when a new date and time are confirmed.'
     case 'in_progress':
-      return 'Your inspection is currently in progress.'
+      return 'The inspection is currently happening. Please stay available at the property. You’ll see the outcome here when the agent submits the report.'
     case 'completed':
       if (hasPaidForProperty(i.property?.id)) {
-        return 'Inspection completed and property payment successful.'
+        return 'Inspection completed and payment successful. You can renew payment later if needed.'
       }
       if (hasReported(i.id)) {
-        return 'Report submitted. You can now pay for this property.'
+        return 'Inspection completed and your report is in. Next step: pay for this property if you want to proceed.'
       }
-      return 'Inspection completed. Please submit a report before paying.'
+      return 'Inspection completed. Next step: submit a short report about the property before payment.'
     case 'cancelled':
-      return i.cancellation_reason || 'This inspection was cancelled.'
+      return i.cancellation_reason
+        ? `This inspection was cancelled. Reason: ${i.cancellation_reason}`
+        : 'This inspection was cancelled. You can request another inspection on a different property.'
     case 'no_show':
-      return 'This inspection was marked as no-show because attendance could not be completed.'
+      return 'This inspection was marked as no-show because attendance could not be completed. Contact support if you need help rebooking.'
     case 'declined':
-      return 'The assigned agent could not take this inspection. LodgeNext will reassign if needed.'
+      return 'The assigned agent could not take this inspection. LodgeNext can reassign another agent if the request is still active.'
     default:
       return 'Track updates here as your inspection progresses.'
   }
+}
+
+const customerNextStep = (i) => {
+  switch (i.status) {
+    case 'pending':
+      return 'No action needed — wait for agent assignment.'
+    case 'accepted':
+      return 'No action needed — wait for schedule confirmation.'
+    case 'scheduled':
+    case 'confirmed':
+      return needsCustomerConfirm(i)
+        ? 'Confirm your attendance now.'
+        : 'Attend the inspection at the scheduled time.'
+    case 'in_progress':
+      return 'Stay at the property until the inspection is finished.'
+    case 'completed':
+      if (hasPaidForProperty(i.property?.id)) return 'You’re done for this property.'
+      if (hasReported(i.id)) return 'Proceed to payment.'
+      return 'Submit your property report.'
+    case 'cancelled':
+    case 'no_show':
+    case 'declined':
+      return 'Browse other properties or contact support.'
+    default:
+      return 'Check this page for updates.'
+  }
+}
+
+const statusBannerClass = (status) => {
+  const map = {
+    pending: 'bg-amber-50 border-amber-200 text-amber-900',
+    accepted: 'bg-blue-50 border-blue-200 text-blue-900',
+    scheduled: 'bg-purple-50 border-purple-200 text-purple-900',
+    confirmed: 'bg-green-50 border-green-200 text-green-900',
+    in_progress: 'bg-indigo-50 border-indigo-200 text-indigo-900',
+    completed: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+    cancelled: 'bg-red-50 border-red-200 text-red-900',
+    no_show: 'bg-gray-100 border-gray-200 text-gray-800',
+    declined: 'bg-gray-100 border-gray-200 text-gray-800',
+    reschedule_requested: 'bg-orange-50 border-orange-200 text-orange-900',
+    rescheduled: 'bg-orange-50 border-orange-200 text-orange-900',
+  }
+  return map[status] || 'bg-blue-50 border-blue-100 text-[var(--royal-blue)]'
 }
 
 const customerConfirmationLabel = (i) => {
@@ -944,7 +1000,6 @@ const getAgentRating = (agentId) => {
   return agentRatings.value[agentId] || null
 }
 
-// ==================== FETCH HELPERS ====================
 const fetchPaidProperties = async (userId) => {
   try {
     const { data, error } = await supabase
@@ -989,9 +1044,7 @@ const fetchAgentRatings = async (agentIds) => {
 
     const map = {}
     ;(data || []).forEach((r) => {
-      if (!map[r.agent_id]) {
-        map[r.agent_id] = { sum: 0, count: 0 }
-      }
+      if (!map[r.agent_id]) map[r.agent_id] = { sum: 0, count: 0 }
       map[r.agent_id].sum += r.rating
       map[r.agent_id].count += 1
     })
@@ -1010,7 +1063,6 @@ const fetchAgentRatings = async (agentIds) => {
   }
 }
 
-// ==================== FETCH INSPECTIONS ====================
 const fetchInspections = async () => {
   loading.value = true
   try {
@@ -1074,11 +1126,7 @@ const fetchInspections = async () => {
     }
 
     const agentIds = [
-      ...new Set(
-        (data || [])
-          .map((i) => i.agent?.id)
-          .filter(Boolean)
-      )
+      ...new Set((data || []).map((i) => i.agent?.id).filter(Boolean))
     ]
     await fetchAgentRatings(agentIds)
   } catch (err) {
@@ -1088,8 +1136,6 @@ const fetchInspections = async () => {
     loading.value = false
   }
 }
-
-// ==================== REPORT ====================
 
 const openReportModal = (inspection) => {
   reportTarget.value = inspection
@@ -1121,7 +1167,6 @@ const submitReport = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Please login')
 
-    // Build a single report string so we don't depend on extra DB columns
     const conditionLabel = reportForm.value.general_condition
     const extra = (reportForm.value.report || '').trim()
     const fullReport = [
@@ -1152,7 +1197,6 @@ const submitReport = async () => {
   }
 }
 
-// ==================== PAY / RENEW ====================
 const payForProperty = async (inspection, isRenewal = false) => {
   const property = inspection?.property
   if (!property?.id || !property?.price) {
@@ -1246,7 +1290,6 @@ const savePropertyPayment = async (reference, property, customerId, inspection, 
   }
 }
 
-// ==================== AGENT REVIEW ====================
 const submitAgentReview = async () => {
   if (!agentReviewForm.value.rating || !agentReviewTarget.value) return
 
@@ -1300,7 +1343,6 @@ const openAppReviewModal = () => {
   showReviewModal.value = true
 }
 
-// ==================== APP REVIEW ====================
 const submitReview = async () => {
   if (!reviewForm.value.rating || !reviewTarget.value) return
 
@@ -1338,7 +1380,6 @@ const skipReview = () => {
   showToast('You can rate us later from your profile')
 }
 
-// ==================== COMPUTED ====================
 const upcomingInspections = computed(() =>
   inspections.value.filter((i) => ACTIVE_UPCOMING.includes(i.status))
 )
@@ -1399,7 +1440,6 @@ const drawerVideos = computed(() =>
   drawerMedia.value.filter((m) => m.media_type === 'video' && m.displayUrl)
 )
 
-// ==================== ACTIONS ====================
 const confirmAttendance = async (inspection) => {
   if (!inspection?.id) return
   savingId.value = inspection.id
@@ -1472,7 +1512,6 @@ const submitCancel = async () => {
   }
 }
 
-// ==================== DRAWER MEDIA ====================
 const resolveMediaUrl = async (item) => {
   if (item.url && String(item.url).startsWith('http')) return item.url
 
@@ -1528,7 +1567,6 @@ watch(
   }
 )
 
-// ==================== REALTIME ====================
 const setupRealtime = async () => {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session?.user) return
@@ -1550,7 +1588,6 @@ const setupRealtime = async () => {
     .subscribe()
 }
 
-// ==================== LIFECYCLE ====================
 onMounted(async () => {
   await fetchInspections()
   await setupRealtime()

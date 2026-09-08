@@ -3,7 +3,6 @@
     
     <!-- Left Side -->
     <div class="flex items-center gap-4">
-      <!-- Hamburger -->
       <button 
         @click="toggleSidebar"
         class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
@@ -12,16 +11,6 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-
-      <!-- Search -->
-      <!-- <div class="relative hidden md:block w-96">
-        <input 
-          type="text"
-          placeholder="Search properties, agents, or customers..."
-          class="w-full bg-gray-100 border border-transparent focus:border-[var(--royal-blue)] rounded-2xl py-3 pl-12 text-sm focus:outline-none transition-all"
-        />
-        <Search class="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-      </div> -->
     </div>
 
     <!-- Right Side -->
@@ -30,7 +19,7 @@
       <!-- ================= NOTIFICATIONS ================= -->
       <div class="relative" ref="notificationRef">
         <button 
-          @click="toggleNotifications"
+          @click.stop="toggleNotifications"
           class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors"
         >
           <Bell class="w-6 h-6 text-gray-600" />
@@ -47,7 +36,6 @@
           v-if="showNotifications"
           class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
         >
-          <!-- Header -->
           <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 class="font-semibold text-[var(--royal-blue)] text-sm">
               Notifications
@@ -61,7 +49,6 @@
             </button>
           </div>
 
-          <!-- List -->
           <div class="max-h-80 overflow-y-auto">
             <div v-if="loadingNotifications" class="py-10 text-center text-sm text-[var(--steel-blue)]">
               Loading...
@@ -104,7 +91,6 @@
             </button>
           </div>
 
-          <!-- Footer -->
           <div class="px-4 py-3 border-t border-gray-100 text-center">
             <router-link 
               to="/admin/support"
@@ -141,6 +127,73 @@
         </div>
       </div>
     </div>
+
+    <!-- ========== NOTIFICATION POPUP (expires in 10 seconds) ========== -->
+    <Transition name="notif-pop">
+      <div
+        v-if="popupNotification"
+        class="fixed top-20 right-4 sm:right-6 z-[80] w-[calc(100%-2rem)] max-w-sm
+               bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+      >
+        <div class="p-4 sm:p-5">
+          <div class="flex items-start gap-3">
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg"
+              :class="popupNotification.iconBg"
+            >
+              {{ popupNotification.icon }}
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold text-[var(--royal-blue)]">
+                {{ popupNotification.title }}
+              </p>
+              <p class="text-xs sm:text-sm text-[var(--steel-blue)] mt-1 leading-relaxed">
+                {{ popupNotification.message }}
+              </p>
+
+              <div class="mt-3 rounded-xl bg-[var(--light-blue)] px-3 py-2.5">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-[var(--royal-blue)] mb-1">
+                  What to do next
+                </p>
+                <p class="text-xs sm:text-sm text-[var(--steel-blue)] leading-relaxed">
+                  {{ nextStepText(popupNotification) }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              @click="closePopup"
+              class="text-[var(--steel-blue)] hover:text-[var(--royal-blue)] text-xl leading-none"
+            >
+              ×
+            </button>
+          </div>
+
+          <!-- 10-second progress bar -->
+          <div class="mt-3 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-[var(--royal-blue)] popup-progress" />
+          </div>
+
+          <div class="mt-4 flex gap-2">
+            <button
+              @click="handlePopupAction"
+              class="flex-1 py-2.5 rounded-xl bg-[var(--royal-blue)] text-white text-sm font-medium
+                     hover:opacity-90 transition-opacity"
+            >
+              Review Ticket
+            </button>
+            <button
+              @click="closePopup"
+              class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[var(--steel-blue)]
+                     hover:bg-gray-50 transition-colors"
+            >
+              Later
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </nav>
 </template>
 
@@ -148,7 +201,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
-import { Bell, MessageCircle, Search } from 'lucide-vue-next'
+import { Bell, MessageCircle } from 'lucide-vue-next'
 
 const emit = defineEmits(['toggle-sidebar'])
 const router = useRouter()
@@ -164,13 +217,80 @@ const showNotifications = ref(false)
 const loadingNotifications = ref(false)
 const notifications = ref([])
 const notificationRef = ref(null)
+const popupNotification = ref(null)
 
-// Store which tickets the admin has already "seen"
 const seenTicketIds = ref(new Set())
+
+let popupTimer = null
+let ticketChannel = null
+
+const POPUP_DURATION_MS = 10000 // 10 seconds
 
 const unreadCount = computed(() => {
   return notifications.value.filter(n => !n.is_read).length
 })
+
+const mapTicketToNotification = (ticket) => ({
+  id: ticket.id,
+  title: ticket.role === 'agent' ? 'New Agent Ticket' : 'New Customer Ticket',
+  message: ticket.subject || ticket.message || 'New support ticket received',
+  created_at: ticket.created_at,
+  is_read: seenTicketIds.value.has(ticket.id),
+  icon: ticket.role === 'agent' ? '🧑‍💼' : '👤',
+  iconBg: ticket.role === 'agent'
+    ? 'bg-blue-50 text-[var(--royal-blue)]'
+    : 'bg-purple-50 text-purple-600',
+  type: 'support_ticket',
+  role: ticket.role,
+  category: ticket.category,
+  status: ticket.status,
+  raw: ticket,
+})
+
+const nextStepText = (item) => {
+  if (!item) return 'Open Support Tickets to review this item.'
+
+  if (item.role === 'agent') {
+    return 'Open Support Tickets, review this agent request, update the status, and add admin notes if needed.'
+  }
+  if (item.role === 'customer') {
+    return 'Open Support Tickets, review this customer request, update the status, and respond with admin notes.'
+  }
+  return 'Open Support Tickets to review the details and take action.'
+}
+
+const showNotificationPopup = (notification) => {
+  popupNotification.value = notification
+
+  if (popupTimer) clearTimeout(popupTimer)
+  popupTimer = setTimeout(() => {
+    popupNotification.value = null
+  }, POPUP_DURATION_MS)
+}
+
+const closePopup = () => {
+  popupNotification.value = null
+  if (popupTimer) clearTimeout(popupTimer)
+}
+
+const markItemRead = (item) => {
+  item.is_read = true
+  seenTicketIds.value.add(item.id)
+  localStorage.setItem(
+    'admin_seen_tickets',
+    JSON.stringify([...seenTicketIds.value])
+  )
+}
+
+const handlePopupAction = () => {
+  const item = popupNotification.value
+  if (!item) return
+
+  markItemRead(item)
+  closePopup()
+  showNotifications.value = false
+  router.push('/admin/support')
+}
 
 const fetchAdminProfile = async () => {
   const { data: { user } } = await supabase.auth.getUser()
@@ -188,7 +308,6 @@ const fetchAdminProfile = async () => {
 const fetchNotifications = async () => {
   loadingNotifications.value = true
   try {
-    // Get recent open / in_progress support tickets
     const { data, error } = await supabase
       .from('support_tickets')
       .select(`
@@ -207,25 +326,12 @@ const fetchNotifications = async () => {
 
     if (error) throw error
 
-    // Load seen ids from localStorage
     const saved = localStorage.getItem('admin_seen_tickets')
     if (saved) {
       seenTicketIds.value = new Set(JSON.parse(saved))
     }
 
-    notifications.value = (data || []).map(ticket => ({
-      id: ticket.id,
-      title: ticket.role === 'agent' ? 'New Agent Ticket' : 'New Customer Ticket',
-      message: ticket.subject,
-      created_at: ticket.created_at,
-      is_read: seenTicketIds.value.has(ticket.id),
-      icon: ticket.role === 'agent' ? '🧑‍💼' : '👤',
-      iconBg: ticket.role === 'agent' 
-        ? 'bg-blue-50 text-[var(--royal-blue)]' 
-        : 'bg-purple-50 text-purple-600',
-      type: 'support_ticket',
-      raw: ticket
-    }))
+    notifications.value = (data || []).map(mapTicketToNotification)
   } catch (err) {
     console.error('Failed to load notifications:', err)
   } finally {
@@ -259,18 +365,9 @@ const markAllAsRead = () => {
 }
 
 const handleNotificationClick = (item) => {
-  // Mark as read
-  item.is_read = true
-  seenTicketIds.value.add(item.id)
-  localStorage.setItem(
-    'admin_seen_tickets',
-    JSON.stringify([...seenTicketIds.value])
-  )
-
+  markItemRead(item)
   showNotifications.value = false
-
-  // Go to support tickets page
-  router.push('/admin/support-tickets')
+  showNotificationPopup(item)
 }
 
 const formatRelativeTime = (date) => {
@@ -287,7 +384,29 @@ const toggleSidebar = () => {
   emit('toggle-sidebar')
 }
 
-// Close dropdown when clicking outside
+const listenForNewTickets = () => {
+  ticketChannel = supabase
+    .channel('admin-support-ticket-popup')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'support_tickets',
+      },
+      (payload) => {
+        const ticket = payload.new
+        // Only notify on open tickets
+        if (ticket.status && !['open', 'in_progress'].includes(ticket.status)) return
+
+        const mapped = mapTicketToNotification(ticket)
+        notifications.value = [mapped, ...notifications.value].slice(0, 15)
+        showNotificationPopup(mapped)
+      }
+    )
+    .subscribe()
+}
+
 const handleClickOutside = (e) => {
   if (notificationRef.value && !notificationRef.value.contains(e.target)) {
     showNotifications.value = false
@@ -296,11 +415,43 @@ const handleClickOutside = (e) => {
 
 onMounted(() => {
   fetchAdminProfile()
-  fetchNotifications() // load badge count on mount
+  fetchNotifications()
+  listenForNewTickets()
   document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  if (ticketChannel) supabase.removeChannel(ticketChannel)
+  if (popupTimer) clearTimeout(popupTimer)
 })
 </script>
+
+<style scoped>
+.notif-pop-enter-active,
+.notif-pop-leave-active {
+  transition: all 0.3s ease;
+}
+.notif-pop-enter-from,
+.notif-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-12px) scale(0.98);
+}
+
+.popup-progress {
+  width: 100%;
+  animation: popupShrink 10s linear forwards;
+}
+
+@keyframes popupShrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup-progress {
+    animation: none;
+    width: 100%;
+  }
+}
+</style>
