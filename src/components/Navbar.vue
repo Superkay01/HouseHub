@@ -44,7 +44,7 @@ const mobileMenuOpen = ref(false)
             All States
           </router-link>
 
-          <router-link to="#about" class="hover:text-[var(--bright-green)] text-[var(--white)]">
+          <router-link to="/about" class="hover:text-[var(--bright-green)] text-[var(--white)]">
             About Us
           </router-link>
         </div>
@@ -158,7 +158,7 @@ const mobileMenuOpen = ref(false)
             </router-link>
 
             <router-link
-              to="about"
+              to="/about"
               class="font-medium text-[var(--white)]"
             >
               About Us
