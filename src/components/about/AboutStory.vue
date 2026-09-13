@@ -11,7 +11,7 @@
           Why We Created LODGENEXT
         </h2>
         <p class="text-sm sm:text-base md:text-lg text-[var(--steel-blue)] leading-relaxed">
-          Finding a house can be stressful — especially when you are moving to a new city where you
+          Finding a house can be stressful, especially when you are moving to a new city where you
           don’t know anyone. LODGENEXT was built to make that journey clearer, safer and more organised.
         </p>
       </div>
@@ -49,7 +49,7 @@
           <p>
             We saw this gap and decided to build a platform that makes the process easier.
             <span class="font-semibold text-[var(--royal-blue)]">LODGENEXT</span> connects people
-            looking for homes with property agents — helping customers discover available properties
+            looking for homes with property agents, helping customers discover available properties
             and connect with agents in a more organised and transparent way.
           </p>
         </div>
@@ -118,7 +118,7 @@ const timeline = [
   },
   {
     title: 'The Vision',
-    text: 'Make finding a home easier, more transparent and more connected — then expand across Nigeria.',
+    text: 'Make finding a home easier, more transparent and more connected, then expand across Nigeria.',
   },
 ]
 

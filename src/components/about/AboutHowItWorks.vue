@@ -9,7 +9,7 @@
           Finding a Home in Four Simple Steps
         </h2>
         <p class="text-sm sm:text-base text-[var(--steel-blue)] leading-relaxed">
-          A clearer path from discovery to decision — designed for customers and agents.
+          A clearer path from discovery to decision, designed for customers and agents.
         </p>
       </div>
 

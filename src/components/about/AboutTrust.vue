@@ -50,7 +50,7 @@
         <p class="text-xs sm:text-sm text-[var(--steel-blue)] leading-relaxed max-w-3xl mx-auto">
           LODGENEXT encourages customers to review property information carefully and use the
           available inspection and verification processes before making decisions. These features
-          support informed choices — they are
+          support informed choices, they are
           <strong class="text-[var(--royal-blue)]">not a guarantee</strong>
           that a property or agent is completely risk-free.
         </p>

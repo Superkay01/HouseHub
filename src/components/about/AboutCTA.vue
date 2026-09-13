@@ -8,7 +8,7 @@
 
     <!-- Overlay for readability -->
     <div
-      class="absolute inset-0 bg-gradient-to-br from-[var(--royal-blue)]/90 via-[var(--medium-blue)]/85 to-[var(--hover-blue)]/90"
+      class="absolute inset-0 bg-gradient-to-br from-[var(--royal-blue)]/70 via-[var(--medium-blue)]/85 to-[var(--hover-blue)]/70"
     />
 
     <!-- Soft decorative blurs -->

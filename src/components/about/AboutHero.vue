@@ -10,7 +10,7 @@
 
     <!-- Premium overlay (multi-tone, not flat) -->
     <div
-      class="absolute inset-0 bg-gradient-to-br from-[var(--royal-blue)]/90 via-[var(--medium-blue)]/75 to-[var(--royal-blue)]/85"
+      class="absolute inset-0 bg-gradient-to-br from-[var(--royal-blue)]/60 via-[var(--medium-blue)]/75 to-[var(--royal-blue)]/65"
     />
     <div
       class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent_50%)]"
@@ -23,13 +23,13 @@
     <!-- Content -->
     <div class="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 text-center text-white">
       <!-- Logo -->
-      <div class="flex justify-center mb-6 sm:mb-8 animate-hero-0">
+      <!-- <div class="flex justify-center mb-6 sm:mb-8 animate-hero-0">
         <img
           src="/Lodgenext_logo__3_-removebg-preview.png"
           alt="LODGENEXT"
           class="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-lg"
         />
-      </div>
+      </div> -->
 
       <p
         class="inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-white/80 mb-4 sm:mb-5 animate-hero-1"

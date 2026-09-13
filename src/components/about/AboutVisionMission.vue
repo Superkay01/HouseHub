@@ -12,7 +12,7 @@
         </h2>
         <p class="text-sm sm:text-base text-[var(--steel-blue)] leading-relaxed">
           LODGENEXT exists to help people discover properties and connect with agents in a more
-          organised, transparent way — starting in Ilorin and Ijebu Ode.
+          organised, transparent way, starting in Ilorin and Ijebu Ode.
         </p>
       </div>
 
@@ -35,7 +35,7 @@
             </h3>
             <p class="text-sm sm:text-base text-white/85 leading-relaxed">
               We want a future where someone moving to a new city can open LODGENEXT, explore
-              available properties, connect with agents, and make better-informed decisions —
+              available properties, connect with agents, and make better-informed decisions,
               without depending only on word-of-mouth.
             </p>
           </div>
@@ -51,7 +51,7 @@
             <span>🎯</span> OUR MISSION
           </div>
           <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-[var(--royal-blue)] leading-snug mb-4">
-            Help people find homes and connect with agents — then grow across Nigeria.
+            Help people find homes and connect with agents, then grow across Nigeria.
           </h3>
           <p class="text-sm sm:text-base text-[var(--steel-blue)] leading-relaxed mb-5">
             We are focused on making property discovery simpler for customers and giving agents a
