@@ -112,8 +112,9 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../../supabaseClient.ts'
 import { Eye, EyeClosed } from 'lucide-vue-next'
-import Footer from '@/components/Footer.vue'
 import Navbar from '@/components/Navbar.vue'
+import Footer from '@/components/Footer.vue'
+
 
 const router = useRouter()
 const loading = ref(false)
