@@ -49,7 +49,7 @@
             :class="msg.sender_type === 'user' ? 'justify-end' : 'justify-start'"
           >
             <div
-              class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm"
+              class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm text-[var(--royal-blue)]"
               :class="{
                 'bg-[var(--royal-blue)] text-white': msg.sender_type === 'user',
                 'bg-white border shadow-sm': msg.sender_type === 'ai' || msg.sender_type === 'system',
@@ -59,7 +59,7 @@
               <p v-if="msg.sender_type === 'ai'" class="text-xs font-medium text-[var(--royal-blue)] mb-1">
                 AI Assistant
               </p>
-              <p v-else-if="msg.sender_type === 'admin'" class="text-xs font-medium text-green-700 mb-1">
+              <p v-else-if="msg.sender_type === 'admin'" class="text-xs font-medium text-[var(--bright-green)] mb-1">
                 Support Admin
               </p>
               <p class="whitespace-pre-wrap">{{ msg.content }}</p>

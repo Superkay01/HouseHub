@@ -52,7 +52,7 @@
                   <p class="font-semibold text-[var(--dark-gray)] truncate">
                     {{ chat.customer_name || 'Customer' }}
                   </p>
-                  <p class="text-sm text-[var(--medium-gray)] truncate mt-0.5">
+                  <p class="text-sm text-[var(--royal-blue)] truncate mt-0.5">
                     {{ chat.property_title || 'Property' }}
                   </p>
                   <p class="text-xs text-[var(--medium-gray)] mt-1 line-clamp-1">
@@ -96,7 +96,7 @@
                 <h2 class="font-bold text-[var(--dark-gray)] truncate">
                   {{ selectedChat.customer_name || 'Customer' }}
                 </h2>
-                <p class="text-sm text-[var(--medium-gray)] truncate">
+                <p class="text-sm text-[var(--royal-blue)] truncate">
                   {{ selectedChat.property_title }}
                 </p>
               </div>
