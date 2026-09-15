@@ -320,6 +320,11 @@ const router = createRouter({
   name: 'AdminSupport',
   component: () => import('@/views/admin/AdminSupportTickets.vue'),
 },
+{
+  path: '/admin/message',
+  name: 'AdminMessage',
+  component: () => import('@/views/admin/message.vue'),
+}
     
   ]
 }

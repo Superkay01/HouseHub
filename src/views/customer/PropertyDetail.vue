@@ -112,7 +112,7 @@
               </span>
             </div>
 
-            <!-- PRIMARY CTA: Request Inspection -->
+            <!-- PRIMARY CTA -->
             <button
               @click="requestInspection"
               class="w-full mb-3 py-4 rounded-2xl font-semibold text-lg text-white bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] transition shadow-md"
@@ -120,9 +120,17 @@
               Request Inspection
             </button>
 
-            <p class="text-xs text-center text-gray-500 mb-6">
+            <p class="text-xs text-center text-gray-500 mb-4">
               Choose a date & time{{ property.inspection_fee ? ', pay the inspection fee,' : '' }} then submit your request
             </p>
+
+            <!-- Chat Button -->
+            <button
+              @click="openPropertyChat"
+              class="w-full mb-6 py-3.5 rounded-2xl font-medium border-2 border-[var(--royal-blue)] text-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition flex items-center justify-center gap-2"
+            >
+              💬 Chat about this property
+            </button>
 
             <!-- Save Button -->
             <button
@@ -219,11 +227,101 @@
         </button>
       </div>
     </div>
+
+    <!-- ==================== PROPERTY CHAT SLIDE-OVER ==================== -->
+    <Teleport to="body">
+      <div
+        v-if="showChat"
+        class="fixed inset-0 z-[200] flex justify-end"
+      >
+        <!-- Backdrop -->
+        <div 
+          class="absolute inset-0 bg-black/40"
+          @click="showChat = false"
+        ></div>
+
+        <!-- Panel -->
+        <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-in">
+          <!-- Header -->
+          <div class="flex items-center justify-between p-4 border-b bg-[var(--royal-blue)] text-white">
+            <div>
+              <h3 class="font-semibold text-lg">Chat about this property</h3>
+              <p class="text-sm opacity-90 truncate max-w-[240px]">
+                {{ property.title }}
+              </p>
+            </div>
+            <button @click="showChat = false" class="text-2xl leading-none hover:opacity-80">×</button>
+          </div>
+
+          <!-- Messages -->
+          <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div v-if="chatLoading" class="text-center py-10 text-gray-500">
+              Loading conversation...
+            </div>
+
+            <div
+              v-for="msg in messages"
+              :key="msg.id"
+              class="flex"
+              :class="msg.sender_type === 'user' ? 'justify-end' : 'justify-start'"
+            >
+              <div
+                class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm"
+                :class="{
+                  'bg-[var(--royal-blue)] text-white': msg.sender_type === 'user',
+                  'bg-white border shadow-sm': msg.sender_type === 'ai' || msg.sender_type === 'system',
+                  'bg-green-100 text-green-800 border border-green-200': msg.sender_type === 'admin' || msg.sender_type === 'agent'
+                }"
+              >
+                <p v-if="msg.sender_type === 'ai'" class="text-xs font-medium text-[var(--royal-blue)] mb-1">
+                  AI Assistant
+                </p>
+                <p v-else-if="msg.sender_type === 'admin' || msg.sender_type === 'agent'" class="text-xs font-medium text-green-700 mb-1">
+                  Admin
+                </p>
+                <p class="whitespace-pre-wrap">{{ msg.content }}</p>
+                <p class="text-[10px] mt-1 opacity-70">
+                  {{ formatTime(msg.created_at) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- AI typing indicator -->
+            <div v-if="aiTyping" class="flex justify-start">
+              <div class="bg-white border shadow-sm rounded-2xl px-4 py-3 text-sm text-gray-500">
+                <span class="animate-pulse">AI is typing...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input -->
+          <div class="p-4 border-t bg-white">
+            <div class="flex gap-2">
+              <input
+                v-model="newMessage"
+                @keyup.enter="sendMessage"
+                type="text"
+                placeholder="Ask anything about this property..."
+                class="flex-1 border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--royal-blue)]"
+                :disabled="sending || aiTyping"
+              />
+              <button
+                @click="sendMessage"
+                :disabled="!newMessage.trim() || sending || aiTyping"
+                class="px-5 py-3 bg-[var(--royal-blue)] text-white rounded-xl font-medium disabled:opacity-50 transition"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient'
 
@@ -240,6 +338,17 @@ const uniqueViewCount = ref(0)
 const isSaved = ref(false)
 const saving = ref(false)
 
+// ==================== CHAT STATE ====================
+const showChat = ref(false)
+const chatId = ref<string | null>(null)
+const messages = ref<any[]>([])
+const newMessage = ref('')
+const chatLoading = ref(false)
+const sending = ref(false)
+const aiTyping = ref(false)
+const messagesContainer = ref<HTMLElement | null>(null)
+
+// ==================== PROPERTY FUNCTIONS ====================
 const fetchProperty = async () => {
   const id = route.params.id as string
   if (!id) {
@@ -273,32 +382,17 @@ const recordUniqueView = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  const { error: insertError } = await supabase
+  await supabase
     .from('property_views')
     .upsert(
-      {
-        property_id: property.value.id,
-        user_id: user.id
-      },
-      {
-        onConflict: 'property_id,user_id',
-        ignoreDuplicates: true
-      }
+      { property_id: property.value.id, user_id: user.id },
+      { onConflict: 'property_id,user_id', ignoreDuplicates: true }
     )
 
-  if (insertError) {
-    console.error('View insert error:', insertError)
-  }
-
-  const { count, error: countError } = await supabase
+  const { count } = await supabase
     .from('property_views')
     .select('*', { count: 'exact', head: true })
     .eq('property_id', property.value.id)
-
-  if (countError) {
-    console.error('View count error:', countError)
-    return
-  }
 
   uniqueViewCount.value = count || 0
 }
@@ -310,17 +404,12 @@ const checkIfSaved = async () => {
     return
   }
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('saved_properties')
     .select('id')
     .eq('user_id', user.id)
     .eq('property_id', property.value.id)
     .maybeSingle()
-
-  if (error) {
-    console.error('Check saved error:', error)
-    return
-  }
 
   isSaved.value = !!data
 }
@@ -340,27 +429,20 @@ const toggleSave = async () => {
   saving.value = true
   try {
     if (isSaved.value) {
-      const { error } = await supabase
+      await supabase
         .from('saved_properties')
         .delete()
         .eq('user_id', user.id)
         .eq('property_id', property.value.id)
-
-      if (error) throw error
       isSaved.value = false
     } else {
-      const { error } = await supabase
+      await supabase
         .from('saved_properties')
-        .insert({
-          user_id: user.id,
-          property_id: property.value.id
-        })
-
-      if (error) throw error
+        .insert({ user_id: user.id, property_id: property.value.id })
       isSaved.value = true
     }
   } catch (err: any) {
-    console.error('Save error:', err)
+    console.error(err)
     alert(err.message || 'Failed to save property')
   } finally {
     saving.value = false
@@ -377,7 +459,6 @@ const requestInspection = async () => {
     return
   }
 
-  // Easy customer journey → request inspection page
   router.push(`/customer/request-inspection/${property.value.id}`)
 }
 
@@ -396,6 +477,265 @@ const allImages = computed(() => {
   return imgs
 })
 
+// ==================== CHAT FUNCTIONS ====================
+const openPropertyChat = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    alert('Please login to chat about this property')
+    router.push('/login')
+    return
+  }
+
+  if (!property.value?.id) return
+
+  showChat.value = true
+  await initOrLoadChat(user.id)
+}
+
+const initOrLoadChat = async (userId: string) => {
+  chatLoading.value = true
+  try {
+    // 1. Try to find existing chat first
+    let { data: existing, error: findError } = await supabase
+      .from('property_chats')
+      .select('id, assigned_to, ai_enabled, property_state, status')
+      .eq('property_id', property.value.id)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (findError) throw findError
+
+    // 2. If no existing chat, create a new one
+    if (!existing) {
+      const { data: newChat, error: insertError } = await supabase
+        .from('property_chats')
+        .insert({
+          property_id: property.value.id,
+          user_id: userId,
+          property_state: property.value.state,
+          status: 'ai_handling',
+          ai_enabled: true
+        })
+        .select('id, assigned_to, ai_enabled, property_state, status')
+        .single()
+
+      if (insertError) {
+        // If it still fails because of unique constraint, try to fetch again
+        if (insertError.code === '23505') {
+          const { data: retry } = await supabase
+            .from('property_chats')
+            .select('id, assigned_to, ai_enabled, property_state, status')
+            .eq('property_id', property.value.id)
+            .eq('user_id', userId)
+            .maybeSingle()
+
+          existing = retry
+        } else {
+          throw insertError
+        }
+      } else {
+        existing = newChat
+
+        // Send welcome message only for brand new chats
+        await supabase.from('property_chat_messages').insert({
+          chat_id: existing.id,
+          sender_type: 'system',
+          content: `You're chatting about:\n• ${property.value.title}\n• ${property.value.area}, ${property.value.city}, ${property.value.state}\n• ₦${Number(property.value.price || 0).toLocaleString()} (${property.value.purpose})\n\nAsk me anything about this property!`
+        })
+      }
+    }
+
+    if (!existing) {
+      throw new Error('Could not load or create chat')
+    }
+
+    chatId.value = existing.id
+    await loadMessages()
+    subscribeToMessages(existing.id)   // make sure realtime is connected
+  } catch (err: any) {
+    console.error('initOrLoadChat error:', err)
+    alert(err.message || 'Could not open chat')
+    showChat.value = false
+  } finally {
+    chatLoading.value = false
+  }
+}
+
+const loadMessages = async () => {
+  if (!chatId.value) return
+
+  const { data, error } = await supabase
+    .from('property_chat_messages')
+    .select('*')
+    .eq('chat_id', chatId.value)
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error(error)
+    return
+  }
+  messages.value = data || []
+  await scrollToBottom()
+}
+
+const sendMessage = async () => {
+  if (!newMessage.value.trim() || !chatId.value || sending.value || aiTyping.value) return
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  sending.value = true
+  const content = newMessage.value.trim()
+  newMessage.value = ''
+
+  // Optimistic UI
+  const tempId = crypto.randomUUID()
+  messages.value.push({
+    id: tempId,
+    content,
+    sender_type: 'user',
+    sender_id: user.id,
+    created_at: new Date().toISOString()
+  })
+  await scrollToBottom()
+
+  try {
+    const { error } = await supabase
+      .from('property_chat_messages')
+      .insert({
+        chat_id: chatId.value,
+        sender_id: user.id,
+        sender_type: 'user',
+        content
+      })
+
+    if (error) throw error
+
+    // Only trigger AI if no Admin has taken over
+    await generateAIReply(content)
+  } catch (err: any) {
+    console.error(err)
+    alert('Failed to send message')
+    messages.value = messages.value.filter(m => m.id !== tempId)
+  } finally {
+    sending.value = false
+  }
+}
+
+let messagesChannel: any = null
+
+const subscribeToMessages = (chatId: string) => {
+  // Remove previous subscription
+  if (messagesChannel) {
+    supabase.removeChannel(messagesChannel)
+  }
+
+  messagesChannel = supabase
+    .channel(`customer-chat-${chatId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'property_chat_messages',
+        filter: `chat_id=eq.${chatId}`,
+      },
+      (payload) => {
+        // Avoid duplicates
+        const exists = messages.value.some(m => m.id === payload.new.id)
+        if (!exists) {
+          messages.value.push(payload.new)
+          scrollToBottom()
+        }
+      }
+    )
+    .subscribe()
+}
+
+// ==================== SMART AI REPLY ====================
+const generateAIReply = async (userQuestion: string) => {
+  if (!chatId.value) return
+
+  // Check if Admin has taken over
+  const { data: chat } = await supabase
+    .from('property_chats')
+    .select('ai_enabled, assigned_to, last_agent_reply_at')
+    .eq('id', chatId.value)
+    .single()
+
+  if (chat?.assigned_to || chat?.ai_enabled === false) {
+    console.log('Admin is handling this chat → AI skipped')
+    return
+  }
+
+  // Skip if Admin replied recently
+  if (chat?.last_agent_reply_at) {
+    const lastReply = new Date(chat.last_agent_reply_at).getTime()
+    if (Date.now() - lastReply < 30 * 60 * 1000) {
+      return
+    }
+  }
+
+  aiTyping.value = true
+  await scrollToBottom()
+
+  try {
+    const propertyContext = {
+      id: property.value.id,
+      title: property.value.title,
+      price: property.value.price,
+      purpose: property.value.purpose,
+      location: `${property.value.area}, ${property.value.city}, ${property.value.state}`,
+      bedrooms: property.value.bedrooms,
+      bathrooms: property.value.bathrooms,
+      parking: property.value.parking_spaces,
+      property_type: property.value.property_type,
+      condition: property.value.condition,
+      availability: property.value.availability,
+      inspection_fee: property.value.inspection_fee,
+      amenities: property.value.amenities || [],
+      description: property.value.description || ''
+    }
+
+    const { error } = await supabase.functions.invoke('generate-property-chat-reply', {
+      body: {
+        chat_id: chatId.value,
+        property: propertyContext,
+        user_question: userQuestion,
+        recent_messages: messages.value.slice(-6).map(m => ({
+          role: m.sender_type === 'user' ? 'user' : 'assistant',
+          content: m.content
+        }))
+      }
+    })
+
+    if (error) throw error
+    await loadMessages()
+  } catch (err) {
+    console.error('AI reply error:', err)
+    await supabase.from('property_chat_messages').insert({
+      chat_id: chatId.value,
+      sender_type: 'ai',
+      content: "Sorry, I'm having trouble right now. An Admin will assist you shortly."
+    })
+    await loadMessages()
+  } finally {
+    aiTyping.value = false
+  }
+}
+
+const scrollToBottom = async () => {
+  await nextTick()
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+  }
+}
+
+const formatTime = (dateStr: string) => {
+  return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+// ==================== LIFECYCLE ====================
 watch(property, (newProp) => {
   if (newProp?.cover_image) mainImage.value = newProp.cover_image
 }, { immediate: true })
@@ -403,10 +743,17 @@ watch(property, (newProp) => {
 onMounted(async () => {
   await fetchProperty()
   if (property.value?.id) {
-    await Promise.all([
-      recordUniqueView(),
-      checkIfSaved()
-    ])
+    await Promise.all([recordUniqueView(), checkIfSaved()])
   }
 })
 </script>
+
+<style scoped>
+@keyframes slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in {
+  animation: slide-in 0.25s ease-out;
+}
+</style>

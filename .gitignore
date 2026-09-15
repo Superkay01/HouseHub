@@ -37,3 +37,7 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Supabase local files
+supabase/.temp/
+supabase/supabase.exe

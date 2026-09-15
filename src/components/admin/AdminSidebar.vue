@@ -73,6 +73,11 @@
   label="Help & Support"
   to="/admin/help-support"
 />
+<SidebarMenuItem
+  icon="HelpCircle"
+  label="Message"
+  to="/admin/message"
+/>
 
 <SidebarMenuItem
   icon="Bell"
