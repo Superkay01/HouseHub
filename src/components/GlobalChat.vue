@@ -28,7 +28,7 @@
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b bg-[var(--royal-blue)] text-white">
           <div>
-            <h3 class="font-semibold text-lg">HouseHub Assistant</h3>
+            <h3 class="font-semibold text-lg">Lodgenext Assistant</h3>
             <p class="text-sm opacity-90">
               {{ headerSubtitle }}
             </p>
@@ -38,7 +38,7 @@
 
         <!-- Messages -->
         <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-          <div v-if="loading" class="text-center py-10 text-gray-500">
+          <div v-if="loading" class="text-center py-10 text-[var(--steel-blue)]">
             Loading conversation...
           </div>
 
@@ -70,7 +70,7 @@
           </div>
 
           <div v-if="aiTyping" class="flex justify-start">
-            <div class="bg-white border shadow-sm rounded-2xl px-4 py-3 text-sm text-gray-500">
+            <div class="bg-white border shadow-sm rounded-2xl px-4 py-3 text-sm text-[var(--bright-green)]">
               <span class="animate-pulse">AI is typing...</span>
             </div>
           </div>
@@ -78,7 +78,7 @@
 
         <!-- Input -->
         <div class="p-4 border-t bg-white">
-          <div v-if="!user" class="text-center text-sm text-gray-500 mb-3">
+          <div v-if="!user" class="text-center text-sm text-[var(--steel-blue)] mb-3">
             Please
             <button @click="goToLogin" class="text-[var(--royal-blue)] font-medium underline">
               login
