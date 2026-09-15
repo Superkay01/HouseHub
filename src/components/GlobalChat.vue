@@ -91,7 +91,7 @@
               v-model="newMessage"
               @keyup.enter="sendMessage"
               type="text"
-              :placeholder="user ? 'Ask anything about HouseHub...' : 'Login to send messages'"
+              :placeholder="user ? 'Ask anything about Lodgenext...' : 'Login to send messages'"
               class="flex-1 border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--royal-blue)]"
               :disabled="!user || sending || aiTyping"
             />
@@ -193,7 +193,7 @@ const initChat = async () => {
     messages.value = [{
       id: 'welcome',
       sender_type: 'system',
-      content: 'Welcome to HouseHub!\n\nI can help you with:\n• How to request inspection\n• How to save properties\n• General questions about the platform\n\nPlease login for personalized support and to chat with the AI assistant.',
+      content: 'Welcome to Lodgenext!\n\nI can help you with:\n• How to request inspection\n• How to save properties\n• General questions about the platform\n\nPlease login for personalized support and to chat with the AI assistant.',
       created_at: new Date().toISOString()
     }]
     return
@@ -233,7 +233,7 @@ const initChat = async () => {
       await supabase.from('property_chat_messages').insert({
         chat_id: existing.id,
         sender_type: 'system',
-        content: `Hello! I'm your HouseHub Assistant.\n\nI can help you with:\n• Navigating the platform\n• Requesting inspections\n• Understanding fees\n• General support\n\nHow can I assist you today?`
+        content: `Hello! I'm your Lodgenext Assistant.\n\nI can help you with:\n• Navigating the platform\n• Requesting inspections\n• Understanding fees\n• General support\n\nHow can I assist you today?`
       })
     }
 
