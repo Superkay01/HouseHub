@@ -175,6 +175,12 @@ const router = createRouter({
         name: 'AgentMessages',
         component: () => import('@/views/agent/Messages.vue'),
       },
+      {
+        path: '/messages/:id',
+        name: 'AgentChatDetail',
+        component: () => import('@/views/agent/AgentChatDetail.vue'),
+        props: true
+      }
         ]
 },
 {
@@ -329,6 +335,12 @@ const router = createRouter({
   path: '/admin/message',
   name: 'AdminMessage',
   component: () => import('@/views/admin/message.vue'),
+},
+{
+  path: '/admin/chats/:id',
+  name: 'ChatDetail',
+  component: () => import('@/views/admin/ChatDetail.vue'),
+  props: true
 }
     
   ]
