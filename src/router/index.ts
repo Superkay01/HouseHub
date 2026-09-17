@@ -170,6 +170,11 @@ const router = createRouter({
         name: 'AgentHelpSupport',
         component: () => import('@/views/agent/AgentHelpSupport.vue'),
       },
+       {
+        path: '/agent/messages',
+        name: 'AgentMessages',
+        component: () => import('@/views/agent/Messages.vue'),
+      },
         ]
 },
 {

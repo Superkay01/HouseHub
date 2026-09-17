@@ -900,8 +900,54 @@ const goToInspections = () => {
   router.push('/agent/inspections')
 }
 
-const messageAdmin = () => {
-  router.push('/agent/messages')
+const messageAdmin = async () => {
+  if (!selected.value) return
+
+  const requestId = selected.value.id
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  try {
+    // 1. Check if a chat already exists for this request
+    let { data: chat } = await supabase
+      .from('property_chats')
+      .select('id')
+      .eq('request_id', requestId)
+      .maybeSingle()
+
+    if (!chat) {
+      // 2. Create new request-specific chat
+      const { data: newChat, error } = await supabase
+        .from('property_chats')
+        .insert({
+          request_id: requestId,
+          property_id: selected.value.property_id || selected.value.properties?.id,
+          user_id: user.id,
+          property_state: normalizeState(selected.value.state || selected.value.properties?.state),
+          status: 'ai_handling',
+          ai_enabled: true,
+          chat_type: 'agent' // ← Only allowed value
+        })
+        .select('id')
+        .single()
+
+      if (error) throw error
+      chat = newChat
+
+      // 3. System message
+      await supabase.from('property_chat_messages').insert({
+        chat_id: chat.id,
+        sender_type: 'system',
+        content: `Chat started for Request: ${selected.value.request_code || selected.value.id.slice(0, 8)}\nProperty: ${selected.value.properties?.title || 'Property'}\n\nYou can ask questions here. The State Admin will join when available.`
+      })
+    }
+
+    // 4. Go to messages page
+    router.push(`/agent/messages?chat=${chat.id}`)
+  } catch (err) {
+    console.error(err)
+    alert(err.message || 'Could not open chat with Admin')
+  }
 }
 
 /* ---------------------------------

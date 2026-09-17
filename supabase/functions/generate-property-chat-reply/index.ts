@@ -263,7 +263,7 @@ function jsonResponse(body: Record<string, unknown>, status = 200) {
   });
 }
 
-serve(async (req) => {
+serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -299,7 +299,7 @@ serve(async (req) => {
     // ========== AI FALLBACK CHECK ==========
     const { data: chat, error: chatError } = await supabase
       .from("property_chats")
-      .select("id, status, handled_by")
+      .select("id, status, handled_by, assigned_to, ai_enabled")
       .eq("id", chat_id)
       .maybeSingle();
 
@@ -308,7 +308,7 @@ serve(async (req) => {
     }
 
     // Admin is handling → AI stays silent
-    if (chat?.status === "admin_handling") {
+    if (chat?.status === "admin_handling" || chat?.ai_enabled === false) {
       console.log(`AI skipped – admin handling chat ${chat_id}`);
       return jsonResponse({
         success: true,
@@ -407,17 +407,26 @@ Do not invent missing property information.
         return jsonResponse({ error: "The AI service is currently unavailable." }, 503);
       }
       if (openRouterResponse.status === 429) {
-        return jsonResponse({
-          error: "The AI service is temporarily busy. Please try again shortly.",
-        }, 429);
+        return jsonResponse(
+          {
+            error: "The AI service is temporarily busy. Please try again shortly.",
+          },
+          429,
+        );
       }
-      return jsonResponse({ error: "The AI service could not process the request." }, 502);
+      return jsonResponse(
+        { error: "The AI service could not process the request." },
+        502,
+      );
     }
 
     const aiReply = extractAssistantText(responseData);
 
     if (!aiReply) {
-      return jsonResponse({ error: "The AI service returned an empty response." }, 502);
+      return jsonResponse(
+        { error: "The AI service returned an empty response." },
+        502,
+      );
     }
 
     // ========== SAVE AI MESSAGE ==========
@@ -431,17 +440,24 @@ Do not invent missing property information.
 
     if (insertError) {
       console.error("Failed to save AI response:", insertError);
-      return jsonResponse({
-        error: "The AI replied successfully, but the response could not be saved.",
-        reply: aiReply,
-      }, 500);
+      return jsonResponse(
+        {
+          error: "The AI replied successfully, but the response could not be saved.",
+          reply: aiReply,
+        },
+        500,
+      );
     }
 
     return jsonResponse({ success: true, reply: aiReply });
   } catch (error) {
     console.error("generate-property-chat-reply error:", error);
-    return jsonResponse({
-      error: "Sorry, the AI assistant is temporarily unavailable. Please try again shortly.",
-    }, 500);
+    return jsonResponse(
+      {
+        error:
+          "Sorry, the AI assistant is temporarily unavailable. Please try again shortly.",
+      },
+      500,
+    );
   }
 });

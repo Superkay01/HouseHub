@@ -92,6 +92,12 @@
           :to="'/agent/notifications'"
           @click="closeSidebar"
         />
+        <SidebarLink 
+          icon="messages" 
+          label="Messages" 
+          :to="'/agent/messages'"
+          @click="closeSidebar"
+        />
           <SidebarLink 
           icon="analytics" 
           label="Analytics" 
