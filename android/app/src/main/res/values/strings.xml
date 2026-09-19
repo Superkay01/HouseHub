@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Lodgenext</string>
+    <string name="title_activity_main">Lodgenext</string>
+    <string name="package_name">com.lodgenext.app</string>
+    <string name="custom_url_scheme">com.lodgenext.app</string>
+</resources>
