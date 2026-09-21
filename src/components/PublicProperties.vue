@@ -1,8 +1,5 @@
 <template>
   <div class="min-h-screen bg-[var(--light-blue)]">
-    <!-- Navbar -->
-    
-
     <!-- Hero + search -->
     <div class="relative py-10 sm:py-14 px-4 bg-gradient-to-br from-[#0025cc] via-[#2e4cd5] to-[#546cdd]">
       <div class="max-w-3xl mx-auto text-center">
@@ -53,13 +50,23 @@
         :properties="properties"
         :loading="loading"
         detail-route-name="PublicPropertyDetail"
+        enable-share
         @view-details="viewPropertyDetails"
+        @link-copied="onLinkCopied"
       />
 
       <EmptyProperties
         v-if="!loading && properties.length === 0"
         @clear-filters="clearSearch"
       />
+    </div>
+
+    <!-- Toast -->
+    <div
+      v-if="toast"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] px-5 py-3 rounded-2xl shadow-lg text-sm font-medium text-white bg-gray-900"
+    >
+      {{ toast }}
     </div>
   </div>
 </template>
@@ -68,7 +75,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
-import { Search } from 'lucide-vue-next'
+import { Search, Share2 } from 'lucide-vue-next'
 import PropertyGrid from '@/components/customer/properties/PropertyGrid.vue'
 import EmptyProperties from '@/components/customer/properties/EmptyProperties.vue'
 
@@ -77,9 +84,19 @@ const searchQuery = ref('')
 const sortBy = ref('newest')
 const loading = ref(false)
 const properties = ref<any[]>([])
+const toast = ref('')
 
 let timeout: ReturnType<typeof setTimeout>
 let subscription: any = null
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+
+const showToast = (message: string) => {
+  toast.value = message
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    toast.value = ''
+  }, 2500)
+}
 
 const fetchProperties = async () => {
   loading.value = true
@@ -134,6 +151,10 @@ const viewPropertyDetails = (id: string) => {
   router.push({ name: 'PublicPropertyDetail', params: { id } })
 }
 
+const onLinkCopied = () => {
+  showToast('Property link copied')
+}
+
 onMounted(() => {
   fetchProperties()
   subscription = supabase
@@ -148,6 +169,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (timeout) clearTimeout(timeout)
+  if (toastTimer) clearTimeout(toastTimer)
   if (subscription) supabase.removeChannel(subscription)
 })
 </script>

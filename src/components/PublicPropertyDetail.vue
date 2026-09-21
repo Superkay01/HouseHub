@@ -43,16 +43,65 @@
               alt="Main Image"
             />
 
-            <button
-              type="button"
-              @click.stop="toggleSave"
-              class="absolute top-5 right-5 w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
-              :title="isSaved ? 'Unsave property' : 'Save property'"
-            >
-              <span class="text-2xl">
-                {{ isSaved ? '❤️' : '🤍' }}
-              </span>
-            </button>
+            <div class="absolute top-5 right-5 flex items-center gap-2">
+              <!-- Share -->
+              <div class="relative" @click.stop>
+                <button
+                  type="button"
+                  @click="toggleShareMenu"
+                  class="w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
+                  title="Share property"
+                >
+                  <span class="text-xl text-[var(--bright-green)]"><Share2/></span>
+                </button>
+
+                <div
+                  v-if="showShareMenu"
+                  class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-20"
+                >
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    @click="copyPropertyLink"
+                  >
+                    Copy link
+                  </button>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    @click="shareToWhatsApp"
+                  >
+                    WhatsApp
+                  </button>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    @click="shareToFacebook"
+                  >
+                    Facebook
+                  </button>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    @click="shareNative"
+                  >
+                    More…
+                  </button>
+                </div>
+              </div>
+
+              <!-- Save -->
+              <button
+                type="button"
+                @click.stop="toggleSave"
+                class="w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
+                :title="isSaved ? 'Unsave property' : 'Save property'"
+              >
+                <span class="text-2xl">
+                  {{ isSaved ? '❤️' : '🤍' }}
+                </span>
+              </button>
+            </div>
           </div>
 
           <div v-if="allImages.length > 1" class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -112,7 +161,32 @@
               </span>
             </div>
 
-            <!-- PRIMARY CTA: Sign in (not Request Inspection) -->
+            <!-- Share row -->
+            <div class="grid grid-cols-3 gap-2 mb-4">
+              <button
+                type="button"
+                @click="copyPropertyLink"
+                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+              >
+                Copy link
+              </button>
+              <button
+                type="button"
+                @click="shareToWhatsApp"
+                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+              >
+                WhatsApp
+              </button>
+              <button
+                type="button"
+                @click="shareToFacebook"
+                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+              >
+                Facebook
+              </button>
+            </div>
+
+            <!-- PRIMARY CTA: Sign in -->
             <button
               type="button"
               @click="goToSignIn"
@@ -219,13 +293,22 @@
         </button>
       </div>
     </div>
+
+    <!-- Toast -->
+    <div
+      v-if="toast"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[110] px-5 py-3 rounded-2xl shadow-lg text-sm font-medium text-white bg-gray-900"
+    >
+      {{ toast }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient'
+import { Share2 } from 'lucide-vue-next'
 
 const PENDING_SAVES_KEY = 'lodgenext_pending_saves'
 
@@ -237,11 +320,84 @@ const loading = ref(true)
 const error = ref('')
 const mainImage = ref('')
 const showLightbox = ref(false)
+const showShareMenu = ref(false)
+const toast = ref('')
 
 const uniqueViewCount = ref(0)
 const isSaved = ref(false)
 const saving = ref(false)
 const isLoggedIn = ref(false)
+
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+
+const showToast = (message: string) => {
+  toast.value = message
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    toast.value = ''
+  }, 2500)
+}
+
+const getPropertyUrl = () => {
+  const id = property.value?.id || (route.params.id as string)
+  return `${window.location.origin}/properties/${id}`
+}
+
+const toggleShareMenu = () => {
+  showShareMenu.value = !showShareMenu.value
+}
+
+const copyPropertyLink = async () => {
+  const url = getPropertyUrl()
+  try {
+    await navigator.clipboard.writeText(url)
+  } catch {
+    const input = document.createElement('input')
+    input.value = url
+    document.body.appendChild(input)
+    input.select()
+    document.execCommand('copy')
+    document.body.removeChild(input)
+  }
+  showShareMenu.value = false
+  showToast('Property link copied')
+}
+
+const shareToWhatsApp = () => {
+  const url = getPropertyUrl()
+  const text = `Check out this property on LodgeNext: ${property.value?.title || 'Property'}\n${url}`
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
+  showShareMenu.value = false
+}
+
+const shareToFacebook = () => {
+  const url = getPropertyUrl()
+  window.open(
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    '_blank',
+    'noopener,noreferrer'
+  )
+  showShareMenu.value = false
+}
+
+const shareNative = async () => {
+  const url = getPropertyUrl()
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: property.value?.title || 'LodgeNext Property',
+        text: 'Check out this property on LodgeNext',
+        url,
+      })
+      showShareMenu.value = false
+      return
+    } catch {
+      showShareMenu.value = false
+      return
+    }
+  }
+  await copyPropertyLink()
+}
 
 const getPendingSaves = (): string[] => {
   try {
@@ -341,7 +497,6 @@ const recordUniqueView = async () => {
   uniqueViewCount.value = count || 0
 }
 
-/** After login: write pending localStorage saves into DB */
 const syncPendingSaves = async (userId: string) => {
   const pending = getPendingSaves()
   if (!pending.length) return
@@ -372,13 +527,11 @@ const checkIfSaved = async () => {
     return
   }
 
-  // Guest: show as saved if in pending list
   if (!user) {
     isSaved.value = getPendingSaves().includes(String(property.value.id))
     return
   }
 
-  // Logged in: sync any pending saves first, then check DB
   await syncPendingSaves(user.id)
 
   const { data, error } = await supabase
@@ -402,7 +555,6 @@ const toggleSave = async () => {
   const propertyId = String(property.value.id)
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Guest: keep in localStorage so it survives login
   if (!user) {
     if (isSaved.value) {
       removePendingSave(propertyId)
@@ -410,7 +562,6 @@ const toggleSave = async () => {
     } else {
       addPendingSave(propertyId)
       isSaved.value = true
-      // Optional: send them to login so the save is attached to their account
       goToSignIn()
     }
     return
@@ -459,11 +610,16 @@ const allImages = computed(() => {
   return imgs
 })
 
+const closeShareOnOutside = () => {
+  showShareMenu.value = false
+}
+
 watch(property, (newProp) => {
   if (newProp?.cover_image) mainImage.value = newProp.cover_image
 }, { immediate: true })
 
 onMounted(async () => {
+  document.addEventListener('click', closeShareOnOutside)
   await fetchProperty()
   if (property.value?.id) {
     await Promise.all([
@@ -471,5 +627,10 @@ onMounted(async () => {
       checkIfSaved()
     ])
   }
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeShareOnOutside)
+  if (toastTimer) clearTimeout(toastTimer)
 })
 </script>
