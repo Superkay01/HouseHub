@@ -10,7 +10,9 @@
         :key="property.id"
         :property="property"
         :detail-route-name="detailRouteName"
+        :enable-share="enableShare"
         @view-details="emitViewDetails"
+        @link-copied="emitLinkCopied"
       />
     </div>
   </div>
@@ -25,17 +27,24 @@ withDefaults(
     properties: any[]
     loading: boolean
     detailRouteName?: string
+    enableShare?: boolean
   }>(),
   {
-    detailRouteName: 'CustomerPropertyDetail'
+    detailRouteName: 'CustomerPropertyDetail',
+    enableShare: true,
   }
 )
 
 const emit = defineEmits<{
   (e: 'view-details', id: string): void
+  (e: 'link-copied'): void
 }>()
 
 const emitViewDetails = (id: string) => {
   emit('view-details', id)
+}
+
+const emitLinkCopied = () => {
+  emit('link-copied')
 }
 </script>

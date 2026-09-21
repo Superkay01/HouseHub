@@ -1,5 +1,9 @@
 <template>
-  <nav class="h-16 bg-white border-b flex items-center px-6 md:px-8 justify-between relative">
+  <nav
+  class="flex-shrink-0 h-16 bg-white border-b
+         flex items-center px-4 sm:px-6 md:px-8 justify-between relative z-50
+         pt-[env(safe-area-inset-top,0px)]"
+>
     
     <!-- Left Side: Hamburger + Search -->
     <div class="flex items-center gap-4">

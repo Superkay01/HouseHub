@@ -23,18 +23,74 @@
         <span class="text-green-500">✓</span> Verified
       </div>
 
-      <!-- Save Button — stop so it doesn't open details -->
-      <button
-        type="button"
-        @click.stop="toggleSave"
-        :disabled="saving"
-        class="absolute top-3 right-3 w-8 h-8 bg-white/90 hover:bg-white rounded-xl flex items-center justify-center shadow transition-all hover:scale-110 disabled:opacity-50"
-      >
-        <Heart
-          :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']"
-          class="w-4 h-4 transition-colors"
-        />
-      </button>
+      <!-- Share + Save (top right) -->
+      <div class="absolute top-3 right-3 flex items-center gap-2 z-10">
+        <!-- SHARE -->
+        <div v-if="enableShare" class="relative" @click.stop>
+          <button
+            type="button"
+            @click="toggleShare"
+            class="w-8 h-8 bg-white/90 hover:bg-white rounded-xl flex items-center justify-center shadow transition-all hover:scale-110"
+            aria-label="Share property"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+              />
+            </svg>
+          </button>
+
+          <div
+            v-if="showShare"
+            class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden"
+          >
+            <button
+              type="button"
+              class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+              @click="copyLink"
+            >
+              Copy link
+            </button>
+            <button
+              type="button"
+              class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+              @click="shareWhatsApp"
+            >
+              WhatsApp
+            </button>
+            <button
+              type="button"
+              class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+              @click="shareFacebook"
+            >
+              Facebook
+            </button>
+            <button
+              type="button"
+              class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+              @click="shareNative"
+            >
+              More…
+            </button>
+          </div>
+        </div>
+
+        <!-- SAVE -->
+        <button
+          type="button"
+          @click.stop="toggleSave"
+          :disabled="saving"
+          class="w-8 h-8 bg-white/90 hover:bg-white rounded-xl flex items-center justify-center shadow transition-all hover:scale-110 disabled:opacity-50"
+        >
+          <Heart
+            :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']"
+            class="w-4 h-4 transition-colors"
+          />
+        </button>
+      </div>
 
       <!-- Purpose Badge -->
       <div class="absolute bottom-3 left-3 bg-[var(--light-blue)] text-[var(--royal-blue)] text-[10px] sm:text-xs font-medium px-3 py-1 rounded-xl">
@@ -44,7 +100,6 @@
 
     <!-- Content -->
     <div class="p-4 sm:p-5 flex-1 flex flex-col">
-      <!-- Title + Price -->
       <div class="flex justify-between items-start gap-3 mb-2">
         <div class="flex-1 min-w-0">
           <h3 class="font-semibold text-sm sm:text-base leading-snug text-gray-900 line-clamp-2">
@@ -73,13 +128,11 @@
         </p>
       </div>
 
-      <!-- Views -->
       <div class="flex items-center gap-1.5 text-[var(--royal-blue)] text-xs mb-3">
         <span>👁️</span>
         <span>{{ formatViews(viewCount) }} views</span>
       </div>
 
-      <!-- Features -->
       <div class="flex flex-wrap gap-3 sm:gap-4 text-xs mb-3">
         <div class="flex items-center gap-1">
           <span class="text-[#0025cc]">🛏️</span>
@@ -95,7 +148,6 @@
         </div>
       </div>
 
-      <!-- Amenities Preview -->
       <div v-if="property.amenities?.length" class="flex flex-wrap gap-1.5 mb-4">
         <span
           v-for="(amenity, i) in property.amenities.slice(0, 3)"
@@ -112,7 +164,6 @@
         </span>
       </div>
 
-      <!-- Agent Info + Button -->
       <div class="mt-auto pt-3 border-t flex items-center gap-2.5">
         <button
           type="button"
@@ -149,7 +200,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { Heart } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
@@ -160,24 +211,108 @@ const props = withDefaults(
   defineProps<{
     property: any
     detailRouteName?: string
+    enableShare?: boolean
   }>(),
   {
-    detailRouteName: 'CustomerPropertyDetail'
+    detailRouteName: 'CustomerPropertyDetail',
+    enableShare: true,
   }
 )
 
 const emit = defineEmits<{
   (e: 'view-details', id: string): void
+  (e: 'link-copied'): void
 }>()
 
 const router = useRouter()
 const viewCount = ref(0)
 const isSaved = ref(false)
 const saving = ref(false)
+const showShare = ref(false)
 
 const agentId = computed(() => {
   return props.property?.agent_id || props.property?.profiles?.id || null
 })
+
+const getPropertyUrl = () => {
+  const id = props.property?.id
+  try {
+    const resolved = router.resolve({
+      name: props.detailRouteName,
+      params: { id },
+    })
+    return `${window.location.origin}${resolved.href}`
+  } catch {
+    // Public fallback
+    if (props.detailRouteName === 'PublicPropertyDetail') {
+      return `${window.location.origin}/properties/${id}`
+    }
+    return `${window.location.origin}/customer/properties/${id}`
+  }
+}
+
+const toggleShare = () => {
+  showShare.value = !showShare.value
+}
+
+const closeShare = () => {
+  showShare.value = false
+}
+
+const copyLink = async () => {
+  const url = getPropertyUrl()
+  try {
+    await navigator.clipboard.writeText(url)
+  } catch {
+    const input = document.createElement('input')
+    input.value = url
+    document.body.appendChild(input)
+    input.select()
+    document.execCommand('copy')
+    document.body.removeChild(input)
+  }
+  emit('link-copied')
+  closeShare()
+}
+
+const shareWhatsApp = () => {
+  const url = getPropertyUrl()
+  const text = `Check out this property on LodgeNext: ${props.property?.title || 'Property'}\n${url}`
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
+  closeShare()
+}
+
+const shareFacebook = () => {
+  const url = getPropertyUrl()
+  window.open(
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    '_blank',
+    'noopener,noreferrer'
+  )
+  closeShare()
+}
+
+const shareNative = async () => {
+  const url = getPropertyUrl()
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: props.property?.title || 'LodgeNext Property',
+        text: 'Check out this property on LodgeNext',
+        url,
+      })
+    } catch {
+      // cancelled
+    }
+    closeShare()
+    return
+  }
+  await copyLink()
+}
+
+const onDocClick = () => {
+  showShare.value = false
+}
 
 const formatViews = (count: number) => {
   if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M'
@@ -219,7 +354,6 @@ const toggleSave = async () => {
   const propertyId = String(props.property.id)
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Guest: keep save in localStorage so it remains after login
   if (!user) {
     if (isSaved.value) {
       removePendingSave(propertyId)
@@ -363,7 +497,6 @@ const viewAgentProfile = () => {
     return
   }
 
-  // Public pages may not have agent profile route — fall back to login if needed
   if (props.detailRouteName === 'PublicPropertyDetail') {
     router.push({
       path: '/login',
@@ -379,9 +512,14 @@ const viewAgentProfile = () => {
 }
 
 onMounted(async () => {
+  document.addEventListener('click', onDocClick)
   await Promise.all([
     loadViewCount(),
     checkIfSaved()
   ])
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocClick)
 })
 </script>

@@ -75,7 +75,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
-import { Search, Share2 } from 'lucide-vue-next'
+import { Search } from 'lucide-vue-next'
 import PropertyGrid from '@/components/customer/properties/PropertyGrid.vue'
 import EmptyProperties from '@/components/customer/properties/EmptyProperties.vue'
 

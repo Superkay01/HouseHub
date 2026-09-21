@@ -12,11 +12,17 @@ export async function enablePushNotifications(role: 'customer' | 'agent' | 'admi
     throw new Error('Push notifications are not supported on this browser')
   }
 
+  const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
+  if (!vapidKey) {
+    throw new Error('VITE_VAPID_PUBLIC_KEY is missing')
+  }
+
   const permission = await Notification.requestPermission()
   if (permission !== 'granted') {
     throw new Error('Notification permission denied')
   }
 
+  // Ensure SW is registered before .ready (if you register elsewhere, this is still safe)
   const registration = await navigator.serviceWorker.ready
 
   const existing = await registration.pushManager.getSubscription()
@@ -24,23 +30,24 @@ export async function enablePushNotifications(role: 'customer' | 'agent' | 'admi
     existing ||
     (await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(
-        import.meta.env.VITE_VAPID_PUBLIC_KEY
-      ),
+      applicationServerKey: urlBase64ToUint8Array(vapidKey),
     }))
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
   const json = subscription.toJSON()
+  if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) {
+    throw new Error('Invalid push subscription')
+  }
 
   const { error } = await supabase.from('push_subscriptions').upsert(
     {
       user_id: user.id,
       role,
-      endpoint: json.endpoint!,
-      p256dh: json.keys!.p256dh!,
-      auth: json.keys!.auth!,
+      endpoint: json.endpoint,
+      p256dh: json.keys.p256dh,
+      auth: json.keys.auth,
       user_agent: navigator.userAgent,
       updated_at: new Date().toISOString(),
     },
@@ -52,6 +59,8 @@ export async function enablePushNotifications(role: 'customer' | 'agent' | 'admi
 }
 
 export async function disablePushNotifications() {
+  if (!('serviceWorker' in navigator)) return
+
   const registration = await navigator.serviceWorker.ready
   const subscription = await registration.pushManager.getSubscription()
   if (!subscription) return

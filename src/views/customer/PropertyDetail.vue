@@ -4,6 +4,7 @@
       
       <!-- Back Button -->
       <button 
+        type="button"
         @click="$router.back()" 
         class="flex items-center gap-2 text-[var(--royal-blue)] hover:text-[var(--medium-blue)] mb-8 font-medium"
       >
@@ -19,6 +20,7 @@
       <div v-else-if="error" class="text-center py-20">
         <p class="text-red-600 text-xl mb-4">{{ error }}</p>
         <button 
+          type="button"
           @click="fetchProperty"
           class="px-6 py-3 bg-[var(--royal-blue)] text-white rounded-2xl"
         >
@@ -41,16 +43,66 @@
               alt="Main Image"
             />
 
-            <!-- Heart Button -->
-            <button
-              @click.stop="toggleSave"
-              class="absolute top-5 right-5 w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
-              :title="isSaved ? 'Unsave property' : 'Save property'"
-            >
-              <span class="text-2xl">
-                {{ isSaved ? '❤️' : '🤍' }}
-              </span>
-            </button>
+            <!-- Share + Heart -->
+            <div class="absolute top-5 right-5 flex items-center gap-2 z-10">
+              <!-- Share -->
+              <div class="relative" @click.stop>
+                <button
+                  type="button"
+                  @click="toggleShareMenu"
+                  class="w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
+                  title="Share property"
+                >
+                  <span class="text-xl text-[var(--bright-green)]"><Share2/></span>
+                </button>
+
+                <div
+                  v-if="showShareMenu"
+                  class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-20"
+                >
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    @click="copyPropertyLink"
+                  >
+                    Copy link
+                  </button>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm text-[var(--bright-green)] hover:bg-gray-50"
+                    @click="shareToWhatsApp"
+                  >
+                    WhatsApp
+                  </button>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    @click="shareToFacebook"
+                  >
+                    Facebook
+                  </button>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    @click="shareNative"
+                  >
+                    More…
+                  </button>
+                </div>
+              </div>
+
+              <!-- Heart -->
+              <button
+                type="button"
+                @click.stop="toggleSave"
+                class="w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
+                :title="isSaved ? 'Unsave property' : 'Save property'"
+              >
+                <span class="text-2xl">
+                  {{ isSaved ? '❤️' : '🤍' }}
+                </span>
+              </button>
+            </div>
           </div>
 
           <!-- Thumbnails -->
@@ -62,7 +114,7 @@
               :class="{ 'border-[var(--royal-blue)] ring-2 ring-offset-2 ring-[var(--royal-blue)]': mainImage === url }"
               @click="mainImage = url"
             >
-              <img :src="url" class="w-full h-28 object-cover" />
+              <img :src="url" class="w-full h-28 object-cover" alt="" />
             </div>
           </div>
 
@@ -103,7 +155,6 @@
               }}
             </p>
 
-            <!-- Unique View Count -->
             <div class="flex items-center gap-2 text-medium-gray text-sm mb-6">
               <span>👁️</span>
               <span>
@@ -112,8 +163,34 @@
               </span>
             </div>
 
+            <!-- Share row -->
+            <div class="grid grid-cols-3 gap-2 mb-4">
+              <button
+                type="button"
+                @click="copyPropertyLink"
+                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+              >
+                Copy link
+              </button>
+              <button
+                type="button"
+                @click="shareToWhatsApp"
+                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+              >
+                WhatsApp
+              </button>
+              <button
+                type="button"
+                @click="shareToFacebook"
+                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+              >
+                Facebook
+              </button>
+            </div>
+
             <!-- PRIMARY CTA -->
             <button
+              type="button"
               @click="requestInspection"
               class="w-full mb-3 py-4 rounded-2xl font-semibold text-lg text-white bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] transition shadow-md"
             >
@@ -126,6 +203,7 @@
 
             <!-- Chat Button -->
             <button
+              type="button"
               @click="openPropertyChat"
               class="w-full mb-6 py-3.5 rounded-2xl font-medium border-2 border-[var(--royal-blue)] text-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition flex items-center justify-center gap-2"
             >
@@ -134,6 +212,7 @@
 
             <!-- Save Button -->
             <button
+              type="button"
               @click="toggleSave"
               class="w-full mb-6 py-3.5 rounded-2xl font-medium transition flex items-center justify-center gap-2"
               :class="isSaved 
@@ -193,9 +272,9 @@
               </p>
             </div>
 
-            <!-- Secondary CTA -->
             <div class="mt-10 pt-8 border-t space-y-3">
               <button
+                type="button"
                 @click="requestInspection"
                 class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] text-white py-4 rounded-2xl font-semibold text-lg transition"
               >
@@ -203,6 +282,7 @@
               </button>
 
               <button
+                type="button"
                 @click="goToHelp"
                 class="w-full bg-white border border-gray-200 hover:bg-gray-50 text-[var(--royal-blue)] py-3.5 rounded-2xl font-medium transition"
               >
@@ -221,28 +301,33 @@
       @click.self="showLightbox = false"
     >
       <div class="relative max-w-6xl w-full p-8">
-        <img :src="mainImage" class="max-h-[90vh] mx-auto rounded-3xl shadow-2xl" />
-        <button @click="showLightbox = false" class="absolute top-8 right-8 text-white text-5xl">
+        <img :src="mainImage" class="max-h-[90vh] mx-auto rounded-3xl shadow-2xl" alt="" />
+        <button type="button" @click="showLightbox = false" class="absolute top-8 right-8 text-white text-5xl">
           ×
         </button>
       </div>
     </div>
 
-    <!-- ==================== PROPERTY CHAT SLIDE-OVER ==================== -->
+    <!-- Toast -->
+    <div
+      v-if="toast"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[210] px-5 py-3 rounded-2xl shadow-lg text-sm font-medium text-white bg-gray-900"
+    >
+      {{ toast }}
+    </div>
+
+    <!-- PROPERTY CHAT SLIDE-OVER -->
     <Teleport to="body">
       <div
         v-if="showChat"
         class="fixed inset-0 z-[200] flex justify-end"
       >
-        <!-- Backdrop -->
         <div 
           class="absolute inset-0 bg-black/40"
           @click="showChat = false"
         ></div>
 
-        <!-- Panel -->
         <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-in">
-          <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b bg-[var(--royal-blue)] text-white">
             <div>
               <h3 class="font-semibold text-lg">Chat about this property</h3>
@@ -250,10 +335,9 @@
                 {{ property.title }}
               </p>
             </div>
-            <button @click="showChat = false" class="text-2xl leading-none hover:opacity-80">×</button>
+            <button type="button" @click="showChat = false" class="text-2xl leading-none hover:opacity-80">×</button>
           </div>
 
-          <!-- Messages -->
           <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
             <div v-if="chatLoading" class="text-center py-10 text-gray-500">
               Loading conversation...
@@ -266,7 +350,7 @@
               :class="msg.sender_type === 'user' ? 'justify-end' : 'justify-start'"
             >
               <div
-                class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm  text-[var(--royal-blue)]"
+                class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm text-[var(--royal-blue)]"
                 :class="{
                   'bg-[var(--royal-blue)] text-white': msg.sender_type === 'user',
                   'bg-white border shadow-sm': msg.sender_type === 'ai' || msg.sender_type === 'system',
@@ -286,7 +370,6 @@
               </div>
             </div>
 
-            <!-- AI typing indicator -->
             <div v-if="aiTyping" class="flex justify-start">
               <div class="bg-white border shadow-sm rounded-2xl px-4 py-3 text-sm text-gray-500">
                 <span class="animate-pulse">AI is typing...</span>
@@ -294,7 +377,6 @@
             </div>
           </div>
 
-          <!-- Input -->
           <div class="p-4 border-t bg-white">
             <div class="flex gap-2">
               <input
@@ -306,6 +388,7 @@
                 :disabled="sending || aiTyping"
               />
               <button
+                type="button"
                 @click="sendMessage"
                 :disabled="!newMessage.trim() || sending || aiTyping"
                 class="px-5 py-3 bg-[var(--royal-blue)] text-white rounded-xl font-medium disabled:opacity-50 transition"
@@ -321,9 +404,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient'
+import { Share2 } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -333,10 +417,87 @@ const loading = ref(true)
 const error = ref('')
 const mainImage = ref('')
 const showLightbox = ref(false)
+const showShareMenu = ref(false)
+const toast = ref('')
 
 const uniqueViewCount = ref(0)
 const isSaved = ref(false)
 const saving = ref(false)
+
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+
+// ==================== SHARE ====================
+const showToast = (message: string) => {
+  toast.value = message
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    toast.value = ''
+  }, 2500)
+}
+
+const getPropertyUrl = () => {
+  const id = property.value?.id || (route.params.id as string)
+  return `${window.location.origin}/customer/properties/${id}`
+}
+
+const toggleShareMenu = () => {
+  showShareMenu.value = !showShareMenu.value
+}
+
+const copyPropertyLink = async () => {
+  const url = getPropertyUrl()
+  try {
+    await navigator.clipboard.writeText(url)
+  } catch {
+    const input = document.createElement('input')
+    input.value = url
+    document.body.appendChild(input)
+    input.select()
+    document.execCommand('copy')
+    document.body.removeChild(input)
+  }
+  showShareMenu.value = false
+  showToast('Property link copied')
+}
+
+const shareToWhatsApp = () => {
+  const url = getPropertyUrl()
+  const text = `Check out this property on LodgeNext: ${property.value?.title || 'Property'}\n${url}`
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
+  showShareMenu.value = false
+}
+
+const shareToFacebook = () => {
+  const url = getPropertyUrl()
+  window.open(
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    '_blank',
+    'noopener,noreferrer'
+  )
+  showShareMenu.value = false
+}
+
+const shareNative = async () => {
+  const url = getPropertyUrl()
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: property.value?.title || 'LodgeNext Property',
+        text: 'Check out this property on LodgeNext',
+        url,
+      })
+    } catch {
+      // cancelled
+    }
+    showShareMenu.value = false
+    return
+  }
+  await copyPropertyLink()
+}
+
+const closeShareOnOutside = () => {
+  showShareMenu.value = false
+}
 
 // ==================== CHAT STATE ====================
 const showChat = ref(false)
@@ -495,7 +656,6 @@ const openPropertyChat = async () => {
 const initOrLoadChat = async (userId: string) => {
   chatLoading.value = true
   try {
-    // 1. Try to find existing chat first
     let { data: existing, error: findError } = await supabase
       .from('property_chats')
       .select('id, assigned_to, ai_enabled, property_state, status')
@@ -505,7 +665,6 @@ const initOrLoadChat = async (userId: string) => {
 
     if (findError) throw findError
 
-    // 2. If no existing chat, create a new one
     if (!existing) {
       const { data: newChat, error: insertError } = await supabase
         .from('property_chats')
@@ -520,7 +679,6 @@ const initOrLoadChat = async (userId: string) => {
         .single()
 
       if (insertError) {
-        // If it still fails because of unique constraint, try to fetch again
         if (insertError.code === '23505') {
           const { data: retry } = await supabase
             .from('property_chats')
@@ -536,7 +694,6 @@ const initOrLoadChat = async (userId: string) => {
       } else {
         existing = newChat
 
-        // Send welcome message only for brand new chats
         await supabase.from('property_chat_messages').insert({
           chat_id: existing.id,
           sender_type: 'system',
@@ -551,7 +708,7 @@ const initOrLoadChat = async (userId: string) => {
 
     chatId.value = existing.id
     await loadMessages()
-    subscribeToMessages(existing.id)   // make sure realtime is connected
+    subscribeToMessages(existing.id)
   } catch (err: any) {
     console.error('initOrLoadChat error:', err)
     alert(err.message || 'Could not open chat')
@@ -588,7 +745,6 @@ const sendMessage = async () => {
   const content = newMessage.value.trim()
   newMessage.value = ''
 
-  // Optimistic UI
   const tempId = crypto.randomUUID()
   messages.value.push({
     id: tempId,
@@ -611,7 +767,6 @@ const sendMessage = async () => {
 
     if (error) throw error
 
-    // Only trigger AI if no Admin has taken over
     await generateAIReply(content)
   } catch (err: any) {
     console.error(err)
@@ -624,24 +779,22 @@ const sendMessage = async () => {
 
 let messagesChannel: any = null
 
-const subscribeToMessages = (chatId: string) => {
-  // Remove previous subscription
+const subscribeToMessages = (id: string) => {
   if (messagesChannel) {
     supabase.removeChannel(messagesChannel)
   }
 
   messagesChannel = supabase
-    .channel(`customer-chat-${chatId}`)
+    .channel(`customer-chat-${id}`)
     .on(
       'postgres_changes',
       {
         event: 'INSERT',
         schema: 'public',
         table: 'property_chat_messages',
-        filter: `chat_id=eq.${chatId}`,
+        filter: `chat_id=eq.${id}`,
       },
       (payload) => {
-        // Avoid duplicates
         const exists = messages.value.some(m => m.id === payload.new.id)
         if (!exists) {
           messages.value.push(payload.new)
@@ -652,11 +805,9 @@ const subscribeToMessages = (chatId: string) => {
     .subscribe()
 }
 
-// ==================== SMART AI REPLY ====================
 const generateAIReply = async (userQuestion: string) => {
   if (!chatId.value) return
 
-  // Check if Admin has taken over
   const { data: chat } = await supabase
     .from('property_chats')
     .select('ai_enabled, assigned_to, last_agent_reply_at')
@@ -664,11 +815,9 @@ const generateAIReply = async (userQuestion: string) => {
     .single()
 
   if (chat?.assigned_to || chat?.ai_enabled === false) {
-    console.log('Admin is handling this chat → AI skipped')
     return
   }
 
-  // Skip if Admin replied recently
   if (chat?.last_agent_reply_at) {
     const lastReply = new Date(chat.last_agent_reply_at).getTime()
     if (Date.now() - lastReply < 30 * 60 * 1000) {
@@ -735,16 +884,22 @@ const formatTime = (dateStr: string) => {
   return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-// ==================== LIFECYCLE ====================
 watch(property, (newProp) => {
   if (newProp?.cover_image) mainImage.value = newProp.cover_image
 }, { immediate: true })
 
 onMounted(async () => {
+  document.addEventListener('click', closeShareOnOutside)
   await fetchProperty()
   if (property.value?.id) {
     await Promise.all([recordUniqueView(), checkIfSaved()])
   }
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeShareOnOutside)
+  if (toastTimer) clearTimeout(toastTimer)
+  if (messagesChannel) supabase.removeChannel(messagesChannel)
 })
 </script>
 

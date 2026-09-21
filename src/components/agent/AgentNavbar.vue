@@ -1,11 +1,17 @@
 <template>
-  <nav class="h-16 bg-white border-b flex items-center px-6 md:px-8 justify-between relative">
+  <nav
+    class="flex-shrink-0 h-16 bg-white border-b
+           flex items-center px-4 sm:px-6 md:px-8 justify-between relative z-50
+           pt-[env(safe-area-inset-top,0px)]"
+  >
     
     <!-- Left Side: Hamburger + Search -->
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-4 min-w-0">
       <button 
+        type="button"
         @click="toggleSidebar"
-        class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+        class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
+        aria-label="Open menu"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -23,10 +29,10 @@
     </div>
 
     <!-- Right Side -->
-    <div class="flex items-center gap-4 md:gap-6">
+    <div class="flex items-center gap-3 sm:gap-4 md:gap-6 flex-shrink-0">
       
       <!-- Messages -->
-      <button class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
+      <button type="button" class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
         </svg>
@@ -35,8 +41,10 @@
       <!-- Notifications -->
       <div class="relative" ref="notifWrapper">
         <button
+          type="button"
           @click.stop="toggleNotifDropdown"
           class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors"
+          aria-label="Notifications"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -53,12 +61,13 @@
         <!-- Notification Dropdown -->
         <div
           v-if="showNotifDropdown"
-          class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
+          class="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[60] overflow-hidden"
         >
           <div class="px-4 py-3 border-b flex items-center justify-between">
-            <h3 class="font-semibold text-gray-900">Notifications</h3>
+            <h3 class="font-semibold text-[var(--royal-blue)]">Notifications</h3>
             <button
               v-if="unreadCount > 0"
+              type="button"
               @click="markAllAsRead"
               class="text-xs text-[var(--royal-blue)] hover:underline"
             >
@@ -67,18 +76,19 @@
           </div>
 
           <div class="max-h-96 overflow-y-auto">
-            <div v-if="loadingNotifications" class="p-6 text-center text-sm text-gray-500">
+            <div v-if="loadingNotifications" class="p-6 text-center text-sm text-[var(--steel-blue)]">
               Loading...
             </div>
 
             <div v-else-if="recentNotifications.length === 0" class="p-8 text-center">
               <p class="text-2xl mb-2">🔔</p>
-              <p class="text-sm text-gray-500">No notifications yet</p>
+              <p class="text-sm text-[var(--steel-blue)]">No notifications yet</p>
             </div>
 
             <button
               v-for="item in recentNotifications"
               :key="item.id"
+              type="button"
               @click="openNotification(item)"
               class="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition"
               :class="!item.is_read ? 'bg-[#f0f7ff]' : ''"
@@ -91,9 +101,9 @@
                   {{ typeIcon(item.type) }}
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 line-clamp-1">{{ item.title }}</p>
-                  <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ item.message }}</p>
-                  <p class="text-[10px] text-gray-400 mt-1">{{ formatTime(item.created_at) }}</p>
+                  <p class="text-sm font-medium text-[var(--royal-blue)] line-clamp-1">{{ item.title }}</p>
+                  <p class="text-xs text-[var(--steel-blue)] mt-0.5 line-clamp-2">{{ item.message }}</p>
+                  <p class="text-[10px] text-[var(--steel-blue)] mt-1">{{ formatTime(item.created_at) }}</p>
                 </div>
                 <span
                   v-if="!item.is_read"
@@ -141,13 +151,14 @@
         <!-- Dropdown Menu -->
         <div 
           v-if="showDropdown"
-          class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50"
+          class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-[60]"
         >
           <div class="px-4 py-2 border-b">
             <div class="flex items-center gap-3">
               <img 
                 :src="userProfile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'Agent')}&background=0025cc&color=fff`"
                 class="w-11 h-11 rounded-2xl object-cover border-2 border-[var(--royal-blue)] shadow-sm"
+                alt=""
               />
               <div>
                 <p class="font-semibold text-xs md:text-sm text-[var(--royal-blue)]">{{ userProfile.full_name }}</p>
@@ -162,42 +173,42 @@
             <router-link
               to="/agent/profile-settings"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-1 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
+              class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
             >
               👤 Profile Settings
             </router-link>
             <router-link
               to="/agent/notifications"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-1 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
+              class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
             >
               🔔 Notifications
             </router-link>
             <router-link
               to="/agent/properties"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-1 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
+              class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
             >
               🏢 My Properties
             </router-link>
             <router-link
               to="/agent/requests"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-1 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
+              class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
             >
               📋 Requests
             </router-link>
             <router-link
               to="/agent/inspections"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-1 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
+              class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
             >
               🏠 Inspections
             </router-link>
             <router-link
               to="/agent/help-support"
               @click="showDropdown = false"
-              class="flex items-center gap-3 px-4 py-1 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
+              class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-xs md:text-sm text-[var(--royal-blue)]"
             >
               ❓ Help & Support
             </router-link>
@@ -205,8 +216,9 @@
 
           <div class="border-t pt-2">
             <button 
+              type="button"
               @click="logout"
-              class="w-full flex items-center gap-3 px-4 py-1 text-red-600 hover:bg-red-50 transition-all"
+              class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-all"
             >
               Logout
             </button>
@@ -250,6 +262,7 @@
             </div>
 
             <button
+              type="button"
               @click="closePopup"
               class="text-[var(--steel-blue)] hover:text-[var(--royal-blue)] text-xl leading-none"
             >
@@ -264,6 +277,7 @@
 
           <div class="mt-4 flex gap-2">
             <button
+              type="button"
               @click="handlePopupAction"
               class="flex-1 py-2.5 rounded-xl bg-[var(--royal-blue)] text-white text-sm font-medium
                      hover:opacity-90 transition-opacity"
@@ -271,6 +285,7 @@
               {{ actionLabel(popupNotification) }}
             </button>
             <button
+              type="button"
               @click="closePopup"
               class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[var(--steel-blue)]
                      hover:bg-gray-50 transition-colors"
@@ -504,7 +519,6 @@ const openNotification = async (item) => {
     await markAsRead(item.id)
   }
 
-  // Show popup with next-step guidance (expires in 10s)
   showNotificationPopup(item)
 }
 
@@ -578,7 +592,6 @@ onUnmounted(() => {
   transform: translateY(-12px) scale(0.98);
 }
 
-/* 10-second progress bar */
 .popup-progress {
   width: 100%;
   animation: popupShrink 10s linear forwards;

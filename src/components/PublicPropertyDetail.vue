@@ -1,4 +1,5 @@
 <template>
+  <Navbar/>
   <div class="min-h-screen bg-gray-50 pb-16">
     <div class="max-w-6xl mx-auto px-4 pt-8">
       
@@ -302,6 +303,7 @@
       {{ toast }}
     </div>
   </div>
+  <Footer/>
 </template>
 
 <script setup lang="ts">
@@ -309,6 +311,8 @@ import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient'
 import { Share2 } from 'lucide-vue-next'
+import Navbar from './Navbar.vue'
+import Footer from './Footer.vue'
 
 const PENDING_SAVES_KEY = 'lodgenext_pending_saves'
 

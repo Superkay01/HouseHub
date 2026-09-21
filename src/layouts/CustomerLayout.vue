@@ -1,15 +1,17 @@
 <template>
-  <div class="flex h-screen bg-[var(--light-blue)] overflow-hidden">
+  <div class="flex h-[100dvh] max-h-[100dvh] bg-[var(--light-blue)] overflow-hidden">
     <!-- Sidebar -->
     <CustomerSidebar ref="sidebarRef" />
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <!-- Navbar -->
-      <CustomerNavbar @toggle-sidebar="toggleSidebar" />
+    <div class="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
+      <!-- Navbar: never shrink / always visible -->
+      <div class="flex-shrink-0 sticky top-0 z-50">
+        <CustomerNavbar @toggle-sidebar="toggleSidebar" />
+      </div>
 
-      <!-- Page Content -->
-      <div class="flex-1 overflow-auto">
+      <!-- Page Content: only this scrolls -->
+      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
         <router-view />
       </div>
     </div>
@@ -17,8 +19,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useCustomerNotifications } from '@/composables/useCustomerNotifications'
 import CustomerSidebar from '@/components/customer/CustomerSidebar.vue'
 import CustomerNavbar from '@/components/customer/CustomerNavbar.vue'
@@ -30,7 +31,6 @@ const toggleSidebar = () => {
 }
 
 const {
-  unreadCount,
   startNotificationListener,
   stopNotificationListener,
 } = useCustomerNotifications()

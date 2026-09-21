@@ -1,5 +1,9 @@
 self.addEventListener('push', (event) => {
-  let data = { title: 'LodgeNext', body: 'You have a new notification', url: '/' }
+  let data = {
+    title: 'LodgeNext',
+    body: 'You have a new notification',
+    url: '/',
+  }
 
   try {
     if (event.data) data = { ...data, ...event.data.json() }
@@ -11,6 +15,11 @@ self.addEventListener('push', (event) => {
       icon: '/Lodgenext_logo__2_-removebg-preview.png',
       badge: '/Lodgenext_logo__2_-removebg-preview.png',
       data: { url: data.url || '/' },
+      // Helps Android show it more reliably
+      requireInteraction: false,
+      vibrate: [120, 80, 120],
+      tag: data.tag || 'lodgenext-notification', // replaces older same-tag notifs
+      renotify: true,
     })
   )
 })
@@ -27,7 +36,7 @@ self.addEventListener('notificationclick', (event) => {
           return client.focus()
         }
       }
-      return clients.openWindow(url)
+      if (clients.openWindow) return clients.openWindow(url)
     })
   )
 })
