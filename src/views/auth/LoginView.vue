@@ -1,5 +1,5 @@
 <template>
-  <Navbar />
+  <!-- <Navbar /> -->
   <div class="min-h-screen bg-[var(--light-blue)] flex items-center justify-center py-8 px-4">
     <div class="max-w-4xl w-full grid md:grid-cols-2 gap-8 bg-white rounded-3xl shadow-2xl overflow-hidden">
 
@@ -104,7 +104,7 @@
       </div>
     </div>
   </div>
-  <Footer />
+  <!-- <Footer /> -->
 </template>
 
 <script setup>
@@ -112,8 +112,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../../supabaseClient.ts'
 import { Eye, EyeClosed } from 'lucide-vue-next'
-import Navbar from '@/components/Navbar.vue'
-import Footer from '@/components/Footer.vue'
+// import Navbar from '@/components/Navbar.vue'
+// import Footer from '@/components/Footer.vue'
 
 
 const router = useRouter()

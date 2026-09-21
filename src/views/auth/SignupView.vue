@@ -1,5 +1,5 @@
 <template>
-  <Navbar/>
+  <!-- <Navbar/> -->
   <div class="min-h-screen bg-[var(--light-blue)] flex items-center justify-center py-5 px-2">
     <div class="max-w-4xl w-full">
       
@@ -90,15 +90,15 @@
       </p>
     </div>
   </div>
-  <Footer/>
+  <!-- <Footer/> -->
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import SignupForm from './SignupForm.vue'
 import { House, User } from 'lucide-vue-next'
-import Footer from '@/components/Footer.vue'
-import Navbar from '@/components/Navbar.vue'
+// import Footer from '@/components/Footer.vue'
+// import Navbar from '@/components/Navbar.vue'
 
 const selectedRole = ref(null)
 
