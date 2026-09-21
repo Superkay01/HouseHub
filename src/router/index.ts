@@ -57,6 +57,26 @@ const router = createRouter({
       name: 'Support',
       component: () => import('@/views/Support.vue')
     },
+    {
+      path: '/agent-support',
+      name: 'AgentSupport',
+      component: () => import('@/views/agent-support.vue')
+    },
+     {
+      path: '/HowItWorks',
+      name: 'HowItWorks',
+      component: () => import('@/components/HowItWorks.vue')
+    },
+     {
+      path: '/faq',
+      name: 'FAQSection',
+      component: () => import('@/components/FAQSection.vue')
+    },
+    {
+      path: '/terms-and-conditions',
+      name: 'TermsAndConditions',
+      component: () => import('@/views/TermsAndConditions.vue')
+    },
     
     // {
     //   path: '/states',

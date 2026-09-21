@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Camera, MapPin, Phone, PhoneCall, X } from 'lucide-vue-next';
 import { Facebook, Instagram } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goToAgent = () => {
+  router.push('/login')
+}
 
 </script>
 
@@ -55,10 +62,10 @@ import { Facebook, Instagram } from 'lucide-vue-next'
           <h3 class="font-semibold text-lg mb-5 text-white">Quick Links</h3>
           <ul class="space-y-3 text-white/80">
             <li><a href="/" class="hover:text-[var(--light-blue)] transition-colors">Home</a></li>
-            <li><a href="/properties" class="hover:text-[var(--light-blue)] transition-colors">Browse Properties</a></li>
+            <li><a href="/property" class="hover:text-[var(--light-blue)] transition-colors">Browse Properties</a></li>
             <li><a href="/featured" class="hover:text-[var(--light-blue)] transition-colors">Featured Homes</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">How It Works</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">FAQ</a></li>
+            <li><a href="/HowItWorks" class="hover:text-[var(--light-blue)] transition-colors">How It Works</a></li>
+            <li><a href="/faq" class="hover:text-[var(--light-blue)] transition-colors">FAQ</a></li>
           </ul>
         </div>
 
@@ -66,10 +73,10 @@ import { Facebook, Instagram } from 'lucide-vue-next'
         <div class="lg:col-span-2">
           <h3 class="font-semibold text-lg mb-5 text-white">Company</h3>
           <ul class="space-y-3 text-white/80">
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">About Us</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Contact Us</a></li>
+            <li><a href="/about" class="hover:text-[var(--light-blue)] transition-colors">About Us</a></li>
+            <li><a href="/contact" class="hover:text-[var(--light-blue)] transition-colors">Contact Us</a></li>
             <li><a href="/privacy-policy" class="hover:text-[var(--light-blue)] transition-colors">Privacy Policy</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Terms & Conditions</a></li>
+            <li><a href="/terms-and-conditions" class="hover:text-[var(--light-blue)] transition-colors">Terms & Conditions</a></li>
           </ul>
         </div>
 
@@ -77,13 +84,14 @@ import { Facebook, Instagram } from 'lucide-vue-next'
         <div class="lg:col-span-3">
           <h3 class="font-semibold text-lg mb-5 text-white">For Agents</h3>
           <ul class="space-y-3 text-white/80 mb-8">
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Become an Agent</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">List a Property</a></li>
-            <li><a href="#" class="hover:text-[var(--light-blue)] transition-colors">Agent Support</a></li>
+            <li><a href="/login" class="hover:text-[var(--light-blue)] transition-colors">Become an Agent</a></li>
+            <li><a href="/property" class="hover:text-[var(--light-blue)] transition-colors">List a Property</a></li>
+            <li><a href="/agent-support" class="hover:text-[var(--light-blue)] transition-colors">Agent Support</a></li>
           </ul>
 
           <!-- CTA Button -->
           <button 
+          @click="goToAgent"
             class="bg-white text-[var(--royal-blue)] font-semibold px-8 py-4 rounded-2xl hover:bg-[var(--light-blue)] hover:text-[var(--royal-blue)] transition-all w-full sm:w-auto">
             Become an Agent
           </button>
