@@ -63,10 +63,12 @@
         
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <button 
+          @click="goToSupport"
             class="bg-white text-[var(--royal-blue)] font-semibold px-8 py-4 rounded-2xl hover:bg-[var(--light-blue)] transition-all hover:scale-105">
             Contact Support
           </button>
           <button 
+          @click="goToProperties"
             class="border border-white/70 text-white font-medium px-8 py-4 rounded-2xl hover:bg-white/10 transition-all">
             Browse Properties
           </button>
@@ -78,6 +80,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const faqs = ref([
   {
@@ -110,5 +115,13 @@ const openIndex = ref(null)
 
 const toggleFAQ = (index) => {
   openIndex.value = openIndex.value === index ? null : index
+}
+
+const goToSupport = () => {
+  router.push('/support')
+}
+
+const goToProperties = () => {
+  router.push('/property')
 }
 </script>

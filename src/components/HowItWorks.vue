@@ -65,7 +65,8 @@
 
       <!-- CTA -->
       <div class="mt-20 text-center">
-        <button 
+        <button
+        @click="goToProperties" 
           class="group inline-flex items-center gap-3 bg-[#0025cc] hover:bg-[#9faffa] text-white font-semibold text-lg px-10 py-5 rounded-3xl transition-all duration-300 hover:shadow-xl hover:shadow-[#0025cc]/30 active:scale-95"
         >
           Start Searching Homes
@@ -80,11 +81,17 @@
 <script setup>
 import { Info, Map, Home, PhoneCall } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const iconMap = {
   Map,
   Home,
   PhoneCall
+}
+
+const goToProperties = () => {
+  router.push('/property')
 }
 
 const steps = ref([
