@@ -1,15 +1,17 @@
 <template>
   <nav
-  class="flex-shrink-0 h-16 bg-white border-b
-         flex items-center px-4 sm:px-6 md:px-8 justify-between relative z-50
-         pt-[env(safe-area-inset-top,0px)]"
->
+    class="flex-shrink-0 h-16 bg-white border-b
+           flex items-center px-4 sm:px-6 md:px-8 justify-between relative z-50
+           pt-[env(safe-area-inset-top,0px)]"
+  >
     
     <!-- Left Side: Hamburger + Search -->
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-4 min-w-0">
       <button 
+        type="button"
         @click="toggleSidebar"
-        class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+        class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
+        aria-label="Open menu"
       >
         <Menu class="w-7 h-7 text-gray-700" />
       </button>
@@ -25,13 +27,15 @@
     </div>
 
     <!-- Right Side -->
-    <div class="flex items-center gap-4 md:gap-6">
+    <div class="flex items-center gap-3 sm:gap-4 md:gap-6 flex-shrink-0">
       
       <!-- Notifications -->
       <div class="relative" ref="notifWrapper">
         <button
+          type="button"
           @click.stop="toggleNotifDropdown"
           class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors"
+          aria-label="Notifications"
         >
           <Bell class="w-6 h-6 text-gray-600" />
           <span
@@ -45,12 +49,13 @@
         <!-- Notification Dropdown -->
         <div
           v-if="showNotifDropdown"
-          class="absolute right-0 mt-2 w-60 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
+          class="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[60] overflow-hidden"
         >
           <div class="px-4 py-3 border-b flex items-center justify-between">
             <h3 class="font-semibold text-[var(--royal-blue)]">Notifications</h3>
             <button
               v-if="unreadCount > 0"
+              type="button"
               @click="markAllAsRead"
               class="text-xs text-[var(--royal-blue)] hover:underline"
             >
@@ -65,12 +70,13 @@
 
             <div v-else-if="recentNotifications.length === 0" class="p-8 text-center">
               <p class="text-2xl mb-2">🔔</p>
-              <p class="text-sm text-[var(--hover-blue)]">No notifications yet</p>
+              <p class="text-sm text-[var(--steel-blue)]">No notifications yet</p>
             </div>
 
             <button
               v-for="item in recentNotifications"
               :key="item.id"
+              type="button"
               @click="openNotification(item)"
               class="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition"
               :class="!item.is_read ? 'bg-[#f0f7ff]' : ''"
@@ -84,7 +90,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-[var(--royal-blue)] line-clamp-1">{{ item.title }}</p>
-                  <p class="text-xs text-[var(--royal-blue)] mt-0.5 line-clamp-2">{{ item.message }}</p>
+                  <p class="text-xs text-[var(--steel-blue)] mt-0.5 line-clamp-2">{{ item.message }}</p>
                   <p class="text-[10px] text-[var(--steel-blue)] mt-1">{{ formatTime(item.created_at) }}</p>
                 </div>
                 <span
@@ -108,7 +114,7 @@
       </div>
 
       <!-- Messages -->
-      <button class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
+      <button type="button" class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
         <MessageCircle class="w-6 h-6 text-gray-600" />
       </button>
 
@@ -135,13 +141,14 @@
 
         <div 
           v-if="showDropdown"
-          class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50"
+          class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-[60]"
         >
           <div class="px-4 py-3 border-b">
             <div class="flex items-center gap-3">
               <img 
                 :src="userProfile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.full_name || 'Customer')}&background=0025cc&color=fff`"
                 class="w-11 h-11 rounded-2xl"
+                alt=""
               />
               <div>
                 <p class="font-semibold">{{ userProfile.full_name }}</p>
@@ -190,6 +197,7 @@
 
           <div class="border-t pt-2">
             <button 
+              type="button"
               @click="logout"
               class="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-all"
             >
@@ -235,6 +243,7 @@
             </div>
 
             <button
+              type="button"
               @click="closePopup"
               class="text-[var(--steel-blue)] hover:text-[var(--royal-blue)] text-xl leading-none"
             >
@@ -244,6 +253,7 @@
 
           <div class="mt-4 flex gap-2">
             <button
+              type="button"
               @click="handlePopupAction"
               class="flex-1 py-2.5 rounded-xl bg-[var(--royal-blue)] text-white text-sm font-medium
                      hover:opacity-90 transition-opacity"
@@ -251,6 +261,7 @@
               {{ actionLabel(popupNotification) }}
             </button>
             <button
+              type="button"
               @click="closePopup"
               class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[var(--steel-blue)]
                      hover:bg-gray-50 transition-colors"
@@ -271,6 +282,7 @@ import { useRouter } from 'vue-router'
 import { Menu, Bell, MessageCircle, Search } from 'lucide-vue-next'
 import { useCustomerNotifications } from '@/composables/useCustomerNotifications'
 import { playNotificationSound } from '@/utils/notificationSound'
+import { enablePushNotifications } from '@/utils/pushNotifications'
 
 const emit = defineEmits(['toggle-sidebar'])
 const router = useRouter()
@@ -489,7 +501,6 @@ const openNotification = async (item) => {
     await markAsRead(item.id)
   }
 
-  // Show guidance popup, then user can go to the related page
   showNotificationPopup(item)
 }
 
@@ -510,11 +521,27 @@ const listenForNewNotifications = async () => {
       async (payload) => {
         const row = payload.new
         recentNotifications.value = [row, ...recentNotifications.value].slice(0, 8)
+        // In-app only while app is open
         showNotificationPopup(row)
         await refreshUnreadCount(user.id)
       }
     )
     .subscribe()
+}
+
+/**
+ * Register this device for lock-screen / background push.
+ * Saves subscription in push_subscriptions with role: 'customer'.
+ * Actual lock-screen delivery is done by the send-push Edge Function
+ * when a customer_notifications row is created.
+ */
+const setupLockScreenPush = async () => {
+  try {
+    await enablePushNotifications('customer')
+    console.log('Customer lock-screen push enabled')
+  } catch (err) {
+    console.log('Lock-screen push not enabled:', err?.message || err)
+  }
 }
 
 const logout = async () => {
@@ -537,6 +564,7 @@ onMounted(async () => {
   await fetchUserProfile()
   await startNotificationListener()
   await listenForNewNotifications()
+  await setupLockScreenPush()
   document.addEventListener('click', handleClickOutside)
 })
 

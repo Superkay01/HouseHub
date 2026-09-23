@@ -270,7 +270,6 @@
             </button>
           </div>
 
-          <!-- Progress bar: 10 seconds -->
           <div class="mt-3 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
             <div class="h-full bg-[var(--royal-blue)] popup-progress" />
           </div>
@@ -304,6 +303,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabaseClient.js'
 import { useRouter } from 'vue-router'
 import { useAgentNotifications } from '@/composables/useAgentNotifications'
+import { enablePushNotifications } from '@/utils/pushNotifications'
 
 const router = useRouter()
 const emit = defineEmits(['toggle-sidebar'])
@@ -326,7 +326,7 @@ const profileWrapper = ref(null)
 let popupTimer = null
 let notifChannel = null
 
-const POPUP_DURATION_MS = 10000 // 10 seconds
+const POPUP_DURATION_MS = 10000
 
 const {
   unreadCount,
@@ -539,11 +539,28 @@ const listenForNewNotifications = async () => {
       async (payload) => {
         const row = payload.new
         recentNotifications.value = [row, ...recentNotifications.value].slice(0, 8)
+        // In-app popup only (app is open)
         showNotificationPopup(row)
         await refreshUnreadCount(user.id)
       }
     )
     .subscribe()
+}
+
+/**
+ * Register this device for lock-screen / background push.
+ * Does NOT send pushes — only saves the subscription in push_subscriptions.
+ * Actual lock-screen delivery is done by the send-push Edge Function
+ * when a notification is created for this agent.
+ */
+const setupLockScreenPush = async () => {
+  try {
+    await enablePushNotifications('agent')
+    console.log('Agent lock-screen push enabled')
+  } catch (err) {
+    // Permission denied / unsupported browser — non-fatal
+    console.log('Lock-screen push not enabled:', err?.message || err)
+  }
 }
 
 const logout = async () => {
@@ -570,6 +587,8 @@ onMounted(async () => {
   await fetchUserProfile()
   await startNotificationListener()
   await listenForNewNotifications()
+  // Ask permission + save device for lock-screen notifications
+  await setupLockScreenPush()
   document.addEventListener('click', handleClickOutside)
 })
 

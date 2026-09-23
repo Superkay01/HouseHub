@@ -1,11 +1,17 @@
 <template>
-  <nav class="h-16 bg-white border-b flex items-center px-6 md:px-8 justify-between relative">
+  <nav
+    class="flex-shrink-0 h-16 bg-white border-b
+           flex items-center px-4 sm:px-6 md:px-8 justify-between relative z-50
+           pt-[env(safe-area-inset-top,0px)]"
+  >
     
     <!-- Left Side -->
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-4 min-w-0">
       <button 
+        type="button"
         @click="toggleSidebar"
-        class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+        class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
+        aria-label="Open menu"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -14,13 +20,15 @@
     </div>
 
     <!-- Right Side -->
-    <div class="flex items-center gap-4 sm:gap-6">
+    <div class="flex items-center gap-3 sm:gap-4 md:gap-6 flex-shrink-0">
       
       <!-- ================= NOTIFICATIONS ================= -->
       <div class="relative" ref="notificationRef">
         <button 
+          type="button"
           @click.stop="toggleNotifications"
           class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors"
+          aria-label="Notifications"
         >
           <Bell class="w-6 h-6 text-gray-600" />
           <span 
@@ -34,7 +42,7 @@
         <!-- Dropdown -->
         <div 
           v-if="showNotifications"
-          class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+          class="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm sm:w-96 bg-white rounded-2xl shadow-xl border border-gray-100 z-[60] overflow-hidden"
         >
           <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 class="font-semibold text-[var(--royal-blue)] text-sm">
@@ -42,6 +50,7 @@
             </h3>
             <button 
               v-if="unreadCount > 0"
+              type="button"
               @click="markAllAsRead"
               class="text-xs text-[var(--royal-blue)] hover:underline"
             >
@@ -61,6 +70,7 @@
             <button
               v-for="item in notifications"
               :key="item.id"
+              type="button"
               @click="handleNotificationClick(item)"
               class="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
               :class="{ 'bg-[var(--royal-blue)]/5': !item.is_read }"
@@ -104,7 +114,7 @@
       </div>
 
       <!-- Messages -->
-      <button class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
+      <button type="button" class="relative p-2 hover:bg-gray-100 rounded-xl transition-colors">
         <MessageCircle class="w-6 h-6 text-gray-600" />
       </button>
 
@@ -163,6 +173,7 @@
             </div>
 
             <button
+              type="button"
               @click="closePopup"
               class="text-[var(--steel-blue)] hover:text-[var(--royal-blue)] text-xl leading-none"
             >
@@ -170,13 +181,13 @@
             </button>
           </div>
 
-          <!-- 10-second progress bar -->
           <div class="mt-3 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
             <div class="h-full bg-[var(--royal-blue)] popup-progress" />
           </div>
 
           <div class="mt-4 flex gap-2">
             <button
+              type="button"
               @click="handlePopupAction"
               class="flex-1 py-2.5 rounded-xl bg-[var(--royal-blue)] text-white text-sm font-medium
                      hover:opacity-90 transition-opacity"
@@ -184,6 +195,7 @@
               Review Ticket
             </button>
             <button
+              type="button"
               @click="closePopup"
               class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[var(--steel-blue)]
                      hover:bg-gray-50 transition-colors"
@@ -202,6 +214,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 import { Bell, MessageCircle } from 'lucide-vue-next'
+import { enablePushNotifications } from '@/utils/pushNotifications'
 
 const emit = defineEmits(['toggle-sidebar'])
 const router = useRouter()
@@ -224,7 +237,7 @@ const seenTicketIds = ref(new Set())
 let popupTimer = null
 let ticketChannel = null
 
-const POPUP_DURATION_MS = 10000 // 10 seconds
+const POPUP_DURATION_MS = 10000
 
 const unreadCount = computed(() => {
   return notifications.value.filter(n => !n.is_read).length
@@ -396,15 +409,24 @@ const listenForNewTickets = () => {
       },
       (payload) => {
         const ticket = payload.new
-        // Only notify on open tickets
         if (ticket.status && !['open', 'in_progress'].includes(ticket.status)) return
 
         const mapped = mapTicketToNotification(ticket)
         notifications.value = [mapped, ...notifications.value].slice(0, 15)
+        // In-app popup only while admin app is open
         showNotificationPopup(mapped)
       }
     )
     .subscribe()
+}
+
+const setupLockScreenPush = async () => {
+  try {
+    await enablePushNotifications('admin')
+    console.log('Admin lock-screen push enabled')
+  } catch (err) {
+    console.log('Lock-screen push not enabled:', err?.message || err)
+  }
 }
 
 const handleClickOutside = (e) => {
@@ -413,10 +435,11 @@ const handleClickOutside = (e) => {
   }
 }
 
-onMounted(() => {
-  fetchAdminProfile()
-  fetchNotifications()
+onMounted(async () => {
+  await fetchAdminProfile()
+  await fetchNotifications()
   listenForNewTickets()
+  await setupLockScreenPush()
   document.addEventListener('click', handleClickOutside)
 })
 
