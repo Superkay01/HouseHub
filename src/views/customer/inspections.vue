@@ -1,99 +1,91 @@
 <template>
   <div class="min-h-screen bg-[var(--light-blue)]">
     <!-- Navbar -->
-    <nav class="bg-white border-b sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center">
-        <img 
-          src="/Lodgenext_logo__2_-removebg-preview.png" 
-          alt="LodgeNext" 
-          class="h-10 sm:h-11 object-contain" 
-        />
-      </div>
-    </nav>
+    
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-3 md:gap-4 mb-5 sm:mb-6 md:mb-8">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-[var(--royal-blue)]">
+          <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-[var(--royal-blue)]">
             My Inspections
           </h1>
-          <p class="text-sm text-gray-600 mt-1">
+          <p class="text-xs sm:text-sm text-gray-600 mt-1">
             Track requests, confirm schedules, and view inspection outcomes
           </p>
         </div>
         <button
           type="button"
           @click="fetchInspections"
-          class="px-4 py-2.5 bg-white border rounded-xl text-sm font-medium hover:bg-gray-50 self-start"
+          class="px-3 sm:px-4 py-2 sm:py-2.5 bg-white border rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-gray-50 self-start"
         >
           Refresh
         </button>
       </div>
 
       <!-- Summary Cards -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-        <div class="bg-white p-4 rounded-2xl shadow-sm">
-          <div class="text-xl mb-1">⚡</div>
-          <div class="text-2xl font-bold text-red-600">{{ actionRequiredCount }}</div>
-          <div class="text-xs text-gray-500">Action Required</div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-5 sm:mb-6 md:mb-8">
+        <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm">
+          <div class="text-base sm:text-lg md:text-xl mb-0.5 sm:mb-1">⚡</div>
+          <div class="text-lg sm:text-xl md:text-2xl font-bold text-red-600">{{ actionRequiredCount }}</div>
+          <div class="text-[10px] sm:text-xs text-gray-500">Action Required</div>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm">
-          <div class="text-xl mb-1">📅</div>
-          <div class="text-2xl font-bold text-[var(--royal-blue)]">{{ upcomingCount }}</div>
-          <div class="text-xs text-gray-500">Upcoming</div>
+        <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm">
+          <div class="text-base sm:text-lg md:text-xl mb-0.5 sm:mb-1">📅</div>
+          <div class="text-lg sm:text-xl md:text-2xl font-bold text-[var(--royal-blue)]">{{ upcomingCount }}</div>
+          <div class="text-[10px] sm:text-xs text-gray-500">Upcoming</div>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm">
-          <div class="text-xl mb-1">✅</div>
-          <div class="text-2xl font-bold text-green-600">{{ completedCount }}</div>
-          <div class="text-xs text-gray-500">Completed</div>
+        <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm">
+          <div class="text-base sm:text-lg md:text-xl mb-0.5 sm:mb-1">✅</div>
+          <div class="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{{ completedCount }}</div>
+          <div class="text-[10px] sm:text-xs text-gray-500">Completed</div>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm">
-          <div class="text-xl mb-1">❌</div>
-          <div class="text-2xl font-bold text-gray-700">{{ cancelledCount }}</div>
-          <div class="text-xs text-gray-500">Cancelled</div>
+        <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm">
+          <div class="text-base sm:text-lg md:text-xl mb-0.5 sm:mb-1">❌</div>
+          <div class="text-lg sm:text-xl md:text-2xl font-bold text-gray-700">{{ cancelledCount }}</div>
+          <div class="text-[10px] sm:text-xs text-gray-500">Cancelled</div>
         </div>
       </div>
 
       <!-- Action Required -->
-      <div v-if="actionRequiredInspections.length" class="mb-10">
-        <div class="mb-4">
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">
+      <div v-if="actionRequiredInspections.length" class="mb-6 sm:mb-8 md:mb-10">
+        <div class="mb-3 sm:mb-4">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-red-100 text-red-700 text-[10px] sm:text-xs font-bold">
               ACTION REQUIRED
             </span>
-            <h3 class="font-semibold text-lg text-[var(--royal-blue)]">
+            <h3 class="font-semibold text-sm sm:text-base md:text-lg text-[var(--royal-blue)]">
               These inspections need your response
             </h3>
           </div>
-          <p class="text-sm text-gray-600 mt-1">
+          <p class="text-xs sm:text-sm text-gray-600 mt-1">
             Confirm attendance so the agent and admin know you will be present.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div
             v-for="inspection in actionRequiredInspections"
             :key="inspection.id"
-            class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-red-100"
+            class="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 shadow-sm border border-red-100"
           >
-            <div class="flex gap-3">
+            <div class="flex gap-2 sm:gap-3">
               <img
                 :src="inspection.property?.cover_image || placeholderImg"
-                class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover flex-shrink-0"
+                class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg sm:rounded-xl object-cover flex-shrink-0"
                 alt=""
               />
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-bold text-red-600 mb-1">
+                <p class="text-[10px] sm:text-xs font-bold text-red-600 mb-0.5 sm:mb-1">
                   {{ customerActionBadge(inspection) }}
                 </p>
-                <h4 class="font-semibold text-base line-clamp-1">
+                <h4 class="font-semibold text-sm sm:text-base line-clamp-1">
                   {{ inspection.property?.title || 'Property' }}
                 </h4>
-                <p class="text-sm text-gray-500 mt-0.5">
+                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
                   {{ inspection.property?.area || inspection.property?.city }}
                 </p>
-                <p class="text-sm mt-1.5">
+                <p class="text-xs sm:text-sm mt-1 sm:mt-1.5">
                   📅 {{ formatDate(inspection.inspection_date) }}
                   · ⏰ {{ inspection.inspection_time || 'TBD' }}
                 </p>
@@ -101,20 +93,20 @@
             </div>
 
             <div
-              class="mt-3 rounded-xl px-3 py-2.5 text-sm border"
+              class="mt-2 sm:mt-3 rounded-lg sm:rounded-xl px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm border"
               :class="statusBannerClass(inspection.status)"
             >
               <p class="font-semibold capitalize">{{ displayStatus(inspection.status) }}</p>
-              <p class="mt-1 text-sm leading-relaxed">{{ customerStatusMessage(inspection) }}</p>
+              <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-relaxed">{{ customerStatusMessage(inspection) }}</p>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-2 mt-3">
+            <div class="flex flex-col sm:flex-row gap-1.5 sm:gap-2 mt-2 sm:mt-3">
               <button
                 v-if="needsCustomerConfirm(inspection)"
                 type="button"
                 :disabled="savingId === inspection.id"
                 @click="confirmAttendance(inspection)"
-                class="flex-1 py-2.5 bg-[var(--royal-blue)] text-white rounded-xl text-sm font-medium disabled:opacity-50"
+                class="flex-1 py-2 sm:py-2.5 bg-[var(--royal-blue)] text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium disabled:opacity-50"
               >
                 {{ savingId === inspection.id ? 'Saving...' : 'Confirm Attendance' }}
               </button>
@@ -124,7 +116,7 @@
                 type="button"
                 :disabled="savingId === inspection.id"
                 @click="openCancel(inspection)"
-                class="flex-1 py-2.5 bg-red-50 text-red-700 rounded-xl text-sm font-medium disabled:opacity-50"
+                class="flex-1 py-2 sm:py-2.5 bg-red-50 text-red-700 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium disabled:opacity-50"
               >
                 Request Cancellation
               </button>
@@ -132,7 +124,7 @@
               <button
                 type="button"
                 @click="selectedInspection = inspection"
-                class="w-full sm:w-auto py-2.5 px-4 border rounded-xl text-sm font-medium"
+                class="w-full sm:w-auto py-2 sm:py-2.5 px-3 sm:px-4 border rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium"
               >
                 View Details
               </button>
@@ -142,8 +134,8 @@
       </div>
 
       <!-- Next Inspection -->
-      <div v-if="nextInspection" class="mb-10">
-        <h3 class="font-semibold text-lg mb-4 text-[var(--royal-blue)]">Next Inspection</h3>
+      <div v-if="nextInspection" class="mb-6 sm:mb-8 md:mb-10">
+        <h3 class="font-semibold text-sm sm:text-base md:text-lg mb-3 sm:mb-4 text-[var(--royal-blue)]">Next Inspection</h3>
         <UpcomingInspectionCard
           :inspection="nextInspection"
           @updated="fetchInspections"
@@ -152,24 +144,24 @@
         />
         <InspectionCountdown
           v-if="isCountdownStatus(nextInspection.status)"
-          class="mt-3"
+          class="mt-2 sm:mt-3"
           :targetDate="nextInspection.inspection_date"
           :targetTime="nextInspection.inspection_time"
         />
       </div>
 
       <!-- Filters / Tabs -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-        <h3 class="font-semibold text-lg text-[var(--royal-blue)]">All Inspections</h3>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-5">
+        <h3 class="font-semibold text-sm sm:text-base md:text-lg text-[var(--royal-blue)]">All Inspections</h3>
 
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-1.5 sm:gap-2">
           <button
             v-for="tab in tabs"
             :key="tab.value"
             type="button"
             @click="filterStatus = tab.value"
             :class="[
-              'px-3.5 py-2 rounded-xl text-sm font-medium transition',
+              'px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition',
               filterStatus === tab.value
                 ? 'bg-[var(--royal-blue)] text-white'
                 : 'bg-white text-gray-600 border border-gray-100 hover:bg-gray-50'
@@ -178,7 +170,7 @@
             {{ tab.label }}
             <span
               v-if="tab.value === 'action' && actionRequiredCount"
-              class="ml-1 inline-flex min-w-[1.1rem] h-5 px-1 items-center justify-center rounded-full bg-red-500 text-white text-[10px]"
+              class="ml-1 inline-flex min-w-[1rem] sm:min-w-[1.1rem] h-4 sm:h-5 px-1 items-center justify-center rounded-full bg-red-500 text-white text-[9px] sm:text-[10px]"
             >
               {{ actionRequiredCount }}
             </span>
@@ -187,31 +179,31 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="loading" class="text-center py-16 text-gray-500">
+      <div v-if="loading" class="text-center py-12 sm:py-16 text-sm sm:text-base text-gray-500">
         Loading inspections...
       </div>
 
       <!-- Empty -->
       <div
         v-else-if="filteredInspections.length === 0"
-        class="bg-white rounded-2xl p-10 text-center text-gray-500"
+        class="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-10 text-center text-gray-500"
       >
-        <p class="text-lg font-medium text-[var(--royal-blue)]">{{ emptyTitle }}</p>
-        <p class="mt-2 text-sm">{{ emptyMessage }}</p>
+        <p class="text-base sm:text-lg font-medium text-[var(--royal-blue)]">{{ emptyTitle }}</p>
+        <p class="mt-1.5 sm:mt-2 text-xs sm:text-sm">{{ emptyMessage }}</p>
         <a
           href="/properties"
-          class="inline-block mt-5 px-5 py-2.5 bg-[var(--royal-blue)] text-white rounded-xl text-sm font-medium"
+          class="inline-block mt-4 sm:mt-5 px-4 sm:px-5 py-2 sm:py-2.5 bg-[var(--royal-blue)] text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium"
         >
           Browse Properties
         </a>
       </div>
 
       <!-- List -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
         <div
           v-for="inspection in filteredInspections"
           :key="inspection.id"
-          class="flex flex-col gap-3"
+          class="flex flex-col gap-2 sm:gap-3"
         >
           <InspectionCard
             :inspection="inspection"
@@ -242,86 +234,86 @@
       class="fixed inset-0 z-50 bg-black/40 flex justify-end"
       @click.self="selectedInspection = null"
     >
-      <div class="bg-white w-full max-w-lg h-full overflow-y-auto shadow-2xl">
-        <div class="sticky top-0 bg-white border-b px-5 py-4 flex items-center justify-between z-10">
+      <div class="bg-white w-full max-w-sm sm:max-w-md md:max-w-lg h-full overflow-y-auto shadow-2xl">
+        <div class="sticky top-0 bg-white border-b px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between z-10">
           <div>
-            <h2 class="text-lg font-bold text-[var(--royal-blue)]">Inspection Details</h2>
-            <p class="text-xs text-gray-500">
+            <h2 class="text-sm sm:text-base md:text-lg font-bold text-[var(--royal-blue)]">Inspection Details</h2>
+            <p class="text-[10px] sm:text-xs text-gray-500">
               {{ selectedInspection.inspection_code || selectedInspection.id?.slice(0, 8) }}
             </p>
           </div>
-          <button type="button" class="text-2xl text-gray-400" @click="selectedInspection = null">×</button>
+          <button type="button" class="text-xl sm:text-2xl text-gray-400" @click="selectedInspection = null">×</button>
         </div>
 
-        <div class="p-5 space-y-5">
+        <div class="p-3 sm:p-4 md:p-5 space-y-3 sm:space-y-4 md:space-y-5">
           <img
             :src="selectedInspection.property?.cover_image || placeholderImg"
-            class="w-full h-44 object-cover rounded-2xl"
+            class="w-full h-32 sm:h-40 md:h-44 object-cover rounded-xl sm:rounded-2xl"
             alt=""
           />
           <div>
-            <h3 class="text-xl font-semibold">{{ selectedInspection.property?.title }}</h3>
-            <p class="text-sm text-gray-500 mt-1">
+            <h3 class="text-base sm:text-lg md:text-xl font-semibold">{{ selectedInspection.property?.title }}</h3>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">
               {{ selectedInspection.property?.property_type }} ·
               {{ selectedInspection.property?.area }},
               {{ selectedInspection.property?.city }}
             </p>
-            <p class="text-xl font-bold text-green-600 mt-2">
+            <p class="text-base sm:text-lg md:text-xl font-bold text-green-600 mt-1.5 sm:mt-2">
               ₦{{ Number(selectedInspection.property?.price || 0).toLocaleString() }}
             </p>
           </div>
 
           <div
-            class="rounded-xl p-4 text-sm border"
+            class="rounded-lg sm:rounded-xl p-3 sm:p-4 text-xs sm:text-sm border"
             :class="statusBannerClass(selectedInspection.status)"
           >
-            <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center justify-between gap-2 sm:gap-3">
               <p class="font-semibold capitalize">
                 {{ displayStatus(selectedInspection.status) }}
               </p>
               <span
                 v-if="needsCustomerConfirm(selectedInspection) || (selectedInspection.status === 'completed' && !hasReported(selectedInspection.id))"
-                class="text-[10px] px-2 py-1 rounded-full bg-red-100 text-red-700 font-bold"
+                class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-red-100 text-red-700 font-bold"
               >
                 ACTION NEEDED
               </span>
             </div>
 
-            <p class="mt-2 leading-relaxed">
+            <p class="mt-1.5 sm:mt-2 leading-relaxed">
               {{ customerStatusMessage(selectedInspection) }}
             </p>
 
-            <div class="mt-3 pt-3 border-t border-black/5">
-              <p class="text-xs font-semibold uppercase tracking-wide opacity-80">
+            <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-black/5">
+              <p class="text-[9px] sm:text-xs font-semibold uppercase tracking-wide opacity-80">
                 What to do next
               </p>
-              <p class="mt-1 font-medium">
+              <p class="mt-0.5 sm:mt-1 font-medium">
                 {{ customerNextStep(selectedInspection) }}
               </p>
             </div>
           </div>
 
-          <div class="bg-gray-50 rounded-2xl p-4 space-y-3 text-sm">
-            <div class="flex justify-between gap-3">
+          <div class="bg-gray-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-2 sm:space-y-3 text-xs sm:text-sm">
+            <div class="flex justify-between gap-2 sm:gap-3">
               <span class="text-gray-500">Date</span>
-              <span class="font-medium">{{ formatDate(selectedInspection.inspection_date) }}</span>
+              <span class="font-medium text-right">{{ formatDate(selectedInspection.inspection_date) }}</span>
             </div>
-            <div class="flex justify-between gap-3">
+            <div class="flex justify-between gap-2 sm:gap-3">
               <span class="text-gray-500">Time</span>
               <span class="font-medium">{{ selectedInspection.inspection_time || '—' }}</span>
             </div>
-            <div class="flex justify-between gap-3">
+            <div class="flex justify-between gap-2 sm:gap-3">
               <span class="text-gray-500">Meeting point</span>
               <span class="font-medium text-right">
                 {{ selectedInspection.meeting_location || 'Property address' }}
               </span>
             </div>
-            <div class="flex justify-between gap-3">
+            <div class="flex justify-between gap-2 sm:gap-3">
               <span class="text-gray-500">Your confirmation</span>
-              <span class="font-medium">{{ customerConfirmationLabel(selectedInspection) }}</span>
+              <span class="font-medium text-right">{{ customerConfirmationLabel(selectedInspection) }}</span>
             </div>
 
-            <div v-if="selectedInspection.agent" class="flex justify-between gap-3 items-start">
+            <div v-if="selectedInspection.agent" class="flex justify-between gap-2 sm:gap-3 items-start">
               <span class="text-gray-500">Agent</span>
               <div class="text-right">
                 <p class="font-medium">
@@ -329,7 +321,7 @@
                 </p>
                 <p
                   v-if="getAgentRating(selectedInspection.agent.id)"
-                  class="text-sm text-amber-600 font-medium mt-0.5"
+                  class="text-xs sm:text-sm text-amber-600 font-medium mt-0.5"
                 >
                   ★ {{ getAgentRating(selectedInspection.agent.id).avg }}
                   <span class="text-gray-500 font-normal">
@@ -340,14 +332,14 @@
             </div>
           </div>
 
-          <div v-if="selectedInspection.admin_notes" class="bg-amber-50 rounded-xl p-4 text-sm">
+          <div v-if="selectedInspection.admin_notes" class="bg-amber-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-xs sm:text-sm">
             <p class="font-semibold text-amber-800">Notes from LodgeNext</p>
             <p class="mt-1 text-amber-900">{{ selectedInspection.admin_notes }}</p>
           </div>
 
           <div
             v-if="selectedInspection.status === 'completed'"
-            class="bg-green-50 rounded-xl p-4 text-sm space-y-1"
+            class="bg-green-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-xs sm:text-sm space-y-1"
           >
             <p class="font-semibold text-green-800">Inspection Outcome</p>
             <p v-if="selectedInspection.inspection_outcome" class="capitalize">
@@ -362,29 +354,29 @@
           </div>
 
           <!-- COMPLETED FLOW -->
-          <div v-if="selectedInspection.status === 'completed'" class="space-y-3">
+          <div v-if="selectedInspection.status === 'completed'" class="space-y-2 sm:space-y-3">
             <div v-if="!hasReported(selectedInspection.id)">
               <button
                 type="button"
                 @click="openReportModal(selectedInspection)"
-                class="w-full py-3.5 bg-[var(--royal-blue)] text-white rounded-xl font-semibold"
+                class="w-full py-2.5 sm:py-3.5 bg-[var(--royal-blue)] text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base"
               >
                 Submit Report to Admin
               </button>
-              <p class="text-xs text-center text-gray-500 mt-2">
+              <p class="text-[10px] sm:text-xs text-center text-gray-500 mt-1.5 sm:mt-2">
                 You must submit a report before you can pay for this property
               </p>
             </div>
 
             <div v-else-if="!hasPaidForProperty(selectedInspection.property?.id)">
-              <div class="flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-[var(--royal-blue)] rounded-xl text-sm font-medium">
+              <div class="flex items-center justify-center gap-2 py-2 sm:py-2.5 bg-blue-50 text-[var(--royal-blue)] rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium">
                 ✓ Report submitted
               </div>
               <button
                 type="button"
                 :disabled="payingPropertyId === selectedInspection.property?.id || !selectedInspection.property?.price"
                 @click="payForProperty(selectedInspection, false)"
-                class="w-full py-3.5 bg-[var(--bright-green)] hover:bg-green-600 disabled:bg-gray-400 text-white rounded-xl font-semibold"
+                class="w-full mt-2 sm:mt-3 py-2.5 sm:py-3.5 bg-[var(--bright-green)] hover:bg-green-600 disabled:bg-gray-400 text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base"
               >
                 <span v-if="payingPropertyId === selectedInspection.property?.id">
                   Processing Payment...
@@ -395,8 +387,8 @@
               </button>
             </div>
 
-            <div v-else class="space-y-3">
-              <div class="flex items-center justify-center gap-2 py-3 bg-green-50 text-green-700 rounded-xl font-semibold">
+            <div v-else class="space-y-2 sm:space-y-3">
+              <div class="flex items-center justify-center gap-2 py-2.5 sm:py-3 bg-green-50 text-green-700 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base">
                 <span>✓</span>
                 <span>Payment Successful</span>
               </div>
@@ -404,7 +396,7 @@
                 type="button"
                 :disabled="payingPropertyId === selectedInspection.property?.id"
                 @click="payForProperty(selectedInspection, true)"
-                class="w-full py-3 border-2 border-[var(--bright-green)] text-[var(--bright-green)] hover:bg-green-50 rounded-xl font-semibold disabled:opacity-50"
+                class="w-full py-2.5 sm:py-3 border-2 border-[var(--bright-green)] text-[var(--bright-green)] hover:bg-green-50 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base disabled:opacity-50"
               >
                 Renew Payment · ₦{{ Number(selectedInspection.property?.price || 0).toLocaleString() }}
               </button>
@@ -413,45 +405,45 @@
 
           <!-- Evidence -->
           <div v-if="selectedInspection.status === 'completed'">
-            <h3 class="font-semibold text-[var(--royal-blue)] mb-3">Inspection Photos & Video</h3>
+            <h3 class="font-semibold text-sm sm:text-base text-[var(--royal-blue)] mb-2 sm:mb-3">Inspection Photos & Video</h3>
 
-            <div v-if="drawerMediaLoading" class="grid grid-cols-2 gap-3">
-              <div v-for="n in 2" :key="n" class="h-28 rounded-xl bg-gray-100 animate-pulse" />
+            <div v-if="drawerMediaLoading" class="grid grid-cols-2 gap-2 sm:gap-3">
+              <div v-for="n in 2" :key="n" class="h-20 sm:h-28 rounded-lg sm:rounded-xl bg-gray-100 animate-pulse" />
             </div>
 
             <template v-else-if="drawerPhotos.length || drawerVideos.length">
-              <div v-if="drawerPhotos.length" class="grid grid-cols-2 gap-3">
+              <div v-if="drawerPhotos.length" class="grid grid-cols-2 gap-2 sm:gap-3">
                 <a
                   v-for="item in drawerPhotos"
                   :key="item.id"
                   :href="item.displayUrl"
                   target="_blank"
                   rel="noopener"
-                  class="block rounded-xl overflow-hidden bg-gray-100"
+                  class="block rounded-lg sm:rounded-xl overflow-hidden bg-gray-100"
                 >
-                  <img :src="item.displayUrl" class="w-full h-28 object-cover" alt="Inspection photo" />
+                  <img :src="item.displayUrl" class="w-full h-20 sm:h-28 object-cover" alt="Inspection photo" />
                 </a>
               </div>
 
-              <div v-if="drawerVideos.length" class="mt-3 space-y-3">
+              <div v-if="drawerVideos.length" class="mt-2 sm:mt-3 space-y-2 sm:space-y-3">
                 <video
                   v-for="item in drawerVideos"
                   :key="item.id"
                   :src="item.displayUrl"
                   controls
-                  class="w-full rounded-xl bg-black max-h-56"
+                  class="w-full rounded-lg sm:rounded-xl bg-black max-h-44 sm:max-h-56"
                 />
               </div>
             </template>
 
-            <p v-else class="text-sm text-gray-500">
+            <p v-else class="text-xs sm:text-sm text-gray-500">
               No photos or video were uploaded for this inspection.
             </p>
           </div>
 
           <div
             v-if="selectedInspection.status === 'cancelled'"
-            class="bg-red-50 rounded-xl p-4 text-sm"
+            class="bg-red-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-xs sm:text-sm"
           >
             <p class="font-semibold text-red-700">
               {{ cancellationLabel(selectedInspection) }}
@@ -461,13 +453,13 @@
             </p>
           </div>
 
-          <div class="space-y-3">
+          <div class="space-y-2 sm:space-y-3">
             <button
               v-if="needsCustomerConfirm(selectedInspection)"
               type="button"
               :disabled="savingId === selectedInspection.id"
               @click="confirmAttendance(selectedInspection)"
-              class="w-full py-3 bg-[var(--royal-blue)] text-white rounded-xl font-semibold disabled:opacity-50"
+              class="w-full py-2.5 sm:py-3 bg-[var(--royal-blue)] text-white rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base disabled:opacity-50"
             >
               Confirm Attendance
             </button>
@@ -476,7 +468,7 @@
               v-if="canCustomerCancel(selectedInspection)"
               type="button"
               @click="openCancel(selectedInspection)"
-              class="w-full py-3 bg-red-50 text-red-700 rounded-xl font-semibold"
+              class="w-full py-2.5 sm:py-3 bg-red-50 text-red-700 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base"
             >
               Request Cancellation
             </button>
@@ -484,7 +476,7 @@
             <a
               v-if="selectedInspection.property?.id"
               :href="`/properties/${selectedInspection.property.id}`"
-              class="block w-full text-center py-3 border rounded-xl font-medium"
+              class="block w-full text-center py-2.5 sm:py-3 border rounded-lg sm:rounded-xl font-medium text-sm sm:text-base"
             >
               View Property
             </a>
@@ -496,24 +488,24 @@
     <!-- ==================== REPORT MODAL ==================== -->
     <div
       v-if="showReportModal"
-      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-3 sm:p-4"
     >
-      <div class="bg-white rounded-2xl w-full max-w-lg p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
-        <h3 class="text-lg sm:text-xl font-bold text-[var(--royal-blue)] mb-2">
+      <div class="bg-white rounded-xl sm:rounded-2xl w-full max-w-sm sm:max-w-md md:max-w-lg p-3 sm:p-5 md:p-6 max-h-[90vh] overflow-y-auto">
+        <h3 class="text-base sm:text-lg md:text-xl font-bold text-[var(--royal-blue)] mb-1.5 sm:mb-2">
           How was the property?
         </h3>
-        <p class="text-sm text-gray-600 mb-5">
-          A quick check so we know if you’re satisfied before you pay.
+        <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 md:mb-5">
+          A quick check so we know if you're satisfied before you pay.
         </p>
 
-        <div class="space-y-4">
+        <div class="space-y-3 sm:space-y-4">
           <div>
-            <label class="block text-sm font-medium mb-2">
+            <label class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">
               How interested are you in this property? *
             </label>
-            <select v-model="reportForm.interest_level" class="w-full px-4 py-3 rounded-xl border text-sm">
+            <select v-model="reportForm.interest_level" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border text-xs sm:text-sm">
               <option value="">Select</option>
-              <option value="very_interested">Very interested — I’d take it</option>
+              <option value="very_interested">Very interested — I'd take it</option>
               <option value="interested">Interested</option>
               <option value="somewhat_interested">Somewhat interested</option>
               <option value="not_interested">Not interested</option>
@@ -521,8 +513,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-2">Overall condition *</label>
-            <select v-model="reportForm.general_condition" class="w-full px-4 py-3 rounded-xl border text-sm">
+            <label class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Overall condition *</label>
+            <select v-model="reportForm.general_condition" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border text-xs sm:text-sm">
               <option value="">Select</option>
               <option value="excellent">Excellent</option>
               <option value="good">Good</option>
@@ -532,25 +524,25 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-2">
+            <label class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">
               Anything else we should know? (optional)
             </label>
             <textarea
               v-model="reportForm.report"
               rows="3"
-              class="w-full px-4 py-3 rounded-xl border resize-none text-sm"
+              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border resize-none text-xs sm:text-sm"
               placeholder="e.g. liked the location, issues with water, agent was helpful…"
             ></textarea>
           </div>
         </div>
 
-        <div class="flex gap-3 mt-6">
-          <button type="button" class="flex-1 py-3 border rounded-xl text-sm" @click="showReportModal = false">
+        <div class="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
+          <button type="button" class="flex-1 py-2.5 sm:py-3 border rounded-lg sm:rounded-xl text-xs sm:text-sm" @click="showReportModal = false">
             Cancel
           </button>
           <button
             type="button"
-            class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-xl font-semibold text-sm disabled:opacity-50"
+            class="flex-1 py-2.5 sm:py-3 bg-[var(--royal-blue)] text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm disabled:opacity-50"
             :disabled="!canSubmitReport || savingReport"
             @click="submitReport"
           >
@@ -563,21 +555,21 @@
     <!-- ==================== AGENT REVIEW MODAL ==================== -->
     <div
       v-if="showAgentReviewModal"
-      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-3 sm:p-4"
     >
-      <div class="bg-white rounded-2xl w-full max-w-lg p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
-        <h3 class="text-lg sm:text-xl font-bold text-[var(--royal-blue)] mb-2">Rate the Agent</h3>
-        <p class="text-sm text-gray-600 mb-6">How was your experience with the agent?</p>
+      <div class="bg-white rounded-xl sm:rounded-2xl w-full max-w-sm sm:max-w-md md:max-w-lg p-3 sm:p-5 md:p-6 max-h-[90vh] overflow-y-auto">
+        <h3 class="text-base sm:text-lg md:text-xl font-bold text-[var(--royal-blue)] mb-1.5 sm:mb-2">Rate the Agent</h3>
+        <p class="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">How was your experience with the agent?</p>
 
-        <div class="mb-5">
-          <label class="block text-sm font-medium mb-2">Overall Rating *</label>
-          <div class="flex justify-center gap-2">
+        <div class="mb-3 sm:mb-5">
+          <label class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Overall Rating *</label>
+          <div class="flex justify-center gap-1.5 sm:gap-2">
             <button
               v-for="star in 5"
               :key="star"
               type="button"
               @click="agentReviewForm.rating = star"
-              class="text-3xl sm:text-4xl transition-transform hover:scale-110"
+              class="text-2xl sm:text-3xl md:text-4xl transition-transform hover:scale-110"
               :class="star <= agentReviewForm.rating ? 'text-yellow-400' : 'text-gray-300'"
             >
               ★
@@ -585,15 +577,15 @@
           </div>
         </div>
 
-        <div class="mb-5">
-          <label class="block text-sm font-medium mb-2">Punctuality</label>
-          <div class="flex justify-center gap-2">
+        <div class="mb-3 sm:mb-5">
+          <label class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Punctuality</label>
+          <div class="flex justify-center gap-1.5 sm:gap-2">
             <button
               v-for="star in 5"
               :key="'p' + star"
               type="button"
               @click="agentReviewForm.punctuality_rating = star"
-              class="text-2xl sm:text-3xl transition-transform hover:scale-110"
+              class="text-xl sm:text-2xl md:text-3xl transition-transform hover:scale-110"
               :class="star <= agentReviewForm.punctuality_rating ? 'text-yellow-400' : 'text-gray-300'"
             >
               ★
@@ -601,15 +593,15 @@
           </div>
         </div>
 
-        <div class="mb-5">
-          <label class="block text-sm font-medium mb-2">Professionalism</label>
-          <div class="flex justify-center gap-2">
+        <div class="mb-3 sm:mb-5">
+          <label class="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Professionalism</label>
+          <div class="flex justify-center gap-1.5 sm:gap-2">
             <button
               v-for="star in 5"
               :key="'pr' + star"
               type="button"
               @click="agentReviewForm.professionalism_rating = star"
-              class="text-2xl sm:text-3xl transition-transform hover:scale-110"
+              class="text-xl sm:text-2xl md:text-3xl transition-transform hover:scale-110"
               :class="star <= agentReviewForm.professionalism_rating ? 'text-yellow-400' : 'text-gray-300'"
             >
               ★
@@ -620,17 +612,17 @@
         <textarea
           v-model="agentReviewForm.review"
           rows="3"
-          class="w-full px-4 py-3 rounded-xl border resize-none mb-6 text-sm"
+          class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border resize-none mb-4 sm:mb-6 text-xs sm:text-sm"
           placeholder="Optional comment about the agent..."
         ></textarea>
 
-        <div class="flex gap-3">
-          <button type="button" class="flex-1 py-3 border rounded-xl text-sm" @click="skipAgentReview">
+        <div class="flex gap-2 sm:gap-3">
+          <button type="button" class="flex-1 py-2.5 sm:py-3 border rounded-lg sm:rounded-xl text-xs sm:text-sm" @click="skipAgentReview">
             Skip
           </button>
           <button
             type="button"
-            class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-xl font-semibold text-sm disabled:opacity-50"
+            class="flex-1 py-2.5 sm:py-3 bg-[var(--royal-blue)] text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm disabled:opacity-50"
             :disabled="!agentReviewForm.rating || savingAgentReview"
             @click="submitAgentReview"
           >
@@ -643,21 +635,21 @@
     <!-- ==================== APP REVIEW MODAL ==================== -->
     <div
       v-if="showReviewModal"
-      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-3 sm:p-4"
     >
-      <div class="bg-white rounded-2xl w-full max-w-lg p-5 sm:p-6">
-        <h3 class="text-lg sm:text-xl font-bold text-[var(--royal-blue)] mb-2">Rate LodgeNext</h3>
-        <p class="text-sm text-gray-600 mb-6">
+      <div class="bg-white rounded-xl sm:rounded-2xl w-full max-w-sm sm:max-w-md md:max-w-lg p-3 sm:p-5 md:p-6">
+        <h3 class="text-base sm:text-lg md:text-xl font-bold text-[var(--royal-blue)] mb-1.5 sm:mb-2">Rate LodgeNext</h3>
+        <p class="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">
           Thank you for your payment! Please rate your experience with us.
         </p>
 
-        <div class="flex justify-center gap-2 mb-6">
+        <div class="flex justify-center gap-1.5 sm:gap-2 mb-4 sm:mb-6">
           <button
             v-for="star in 5"
             :key="star"
             type="button"
             @click="reviewForm.rating = star"
-            class="text-3xl sm:text-4xl transition-transform hover:scale-110"
+            class="text-2xl sm:text-3xl md:text-4xl transition-transform hover:scale-110"
             :class="star <= reviewForm.rating ? 'text-yellow-400' : 'text-gray-300'"
           >
             ★
@@ -667,17 +659,17 @@
         <textarea
           v-model="reviewForm.review"
           rows="4"
-          class="w-full px-4 py-3 rounded-xl border resize-none mb-6 text-sm"
+          class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border resize-none mb-4 sm:mb-6 text-xs sm:text-sm"
           placeholder="Write a short review (optional)..."
         ></textarea>
 
-        <div class="flex gap-3">
-          <button type="button" class="flex-1 py-3 border rounded-xl text-sm" @click="skipReview">
+        <div class="flex gap-2 sm:gap-3">
+          <button type="button" class="flex-1 py-2.5 sm:py-3 border rounded-lg sm:rounded-xl text-xs sm:text-sm" @click="skipReview">
             Skip
           </button>
           <button
             type="button"
-            class="flex-1 py-3 bg-[var(--royal-blue)] text-white rounded-xl font-semibold text-sm disabled:opacity-50"
+            class="flex-1 py-2.5 sm:py-3 bg-[var(--royal-blue)] text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm disabled:opacity-50"
             :disabled="!reviewForm.rating || savingReview"
             @click="submitReview"
           >
@@ -690,14 +682,14 @@
     <!-- ==================== CANCEL MODAL ==================== -->
     <div
       v-if="showCancelModal"
-      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+      class="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-3 sm:p-4"
     >
-      <div class="bg-white rounded-2xl w-full max-w-lg p-5 sm:p-6">
-        <h3 class="text-lg sm:text-xl font-bold text-[var(--royal-blue)] mb-2">Cancel Inspection</h3>
-        <p class="text-sm text-gray-600 mb-4">
+      <div class="bg-white rounded-xl sm:rounded-2xl w-full max-w-sm sm:max-w-md md:max-w-lg p-3 sm:p-5 md:p-6">
+        <h3 class="text-base sm:text-lg md:text-xl font-bold text-[var(--royal-blue)] mb-1.5 sm:mb-2">Cancel Inspection</h3>
+        <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
           Please tell us why you need to cancel. Admin and agent will be notified.
         </p>
-        <select v-model="cancelReason" class="w-full px-4 py-3 rounded-xl border mb-4 text-sm">
+        <select v-model="cancelReason" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border mb-3 sm:mb-4 text-xs sm:text-sm">
           <option value="">Select reason</option>
           <option value="Schedule conflict">Schedule conflict</option>
           <option value="No longer interested">No longer interested</option>
@@ -709,16 +701,16 @@
           v-if="cancelReason === 'Other'"
           v-model="cancelNotes"
           rows="3"
-          class="w-full px-4 py-3 rounded-xl border mb-4 text-sm"
+          class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border mb-3 sm:mb-4 text-xs sm:text-sm"
           placeholder="Additional details..."
         />
-        <div class="flex gap-3">
-          <button type="button" class="flex-1 py-3 border rounded-xl text-sm" @click="showCancelModal = false">
+        <div class="flex gap-2 sm:gap-3">
+          <button type="button" class="flex-1 py-2.5 sm:py-3 border rounded-lg sm:rounded-xl text-xs sm:text-sm" @click="showCancelModal = false">
             Back
           </button>
           <button
             type="button"
-            class="flex-1 py-3 bg-red-600 text-white rounded-xl text-sm disabled:opacity-50"
+            class="flex-1 py-2.5 sm:py-3 bg-red-600 text-white rounded-lg sm:rounded-xl text-xs sm:text-sm disabled:opacity-50"
             :disabled="!cancelReason || !!savingId"
             @click="submitCancel"
           >
@@ -731,7 +723,7 @@
     <!-- ==================== TOAST ==================== -->
     <div
       v-if="toast"
-      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] px-5 py-3 rounded-xl shadow-lg text-sm font-medium text-white"
+      class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[70] px-3 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl shadow-lg text-xs sm:text-sm font-medium text-white max-w-[90vw] text-center"
       :class="toast.type === 'error' ? 'bg-red-600' : 'bg-gray-900'"
     >
       {{ toast.message }}
@@ -1187,12 +1179,25 @@ const payForProperty = async (inspection, isRenewal = false) => {
     return
   }
 
+  const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
+  if (!publicKey || !String(publicKey).startsWith('pk_')) {
+    showToast('Payment is not configured correctly.', 'error')
+    return
+  }
+
+  // ✅ Add Paystack fee (1.5% + ₦100, capped at ₦2,000) + ₦10 buffer
+  // so the seller nets at least the property price.
+  const baseAmount = Number(property.price)
+  const paystackFee = Math.min(baseAmount * 0.015 + 100, 2000)
+  const amountWithFee = baseAmount + paystackFee + 10
+  const amountInKobo = Math.round(amountWithFee * 100)
+
   payingPropertyId.value = property.id
 
   const handler = window.PaystackPop.setup({
-    key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+    key: publicKey,
     email: user.email,
-    amount: Number(property.price) * 100,
+    amount: amountInKobo,
     currency: 'NGN',
     ref: `prop_${property.id}_${Date.now()}`,
     metadata: {
@@ -1203,6 +1208,7 @@ const payForProperty = async (inspection, isRenewal = false) => {
       is_renewal: isRenewal
     },
     callback: function (response) {
+      // ✅ store base price, not the marked-up amount
       savePropertyPayment(response.reference, property, user.id, inspection, isRenewal)
     },
     onClose: function () {
@@ -1213,7 +1219,6 @@ const payForProperty = async (inspection, isRenewal = false) => {
 
   handler.openIframe()
 }
-
 const savePropertyPayment = async (reference, property, customerId, inspection, isRenewal = false) => {
   try {
     const { error } = await supabase

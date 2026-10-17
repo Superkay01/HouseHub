@@ -1,52 +1,52 @@
 <template>
-  <div class="min-h-screen bg-[var(--light-blue)] py-8 px-4">
+  <div class="min-h-screen bg-[var(--light-blue)] py-6 px-3 sm:px-4">
     <div class="max-w-3xl mx-auto">
       <button 
         @click="$router.back()"
-        class="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+        class="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 transition-colors"
       >
         ← Back to Property
       </button>
 
-      <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+      <div class="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
         <!-- Property Summary -->
-        <div class="p-6 sm:p-8 border-b bg-gradient-to-r from-[#f5f8ff] to-white" v-if="property">
-          <div class="flex gap-4 sm:gap-5">
+        <div class="p-4 sm:p-6 border-b bg-gradient-to-r from-[#f5f8ff] to-white" v-if="property">
+          <div class="flex gap-3 sm:gap-4">
             <img 
               :src="property.cover_image || placeholderImg" 
-              class="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-2xl flex-shrink-0 shadow-sm"
+              class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-cover rounded-xl sm:rounded-2xl flex-shrink-0 shadow-sm"
               alt=""
             />
             <div class="flex-1 min-w-0">
-              <h1 class="text-xl sm:text-2xl font-bold leading-tight text-[var(--royal-blue)]">
+              <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight text-[var(--royal-blue)]">
                 {{ property.title }}
               </h1>
               <p class="text-sm text-gray-500 mt-1">
                 📍 {{ property.area }}, {{ property.city }}, {{ property.state }}
               </p>
               
-              <div class="flex flex-wrap items-center gap-3 sm:gap-5 mt-3 text-xs sm:text-sm text-gray-600">
+              <div class="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 mt-2 sm:mt-3 text-xs sm:text-sm text-gray-600">
                 <span>🛏️ {{ property.bedrooms ?? '—' }} Beds</span>
                 <span>🚿 {{ property.bathrooms ?? '—' }} Baths</span>
                 <span>🚗 {{ property.parking_spaces ?? 0 }} Parking</span>
               </div>
 
-              <p class="mt-3 text-xl sm:text-2xl font-bold text-[var(--bright-green)]">
+              <p class="mt-2 sm:mt-3 text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[var(--bright-green)]">
                 ₦{{ formatMoney(property.price) }}
-                <span class="text-sm font-normal text-gray-500">/ year</span>
+                <span class="text-xs sm:text-sm font-normal text-gray-500">/ year</span>
               </p>
             </div>
           </div>
         </div>
 
-        <div v-else class="p-12 text-center text-gray-500">
+        <div v-else class="p-8 sm:p-12 text-center text-gray-500 text-sm sm:text-base">
           Loading property details...
         </div>
 
         <!-- Form -->
-        <div class="p-6 sm:p-8" v-if="property">
-          <div class="mb-8">
-            <h2 class="text-xl sm:text-2xl font-bold text-[var(--royal-blue)]">
+        <div class="p-4 sm:p-6" v-if="property">
+          <div class="mb-5 sm:mb-6 md:mb-8">
+            <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-[var(--royal-blue)]">
               Request Property Inspection
             </h2>
             <p class="text-sm text-gray-500 mt-1">
@@ -54,23 +54,23 @@
             </p>
           </div>
 
-          <form @submit.prevent="submitRequest" class="space-y-8">
+          <form @submit.prevent="submitRequest" class="space-y-5 sm:space-y-6 md:space-y-8">
 
             <!-- STEP 1: Preferred Date -->
             <div 
-              class="rounded-3xl p-5 sm:p-6 border transition-all duration-300"
+              class="rounded-2xl sm:rounded-3xl p-4 sm:p-5 border transition-all duration-300"
               :class="currentStep === 1 
                 ? 'border-[var(--royal-blue)] bg-blue-50 shadow-md ring-2 ring-[var(--royal-blue)]/20' 
                 : 'border-gray-100 bg-gray-50'"
             >
-              <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center gap-2.5 sm:gap-3 mb-3">
                 <div 
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0"
                   :class="currentStep === 1 ? 'bg-[var(--royal-blue)] text-white' : 'bg-gray-200 text-gray-600'"
                 >
                   1
                 </div>
-                <label class="text-sm font-semibold text-gray-800">
+                <label class="text-sm sm:text-base font-semibold text-gray-800">
                   Preferred Date
                 </label>
               </div>
@@ -78,9 +78,9 @@
               <input
                 v-model="form.inspection_date"
                 type="date"
-                class="w-full px-4 py-3.5 rounded-2xl border border-gray-200 bg-white
+                class="w-full px-3 sm:px-4 py-3 rounded-xl sm:rounded-2xl border border-gray-200 bg-white
                   focus:outline-none focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/10
-                  text-[var(--royal-blue)]"
+                  text-sm sm:text-base text-[var(--royal-blue)]"
                 :min="today"
                 required
                 @change="goToStep(2)"
@@ -89,34 +89,34 @@
 
             <!-- STEP 2: Preferred Time -->
             <div 
-              class="rounded-3xl p-5 sm:p-6 border transition-all duration-300"
+              class="rounded-2xl sm:rounded-3xl p-4 sm:p-5 border transition-all duration-300"
               :class="currentStep === 2 
                 ? 'border-[var(--royal-blue)] bg-blue-50 shadow-md ring-2 ring-[var(--royal-blue)]/20' 
                 : 'border-gray-100 bg-gray-50'"
             >
-              <div class="flex items-center gap-3 mb-2">
+              <div class="flex items-center gap-2.5 sm:gap-3 mb-2">
                 <div 
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0"
                   :class="currentStep === 2 ? 'bg-[var(--royal-blue)] text-white' : 'bg-gray-200 text-gray-600'"
                 >
                   2
                 </div>
-                <label class="text-sm font-semibold text-gray-800">
+                <label class="text-sm sm:text-base font-semibold text-gray-800">
                   Preferred Time Frame
                 </label>
               </div>
-              <p class="text-xs text-gray-500 mb-4 ml-11">
+              <p class="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4 ml-9 sm:ml-11">
                 Select a 1-hour window that works best for you
               </p>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <button
                   v-for="slot in timeSlots"
                   :key="slot.value"
                   type="button"
                   @click="selectTime(slot.value)"
                   :class="[
-                    'py-3.5 px-4 rounded-2xl text-sm font-medium transition-all border text-left',
+                    'py-3 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-sm sm:text-base font-medium transition-all border text-left',
                     form.inspection_time === slot.value 
                       ? 'bg-[var(--royal-blue)] text-white border-[var(--royal-blue)] shadow-md' 
                       : 'bg-white text-gray-700 border-gray-200 hover:border-[var(--royal-blue)] hover:bg-[#f5f8ff]'
@@ -135,57 +135,57 @@
 
             <!-- STEP 3: Message + Payment -->
             <div 
-              class="rounded-3xl p-5 sm:p-6 border transition-all duration-300"
+              class="rounded-2xl sm:rounded-3xl p-4 sm:p-5 border transition-all duration-300"
               :class="currentStep === 3 
                 ? 'border-[var(--royal-blue)] bg-blue-50 shadow-md ring-2 ring-[var(--royal-blue)]/20' 
                 : 'border-gray-100 bg-gray-50'"
             >
-              <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-center gap-2.5 sm:gap-3 mb-4">
                 <div 
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0"
                   :class="currentStep === 3 ? 'bg-[var(--royal-blue)] text-white' : 'bg-gray-200 text-gray-600'"
                 >
                   3
                 </div>
-                <label class="text-sm font-semibold text-gray-800">
+                <label class="text-sm sm:text-base font-semibold text-gray-800">
                   Message & Payment
                 </label>
               </div>
 
               <!-- Message -->
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+              <div class="mb-5 sm:mb-6">
+                <label class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
                   Message to Agent <span class="text-gray-400">(Optional)</span>
                 </label>
                 <textarea
                   v-model="form.message"
                   rows="3"
                   placeholder="I would like to inspect the property with my family..."
-                  class="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white
+                  class="w-full px-3 sm:px-4 py-3 rounded-xl sm:rounded-2xl border border-gray-200 bg-white
                     focus:outline-none focus:border-[var(--royal-blue)] focus:ring-2 focus:ring-[var(--royal-blue)]/10
-                    resize-y text-sm text-gray-700"
+                    resize-y text-sm sm:text-base text-gray-700"
                 ></textarea>
               </div>
 
               <!-- Payment -->
-              <div class="border-t pt-5">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <div class="border-t pt-4 sm:pt-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
                   <div>
-                    <h3 class="font-semibold text-[var(--royal-blue)]">Inspection Fee</h3>
-                    <p class="text-sm text-gray-600 mt-1">
+                    <h3 class="text-sm sm:text-base font-semibold text-[var(--royal-blue)]">Inspection Fee</h3>
+                    <p class="text-xs sm:text-sm text-gray-600 mt-1">
                       Payment is required before you can submit
                     </p>
                   </div>
-                  <p class="text-2xl font-bold text-[var(--royal-blue)]">
+                  <p class="text-xl sm:text-2xl font-bold text-[var(--royal-blue)]">
                     ₦{{ formatMoney(property.inspection_fee) }}
                   </p>
                 </div>
 
                 <div
                   v-if="hasPaid"
-                  class="flex items-center gap-2 text-green-600 font-medium mb-4 bg-green-50 border border-green-100 rounded-2xl px-4 py-3"
+                  class="flex items-center gap-2 text-green-600 text-sm sm:text-base font-medium mb-4 bg-green-50 border border-green-100 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3"
                 >
-                  <span class="text-xl">✓</span>
+                  <span class="text-lg sm:text-xl">✓</span>
                   <span>Payment successful — you can now submit</span>
                 </div>
 
@@ -194,7 +194,7 @@
                   type="button"
                   @click="payInspectionFee"
                   :disabled="isPaying || isVerifying || !canPay"
-                  class="w-full bg-[var(--bright-green)] hover:bg-green-600 disabled:bg-gray-400 text-white py-3.5 rounded-2xl font-semibold transition-all"
+                  class="w-full bg-[var(--bright-green)] hover:bg-green-600 disabled:bg-gray-400 text-white py-3 sm:py-3.5 rounded-xl sm:rounded-2xl text-sm sm:text-base font-semibold transition-all"
                 >
                   <span v-if="isPaying">Opening Paystack...</span>
                   <span v-else-if="isVerifying">Verifying Payment...</span>
@@ -205,19 +205,19 @@
 
             <!-- STEP 4: Submit -->
             <div 
-              class="rounded-3xl p-5 sm:p-6 border transition-all duration-300"
+              class="rounded-2xl sm:rounded-3xl p-4 sm:p-5 border transition-all duration-300"
               :class="currentStep === 4 
                 ? 'border-[var(--royal-blue)] bg-blue-50 shadow-md ring-2 ring-[var(--royal-blue)]/20' 
                 : 'border-gray-100 bg-gray-50'"
             >
-              <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-center gap-2.5 sm:gap-3 mb-4">
                 <div 
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0"
                   :class="currentStep === 4 ? 'bg-[var(--royal-blue)] text-white' : 'bg-gray-200 text-gray-600'"
                 >
                   4
                 </div>
-                <label class="text-sm font-semibold text-gray-800">
+                <label class="text-sm sm:text-base font-semibold text-gray-800">
                   Submit Request
                 </label>
               </div>
@@ -225,12 +225,12 @@
               <button
                 type="submit"
                 :disabled="isSubmitting || !hasPaid || !form.inspection_date || !form.inspection_time"
-                class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-2xl text-base sm:text-lg font-semibold transition-all shadow-md"
+                class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-3.5 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base font-semibold transition-all shadow-md"
               >
                 {{ isSubmitting ? 'Submitting Request...' : 'Submit Inspection Request' }}
               </button>
 
-              <p v-if="!hasPaid" class="text-center text-sm text-gray-500 mt-3">
+              <p v-if="!hasPaid" class="text-center text-xs sm:text-sm text-gray-500 mt-3">
                 Complete payment in Step 3 to activate this button
               </p>
             </div>
@@ -359,10 +359,11 @@ const payInspectionFee = async () => {
     return
   }
 
-  // Automatically add 1.5% Paystack fee (hidden from user)
+  // ✅ NEW: cover Paystack fee + small buffer so we net ≥ baseAmount
   const baseAmount = Number(property.value.inspection_fee)
-  const amountWithFee = baseAmount * 1.015
-  const amountInKobo = Math.round(amountWithFee * 100)
+const paystackFee = Math.min(baseAmount * 0.015 + 100, 2000)
+const amountWithFee = baseAmount + paystackFee + 10   // ← 10, not 5
+const amountInKobo = Math.round(amountWithFee * 100)
 
   isPaying.value = true
 
@@ -378,6 +379,7 @@ const payInspectionFee = async () => {
       type: 'inspection_fee'
     },
     callback: function (response) {
+      // ✅ store base amount (6000), not the marked-up amount
       savePayment(response.reference, user.id, baseAmount)
     },
     onClose: function () {

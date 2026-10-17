@@ -21,7 +21,8 @@ serve(async (req) => {
       )
     }
 
-    // 1. Verify with Paystack
+    // 1. Verify with Paystack (LIVE mode)
+    // Make sure PAYSTACK_SECRET_KEY is set to your live key (sk_live_...)
     const paystackRes = await fetch(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -47,7 +48,7 @@ serve(async (req) => {
 
     const transaction = paystackData.data
 
-    // 2. Create Supabase client with service role (or user JWT)
+    // 2. Create Supabase client with service role
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""

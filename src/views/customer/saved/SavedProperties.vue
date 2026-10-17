@@ -1,77 +1,67 @@
 <template>
   <div class="min-h-screen bg-[var(--light-blue)]">
     <!-- Navbar -->
-    <nav class="bg-white border-b sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-        <div class="flex items-center">
-          <img 
-            src="/Lodgenext_logo__2_-removebg-preview.png" 
-            alt="LodgeNext" 
-            class="h-10 sm:h-11 object-contain" 
-          />
-        </div>
-      </div>
-    </nav>
+    
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 sm:gap-4 mb-5 sm:mb-6 md:mb-8">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Saved Properties</h1>
-          <p class="text-sm text-gray-600 mt-1">Quickly access all the homes you've saved</p>
+          <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">Saved Properties</h1>
+          <p class="text-xs sm:text-sm text-gray-600 mt-1">Quickly access all the homes you've saved</p>
         </div>
-        <div class="bg-white rounded-2xl px-5 py-3 shadow-sm self-start">
-          <p class="text-2xl font-semibold text-[var(--royal-blue)]">{{ savedProperties.length }}</p>
-          <p class="text-xs text-gray-500">Properties Saved</p>
+        <div class="bg-white rounded-xl sm:rounded-2xl px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 shadow-sm self-start">
+          <p class="text-lg sm:text-xl md:text-2xl font-semibold text-[var(--royal-blue)]">{{ savedProperties.length }}</p>
+          <p class="text-[10px] sm:text-xs text-gray-500">Properties Saved</p>
         </div>
       </div>
 
-      <!-- Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 mb-8">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-red-100 rounded-xl flex items-center justify-center text-2xl">❤️</div>
-            <div>
-              <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ savedProperties.length }}</p>
-              <p class="text-xs sm:text-sm text-gray-500">Saved</p>
+      <!-- Stats (3 in a row on all sizes) -->
+      <div class="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-5 sm:mb-6 md:mb-8">
+        <div class="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 lg:p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-3">
+            <div class="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 bg-red-100 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-lg md:text-xl lg:text-2xl flex-shrink-0">❤️</div>
+            <div class="min-w-0">
+              <p class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">{{ savedProperties.length }}</p>
+              <p class="text-[9px] sm:text-[11px] md:text-xs lg:text-sm text-gray-500 leading-tight">Saved</p>
             </div>
           </div>
         </div>
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center text-2xl">🏠</div>
-            <div>
-              <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ availableSaved }}</p>
-              <p class="text-xs sm:text-sm text-gray-500">Available</p>
+        <div class="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 lg:p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-3">
+            <div class="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-lg md:text-xl lg:text-2xl flex-shrink-0">🏠</div>
+            <div class="min-w-0">
+              <p class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">{{ availableSaved }}</p>
+              <p class="text-[9px] sm:text-[11px] md:text-xs lg:text-sm text-gray-500 leading-tight">Available</p>
             </div>
           </div>
         </div>
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">📅</div>
-            <div>
-              <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ recentSaved }}</p>
-              <p class="text-xs sm:text-sm text-gray-500">Recently Saved</p>
+        <div class="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 lg:p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-3">
+            <div class="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center text-sm sm:text-lg md:text-xl lg:text-2xl flex-shrink-0">📅</div>
+            <div class="min-w-0">
+              <p class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">{{ recentSaved }}</p>
+              <p class="text-[9px] sm:text-[11px] md:text-xs lg:text-sm text-gray-500 leading-tight">Recently Saved</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Search & Filters -->
-      <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-5 mb-6 sm:mb-8">
-        <div class="flex flex-col sm:flex-row gap-3">
+      <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm p-3 sm:p-4 md:p-5 mb-4 sm:mb-6 md:mb-8">
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <div class="flex-1 relative">
-            <Search class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search saved properties..."
-              class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:border-[var(--royal-blue)] focus:outline-none"
+              class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border border-gray-200 text-xs sm:text-sm focus:border-[var(--royal-blue)] focus:outline-none"
             />
           </div>
           <select 
             v-model="sortBy" 
-            class="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-[var(--royal-blue)]"
+            class="border border-gray-200 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:border-[var(--royal-blue)]"
           >
             <option value="recent">Recently Saved</option>
             <option value="price-low">Lowest Price</option>
@@ -81,7 +71,7 @@
       </div>
 
       <!-- Saved Properties Grid -->
-      <div v-if="filteredSaved.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div v-if="filteredSaved.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         <SavedPropertyCard
           v-for="item in filteredSaved"
           :key="item.id"
@@ -95,7 +85,7 @@
       <EmptySavedState v-else @browse="goToBrowse" />
 
       <!-- Recently Viewed -->
-      <div class="mt-10">
+      <div class="mt-6 sm:mt-8 md:mt-10">
         <RecentlyViewed
           :recentlyViewed="recentlyViewedProperties"
           @view="viewProperty"
@@ -104,7 +94,7 @@
       </div>
 
       <!-- Recommendations -->
-      <div class="mt-10">
+      <div class="mt-6 sm:mt-8 md:mt-10">
         <Recommendations
           :recommendations="recommendedProperties"
           @view="viewProperty"

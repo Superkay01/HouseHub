@@ -1,89 +1,89 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-16">
-    <div class="max-w-6xl mx-auto px-4 pt-8">
+  <div class="min-h-screen bg-gray-50 pb-12 sm:pb-16">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 pt-5 sm:pt-6 md:pt-8">
       
       <!-- Back Button -->
       <button 
         type="button"
         @click="$router.back()" 
-        class="flex items-center gap-2 text-[var(--royal-blue)] hover:text-[var(--medium-blue)] mb-8 font-medium"
+        class="flex items-center gap-2 text-sm sm:text-base text-[var(--royal-blue)] hover:text-[var(--medium-blue)] mb-5 sm:mb-6 md:mb-8 font-medium"
       >
         ← Back
       </button>
 
       <!-- Loading -->
-      <div v-if="loading" class="flex justify-center py-32">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[var(--royal-blue)]"></div>
+      <div v-if="loading" class="flex justify-center py-20 sm:py-32">
+        <div class="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-4 border-b-4 border-[var(--royal-blue)]"></div>
       </div>
 
       <!-- Error -->
-      <div v-else-if="error" class="text-center py-20">
-        <p class="text-red-600 text-xl mb-4">{{ error }}</p>
+      <div v-else-if="error" class="text-center py-16 sm:py-20 px-4">
+        <p class="text-red-600 text-base sm:text-lg md:text-xl mb-4">{{ error }}</p>
         <button 
           type="button"
           @click="fetchProperty"
-          class="px-6 py-3 bg-[var(--royal-blue)] text-white rounded-2xl"
+          class="px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-[var(--royal-blue)] text-white rounded-xl sm:rounded-2xl"
         >
           Try Again
         </button>
       </div>
 
       <!-- Content -->
-      <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10">
         
         <!-- Images -->
-        <div class="lg:col-span-7 space-y-6">
+        <div class="lg:col-span-7 space-y-4 sm:space-y-5 md:space-y-6">
           <div
-            class="relative rounded-3xl overflow-hidden shadow-2xl bg-white cursor-pointer" 
+            class="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl bg-white cursor-pointer" 
             @click="showLightbox = true"
           >
             <img 
               :src="mainImage" 
-              class="w-full h-[520px] object-cover"
+              class="w-full h-64 sm:h-80 md:h-96 lg:h-[520px] object-cover"
               alt="Main Image"
             />
 
             <!-- Share + Heart -->
-            <div class="absolute top-5 right-5 flex items-center gap-2 z-10">
+            <div class="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-5 md:right-5 flex items-center gap-1.5 sm:gap-2 z-10">
               <!-- Share -->
               <div class="relative" @click.stop>
                 <button
                   type="button"
                   @click="toggleShareMenu"
-                  class="w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
+                  class="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
                   title="Share property"
                 >
-                  <span class="text-xl text-[var(--bright-green)]"><Share2/></span>
+                  <span class="text-lg sm:text-xl text-[var(--bright-green)]"><Share2 /></span>
                 </button>
 
                 <div
                   v-if="showShareMenu"
-                  class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-20"
+                  class="absolute right-0 mt-2 w-44 sm:w-48 bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-20"
                 >
                   <button
                     type="button"
-                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    class="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
                     @click="copyPropertyLink"
                   >
                     Copy link
                   </button>
                   <button
                     type="button"
-                    class="w-full text-left px-4 py-3 text-sm text-[var(--bright-green)] hover:bg-gray-50"
+                    class="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-[var(--bright-green)] hover:bg-gray-50"
                     @click="shareToWhatsApp"
                   >
                     WhatsApp
                   </button>
                   <button
                     type="button"
-                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    class="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
                     @click="shareToFacebook"
                   >
                     Facebook
                   </button>
                   <button
                     type="button"
-                    class="w-full text-left px-4 py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
+                    class="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
                     @click="shareNative"
                   >
                     More…
@@ -95,10 +95,10 @@
               <button
                 type="button"
                 @click.stop="toggleSave"
-                class="w-12 h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
+                class="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg hover:scale-110 transition"
                 :title="isSaved ? 'Unsave property' : 'Save property'"
               >
-                <span class="text-2xl">
+                <span class="text-xl sm:text-2xl">
                   {{ isSaved ? '❤️' : '🤍' }}
                 </span>
               </button>
@@ -106,48 +106,48 @@
           </div>
 
           <!-- Thumbnails -->
-          <div v-if="allImages.length > 1" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div v-if="allImages.length > 1" class="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
             <div 
               v-for="(url, index) in allImages" 
               :key="index"
-              class="rounded-3xl overflow-hidden border-2 cursor-pointer transition-all hover:scale-105"
+              class="rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border-2 cursor-pointer transition-all hover:scale-105"
               :class="{ 'border-[var(--royal-blue)] ring-2 ring-offset-2 ring-[var(--royal-blue)]': mainImage === url }"
               @click="mainImage = url"
             >
-              <img :src="url" class="w-full h-28 object-cover" alt="" />
+              <img :src="url" class="w-full h-20 sm:h-24 md:h-28 object-cover" alt="" />
             </div>
           </div>
 
-          <div v-if="property.video_url" class="rounded-3xl overflow-hidden shadow-2xl bg-black">
+          <div v-if="property.video_url" class="rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl bg-black">
             <video :src="property.video_url" controls class="w-full aspect-video"></video>
           </div>
         </div>
 
         <!-- Details -->
         <div class="lg:col-span-5">
-          <div class="bg-white rounded-3xl shadow-2xl p-8 sticky top-8">
+          <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl p-4 sm:p-6 lg:p-8 lg:sticky lg:top-8">
             
-            <div class="flex justify-between items-start mb-6">
-              <span class="inline-block px-4 py-1.5 bg-green-100 text-green-700 text-sm font-medium rounded-2xl capitalize">
+            <div class="flex justify-between items-start gap-3 mb-4 sm:mb-5 md:mb-6">
+              <span class="inline-block px-2.5 sm:px-3 md:px-4 py-1 sm:py-1.5 bg-green-100 text-green-700 text-xs sm:text-sm font-medium rounded-xl sm:rounded-2xl capitalize">
                 {{ property.status || 'pending' }}
               </span>
               <div class="text-right">
-                <p class="text-4xl font-bold text-[var(--royal-blue)]">
+                <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--royal-blue)]">
                   ₦{{ Number(property.price || 0).toLocaleString() }}
                 </p>
-                <p class="text-sm text-[var(--royal-blue)]">{{ property.purpose }}</p>
+                <p class="text-xs sm:text-sm text-[var(--royal-blue)]">{{ property.purpose }}</p>
               </div>
             </div>
 
-            <h1 class="text-3xl font-bold leading-tight mb-2 text-[var(--royal-blue)]">
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight mb-2 text-[var(--royal-blue)]">
               {{ property.title }}
             </h1>
             
-            <p class="text-[var(--royal-blue)] mb-4">
+            <p class="text-sm sm:text-base text-[var(--royal-blue)] mb-3 sm:mb-4">
               📍 {{ property.area }}, {{ property.city }}, {{ property.state }}
             </p>
 
-            <p class="text-[var(--royal-blue)] mb-6">
+            <p class="text-sm sm:text-base text-[var(--royal-blue)] mb-4 sm:mb-5 md:mb-6">
               {{
                 property.inspection_fee
                   ? `Inspection Fee: ₦${Number(property.inspection_fee).toLocaleString()}`
@@ -155,7 +155,7 @@
               }}
             </p>
 
-            <div class="flex items-center gap-2 text-medium-gray text-sm mb-6">
+            <div class="flex items-center gap-2 text-gray-500 text-xs sm:text-sm mb-4 sm:mb-5 md:mb-6">
               <span>👁️</span>
               <span>
                 {{ uniqueViewCount }}
@@ -164,25 +164,25 @@
             </div>
 
             <!-- Share row -->
-            <div class="grid grid-cols-3 gap-2 mb-4">
+            <div class="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3 sm:mb-4">
               <button
                 type="button"
                 @click="copyPropertyLink"
-                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+                class="py-2.5 sm:py-3 rounded-xl sm:rounded-2xl border border-gray-200 text-xs sm:text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
               >
                 Copy link
               </button>
               <button
                 type="button"
                 @click="shareToWhatsApp"
-                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+                class="py-2.5 sm:py-3 rounded-xl sm:rounded-2xl border border-gray-200 text-xs sm:text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
               >
                 WhatsApp
               </button>
               <button
                 type="button"
                 @click="shareToFacebook"
-                class="py-3 rounded-2xl border border-gray-200 text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
+                class="py-2.5 sm:py-3 rounded-xl sm:rounded-2xl border border-gray-200 text-xs sm:text-sm font-medium text-[var(--royal-blue)] hover:bg-gray-50"
               >
                 Facebook
               </button>
@@ -192,12 +192,12 @@
             <button
               type="button"
               @click="requestInspection"
-              class="w-full mb-3 py-4 rounded-2xl font-semibold text-lg text-white bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] transition shadow-md"
+              class="w-full mb-2.5 sm:mb-3 py-3 sm:py-3.5 lg:py-4 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg text-white bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] transition shadow-md"
             >
               Request Inspection
             </button>
 
-            <p class="text-xs text-center text-gray-500 mb-4">
+            <p class="text-xs text-center text-gray-500 mb-3 sm:mb-4">
               Choose a date & time{{ property.inspection_fee ? ', pay the inspection fee,' : '' }} then submit your request
             </p>
 
@@ -205,7 +205,7 @@
             <button
               type="button"
               @click="openPropertyChat"
-              class="w-full mb-6 py-3.5 rounded-2xl font-medium border-2 border-[var(--royal-blue)] text-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition flex items-center justify-center gap-2"
+              class="w-full mb-4 sm:mb-5 md:mb-6 py-2.5 sm:py-3 md:py-3.5 rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base border-2 border-[var(--royal-blue)] text-[var(--royal-blue)] hover:bg-[var(--light-blue)] transition flex items-center justify-center gap-2"
             >
               💬 Chat about this property
             </button>
@@ -214,7 +214,7 @@
             <button
               type="button"
               @click="toggleSave"
-              class="w-full mb-6 py-3.5 rounded-2xl font-medium transition flex items-center justify-center gap-2"
+              class="w-full mb-4 sm:mb-5 md:mb-6 py-2.5 sm:py-3 md:py-3.5 rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition flex items-center justify-center gap-2"
               :class="isSaved 
                 ? 'bg-red-50 text-red-600 border border-red-200' 
                 : 'bg-[var(--light-blue)] text-[var(--royal-blue)] border border-[var(--light-blue)]'"
@@ -222,61 +222,61 @@
               <span>{{ isSaved ? '❤️ Saved' : '🤍 Save Property' }}</span>
             </button>
 
-            <div class="border-t border-b py-6 my-6 grid grid-cols-3 gap-4 text-center">
+            <div class="border-t border-b py-4 sm:py-5 md:py-6 my-4 sm:my-5 md:my-6 grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 text-center">
               <div>
-                <div class="text-2xl font-semibold">{{ property.bedrooms || 0 }}</div>
-                <div class="text-xs text-[var(--royal-blue)]">BEDROOMS</div>
+                <div class="text-xl sm:text-2xl font-semibold">{{ property.bedrooms || 0 }}</div>
+                <div class="text-[10px] sm:text-xs text-[var(--royal-blue)]">BEDROOMS</div>
               </div>
               <div>
-                <div class="text-2xl font-semibold">{{ property.bathrooms || 0 }}</div>
-                <div class="text-xs text-[var(--royal-blue)]">BATHROOMS</div>
+                <div class="text-xl sm:text-2xl font-semibold">{{ property.bathrooms || 0 }}</div>
+                <div class="text-[10px] sm:text-xs text-[var(--royal-blue)]">BATHROOMS</div>
               </div>
               <div>
-                <div class="text-2xl font-semibold">{{ property.parking_spaces || 0 }}</div>
-                <div class="text-xs text-[var(--royal-blue)]">PARKING</div>
+                <div class="text-xl sm:text-2xl font-semibold">{{ property.parking_spaces || 0 }}</div>
+                <div class="text-[10px] sm:text-xs text-[var(--royal-blue)]">PARKING</div>
               </div>
             </div>
 
-            <div class="space-y-4 text-sm">
-              <div class="flex justify-between">
+            <div class="space-y-3 text-sm sm:text-base">
+              <div class="flex justify-between gap-2">
                 <span class="text-[var(--royal-blue)]">Property Type</span>
-                <strong>{{ property.property_type || '—' }}</strong>
+                <strong class="text-right">{{ property.property_type || '—' }}</strong>
               </div>
-              <div class="flex justify-between">
+              <div class="flex justify-between gap-2">
                 <span class="text-[var(--royal-blue)]">Condition</span>
-                <strong>{{ property.condition || '—' }}</strong>
+                <strong class="text-right">{{ property.condition || '—' }}</strong>
               </div>
-              <div class="flex justify-between">
+              <div class="flex justify-between gap-2">
                 <span class="text-[var(--royal-blue)]">Availability</span>
-                <strong>{{ property.availability || '—' }}</strong>
+                <strong class="text-right">{{ property.availability || '—' }}</strong>
               </div>
             </div>
 
-            <div v-if="property.amenities?.length" class="mt-8">
-              <h4 class="font-semibold mb-4">Amenities</h4>
-              <div class="flex flex-wrap gap-2">
+            <div v-if="property.amenities?.length" class="mt-6 sm:mt-7 md:mt-8">
+              <h4 class="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Amenities</h4>
+              <div class="flex flex-wrap gap-1.5 sm:gap-2">
                 <span 
                   v-for="amenity in property.amenities" 
                   :key="amenity"
-                  class="bg-[var(--hover-blue)] px-4 py-2 rounded-2xl text-sm"
+                  class="bg-[var(--hover-blue)] px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs sm:text-sm"
                 >
                   {{ amenity }}
                 </span>
               </div>
             </div>
 
-            <div v-if="property.description" class="mt-10 pt-8 border-t">
-              <h4 class="font-semibold mb-3">Description</h4>
-              <p class="leading-relaxed text-[var(--royal-blue)] whitespace-pre-wrap">
+            <div v-if="property.description" class="mt-6 sm:mt-8 md:mt-10 pt-5 sm:pt-6 md:pt-8 border-t">
+              <h4 class="font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Description</h4>
+              <p class="leading-relaxed text-sm sm:text-base text-[var(--royal-blue)] whitespace-pre-wrap">
                 {{ property.description }}
               </p>
             </div>
 
-            <div class="mt-10 pt-8 border-t space-y-3">
+            <div class="mt-6 sm:mt-8 md:mt-10 pt-5 sm:pt-6 md:pt-8 border-t space-y-2.5 sm:space-y-3">
               <button
                 type="button"
                 @click="requestInspection"
-                class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] text-white py-4 rounded-2xl font-semibold text-lg transition"
+                class="w-full bg-[var(--royal-blue)] hover:bg-[var(--medium-blue)] text-white py-3 sm:py-3.5 md:py-4 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg transition"
               >
                 Request Inspection
               </button>
@@ -284,7 +284,7 @@
               <button
                 type="button"
                 @click="goToHelp"
-                class="w-full bg-white border border-gray-200 hover:bg-gray-50 text-[var(--royal-blue)] py-3.5 rounded-2xl font-medium transition"
+                class="w-full bg-white border border-gray-200 hover:bg-gray-50 text-[var(--royal-blue)] py-2.5 sm:py-3 md:py-3.5 rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition"
               >
                 Need Help?
               </button>
@@ -300,9 +300,9 @@
       class="fixed inset-0 z-[100] bg-black flex items-center justify-center" 
       @click.self="showLightbox = false"
     >
-      <div class="relative max-w-6xl w-full p-8">
-        <img :src="mainImage" class="max-h-[90vh] mx-auto rounded-3xl shadow-2xl" alt="" />
-        <button type="button" @click="showLightbox = false" class="absolute top-8 right-8 text-white text-5xl">
+      <div class="relative max-w-6xl w-full p-4 sm:p-8">
+        <img :src="mainImage" class="max-h-[85vh] sm:max-h-[90vh] mx-auto rounded-2xl sm:rounded-3xl shadow-2xl" alt="" />
+        <button type="button" @click="showLightbox = false" class="absolute top-4 right-4 sm:top-8 sm:right-8 text-white text-3xl sm:text-5xl">
           ×
         </button>
       </div>
@@ -311,7 +311,7 @@
     <!-- Toast -->
     <div
       v-if="toast"
-      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[210] px-5 py-3 rounded-2xl shadow-lg text-sm font-medium text-white bg-gray-900"
+      class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[210] px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg text-xs sm:text-sm font-medium text-white bg-gray-900"
     >
       {{ toast }}
     </div>
@@ -327,19 +327,19 @@
           @click="showChat = false"
         ></div>
 
-        <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-in">
-          <div class="flex items-center justify-between p-4 border-b bg-[var(--royal-blue)] text-white">
-            <div>
-              <h3 class="font-semibold text-lg">Chat about this property</h3>
-              <p class="text-sm opacity-90 truncate max-w-[240px]">
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-in">
+          <div class="flex items-center justify-between p-3 sm:p-4 border-b bg-[var(--royal-blue)] text-white">
+            <div class="min-w-0 flex-1">
+              <h3 class="font-semibold text-base sm:text-lg">Chat about this property</h3>
+              <p class="text-xs sm:text-sm opacity-90 truncate">
                 {{ property.title }}
               </p>
             </div>
-            <button type="button" @click="showChat = false" class="text-2xl leading-none hover:opacity-80">×</button>
+            <button type="button" @click="showChat = false" class="text-2xl leading-none hover:opacity-80 ml-2 flex-shrink-0">×</button>
           </div>
 
-          <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-            <div v-if="chatLoading" class="text-center py-10 text-gray-500">
+          <div ref="messagesContainer" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-gray-50">
+            <div v-if="chatLoading" class="text-center py-8 sm:py-10 text-sm sm:text-base text-gray-500">
               Loading conversation...
             </div>
 
@@ -350,7 +350,7 @@
               :class="msg.sender_type === 'user' ? 'justify-end' : 'justify-start'"
             >
               <div
-                class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm text-[var(--royal-blue)]"
+                class="max-w-[85%] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-[var(--royal-blue)]"
                 :class="{
                   'bg-[var(--royal-blue)] text-white': msg.sender_type === 'user',
                   'bg-white border shadow-sm': msg.sender_type === 'ai' || msg.sender_type === 'system',
@@ -371,27 +371,27 @@
             </div>
 
             <div v-if="aiTyping" class="flex justify-start">
-              <div class="bg-white border shadow-sm rounded-2xl px-4 py-3 text-sm text-gray-500">
+              <div class="bg-white border shadow-sm rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-500">
                 <span class="animate-pulse">AI is typing...</span>
               </div>
             </div>
           </div>
 
-          <div class="p-4 border-t bg-white">
+          <div class="p-3 sm:p-4 border-t bg-white">
             <div class="flex gap-2">
               <input
                 v-model="newMessage"
                 @keyup.enter="sendMessage"
                 type="text"
                 placeholder="Ask anything about this property..."
-                class="flex-1 border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--royal-blue)]"
+                class="flex-1 border rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[var(--royal-blue)]"
                 :disabled="sending || aiTyping"
               />
               <button
                 type="button"
                 @click="sendMessage"
                 :disabled="!newMessage.trim() || sending || aiTyping"
-                class="px-5 py-3 bg-[var(--royal-blue)] text-white rounded-xl font-medium disabled:opacity-50 transition"
+                class="px-4 sm:px-5 py-2.5 sm:py-3 bg-[var(--royal-blue)] text-white rounded-xl font-medium text-sm sm:text-base disabled:opacity-50 transition"
               >
                 Send
               </button>

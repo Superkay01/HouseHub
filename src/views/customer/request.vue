@@ -1,118 +1,108 @@
 <template>
   <div class="min-h-screen bg-[var(--light-blue)]">
     <!-- Navbar -->
-    <nav class="bg-white border-b sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-        <div class="flex items-center">
-          <img 
-            src="/Lodgenext_logo__2_-removebg-preview.png" 
-            alt="LodgeNext" 
-            class="h-10 sm:h-12 object-contain" 
-          />
-        </div>
-      </div>
-    </nav>
+    
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 sm:mb-10">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 sm:gap-4 mb-5 sm:mb-6 md:mb-8 lg:mb-10">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-[var(--royal-blue)]">
+          <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-[var(--royal-blue)]">
             My Property Requests
           </h1>
-          <p class="text-sm sm:text-base text-gray-600 mt-1.5">
+          <p class="text-xs sm:text-sm md:text-base text-gray-600 mt-1 sm:mt-1.5">
             Track the progress of all your inspection and rental requests
           </p>
         </div>
 
-        <div class="bg-white rounded-2xl px-5 py-3 shadow-sm self-start sm:self-auto">
-          <p class="text-2xl sm:text-3xl font-semibold text-[var(--royal-blue)]">
+        <div class="bg-white rounded-xl sm:rounded-2xl px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 shadow-sm self-start sm:self-auto">
+          <p class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-[var(--royal-blue)]">
             {{ totalRequests }}
           </p>
-          <p class="text-xs sm:text-sm text-gray-500">Total Requests</p>
+          <p class="text-[10px] sm:text-xs md:text-sm text-gray-500">Total Requests</p>
         </div>
       </div>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-8 sm:mb-10">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[var(--light-blue)] rounded-xl flex items-center justify-center flex-shrink-0">
-              <Send class="w-5 h-5 sm:w-6 sm:h-6 text-[var(--royal-blue)]" />
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-5 sm:mb-6 md:mb-8 lg:mb-10">
+        <div class="bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-4 lg:p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-3">
+            <div class="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-[var(--light-blue)] rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+              <Send class="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-[var(--royal-blue)]" />
             </div>
-            <div>
-              <p class="text-xl sm:text-2xl font-bold text-[var(--royal-blue)]">
+            <div class="min-w-0">
+              <p class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-[var(--royal-blue)] leading-tight">
                 {{ totalRequests }}
               </p>
-              <p class="text-xs sm:text-sm text-gray-500">Total</p>
+              <p class="text-[9px] sm:text-[11px] md:text-xs lg:text-sm text-gray-500 leading-tight">Total</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Clock class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+        <div class="bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-4 lg:p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-3">
+            <div class="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-amber-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+              <Clock class="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-amber-600" />
             </div>
-            <div>
-              <p class="text-xl sm:text-2xl font-bold text-[var(--royal-blue)]">
+            <div class="min-w-0">
+              <p class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-[var(--royal-blue)] leading-tight">
                 {{ pendingRequests }}
               </p>
-              <p class="text-xs sm:text-sm text-gray-500">Pending</p>
+              <p class="text-[9px] sm:text-[11px] md:text-xs lg:text-sm text-gray-500 leading-tight">Pending</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <CheckCircle class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+        <div class="bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-4 lg:p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-3">
+            <div class="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-emerald-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+              <CheckCircle class="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-emerald-600" />
             </div>
-            <div>
-              <p class="text-xl sm:text-2xl font-bold text-[var(--royal-blue)]">
+            <div class="min-w-0">
+              <p class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-[var(--royal-blue)] leading-tight">
                 {{ approvedRequests }}
               </p>
-              <p class="text-xs sm:text-sm text-gray-500">Approved</p>
+              <p class="text-[9px] sm:text-[11px] md:text-xs lg:text-sm text-gray-500 leading-tight">Approved</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <XCircle class="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+        <div class="bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-3 md:p-4 lg:p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-3">
+            <div class="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-red-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+              <XCircle class="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-red-600" />
             </div>
-            <div>
-              <p class="text-xl sm:text-2xl font-bold text-[var(--royal-blue)]">
+            <div class="min-w-0">
+              <p class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-[var(--royal-blue)] leading-tight">
                 {{ rejectedRequests }}
               </p>
-              <p class="text-xs sm:text-sm text-gray-500">Rejected</p>
+              <p class="text-[9px] sm:text-[11px] md:text-xs lg:text-sm text-gray-500 leading-tight">Rejected</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Search & Filters -->
-      <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-5 mb-6 sm:mb-8">
-        <div class="flex flex-col sm:flex-row gap-3">
+      <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm p-2.5 sm:p-3 md:p-4 lg:p-5 mb-4 sm:mb-6 md:mb-8">
+        <div class="flex flex-col gap-2 sm:flex-row sm:gap-3">
           <!-- Search -->
           <div class="flex-1 relative">
-            <Search class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search by property or request ID..."
-              class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 text-sm
+              class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border border-gray-200 text-xs sm:text-sm
                 focus:border-[var(--royal-blue)] focus:outline-none transition-colors"
             />
           </div>
 
-          <!-- Filters -->
-          <div class="flex flex-col sm:flex-row gap-3">
+          <!-- Filters — 3 columns on mobile, flex row on tablet+ -->
+          <div class="grid grid-cols-3 gap-1.5 sm:flex sm:flex-row sm:gap-3">
             <select 
               v-model="statusFilter" 
-              class="border border-gray-200 rounded-xl px-4 py-3 text-sm
-                focus:border-[var(--royal-blue)] focus:outline-none"
+              class="border border-gray-200 rounded-lg sm:rounded-xl px-1.5 sm:px-4 py-2 sm:py-3 text-[10px] sm:text-sm
+                focus:border-[var(--royal-blue)] focus:outline-none min-w-0"
             >
               <option value="">All Status</option>
               <option value="pending">Pending</option>
@@ -126,8 +116,8 @@
 
             <select 
               v-model="typeFilter" 
-              class="border border-gray-200 rounded-xl px-4 py-3 text-sm
-                focus:border-[var(--royal-blue)] focus:outline-none"
+              class="border border-gray-200 rounded-lg sm:rounded-xl px-1.5 sm:px-4 py-2 sm:py-3 text-[10px] sm:text-sm
+                focus:border-[var(--royal-blue)] focus:outline-none min-w-0"
             >
               <option value="">All Types</option>
               <option value="inspection">Inspection</option>
@@ -136,8 +126,8 @@
 
             <select 
               v-model="sortBy" 
-              class="border border-gray-200 rounded-xl px-4 py-3 text-sm
-                focus:border-[var(--royal-blue)] focus:outline-none"
+              class="border border-gray-200 rounded-lg sm:rounded-xl px-1.5 sm:px-4 py-2 sm:py-3 text-[10px] sm:text-sm
+                focus:border-[var(--royal-blue)] focus:outline-none min-w-0"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -147,7 +137,7 @@
       </div>
 
       <!-- Requests Grid -->
-      <div v-if="filteredRequests.length" class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div v-if="filteredRequests.length" class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
         <RequestCard
           v-for="request in filteredRequests"
           :key="request.id"
