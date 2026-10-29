@@ -135,7 +135,14 @@
                 <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--royal-blue)]">
                   ₦{{ Number(property.price || 0).toLocaleString() }}
                 </p>
-                <p class="text-xs sm:text-sm text-[var(--royal-blue)]">{{ property.purpose }}</p>
+                <p class="text-xs sm:text-sm text-[var(--royal-blue)]">{{ listingTypeLabel }}</p>
+                <p v-if="isSaleListing" class="mt-2 text-xs sm:text-sm text-[var(--bright-green)] font-medium">
+                  Estimated platform charge ({{ Number(property.system_charge_rate ?? 5) }}%):
+                  {{ formatNaira(estimatedSystemCharge) }}
+                </p>
+                <p v-if="isSaleListing" class="mt-1 max-w-xs text-[10px] sm:text-xs text-gray-500">
+                  Estimate only. The final platform charge is calculated from the agreed sale price, not the asking price.
+                </p>
               </div>
             </div>
 
@@ -222,7 +229,7 @@
               <span>{{ isSaved ? '❤️ Saved' : '🤍 Save Property' }}</span>
             </button>
 
-            <div class="border-t border-b py-4 sm:py-5 md:py-6 my-4 sm:my-5 md:my-6 grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 text-center">
+            <div v-if="!isLandListing" class="border-t border-b py-4 sm:py-5 md:py-6 my-4 sm:my-5 md:my-6 grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 text-center">
               <div>
                 <div class="text-xl sm:text-2xl font-semibold">{{ property.bedrooms || 0 }}</div>
                 <div class="text-[10px] sm:text-xs text-[var(--royal-blue)]">BEDROOMS</div>
@@ -237,10 +244,37 @@
               </div>
             </div>
 
+            <div v-if="isLandListing" class="border-t border-b py-4 sm:py-5 md:py-6 my-4 sm:my-5 md:my-6">
+              <h4 class="font-semibold text-sm sm:text-base mb-3 text-[var(--royal-blue)]">Land Details</h4>
+              <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                <div v-if="property.land_size">
+                  <p class="text-xs text-gray-500 mb-1">Land Size</p>
+                  <p class="font-semibold text-sm sm:text-base">
+                    {{ property.land_size }} {{ property.land_size_unit || '' }}
+                  </p>
+                </div>
+                <div v-if="property.land_use">
+                  <p class="text-xs text-gray-500 mb-1">Permitted / Intended Use</p>
+                  <p class="font-semibold text-sm sm:text-base">{{ property.land_use }}</p>
+                </div>
+                <div v-if="property.access_road">
+                  <p class="text-xs text-gray-500 mb-1">Road Access</p>
+                  <p class="font-semibold text-sm sm:text-base">{{ property.access_road }}</p>
+                </div>
+                <div v-if="property.title_document_status">
+                  <p class="text-xs text-gray-500 mb-1">Title / Documents</p>
+                  <p class="font-semibold text-sm sm:text-base">{{ property.title_document_status }}</p>
+                </div>
+              </div>
+              <p v-if="!property.land_size && !property.land_use && !property.access_road && !property.title_document_status" class="text-sm text-gray-500">
+                Land details have not been provided for this listing.
+              </p>
+            </div>
+
             <div class="space-y-3 text-sm sm:text-base">
               <div class="flex justify-between gap-2">
                 <span class="text-[var(--royal-blue)]">Property Type</span>
-                <strong class="text-right">{{ property.property_type || '—' }}</strong>
+                <strong class="text-right">{{ property.property_type || (isLandListing ? 'Land' : '—') }}</strong>
               </div>
               <div class="flex justify-between gap-2">
                 <span class="text-[var(--royal-blue)]">Condition</span>
@@ -413,6 +447,59 @@ const route = useRoute()
 const router = useRouter()
 
 const property = ref<any>({})
+
+// Listing classification supports both the new listing_category field and
+// existing purpose/property_type values so older listings continue to work.
+const isLandListing = computed(() => {
+  const category = String(property.value?.listing_category || '').toLowerCase()
+  const purpose = String(property.value?.purpose || '').toLowerCase()
+  const type = String(property.value?.property_type || '').toLowerCase()
+
+  return category === 'land_sale' ||
+    purpose === 'land for sale' ||
+    type === 'land' ||
+    type.includes('plot of land')
+})
+
+const isSaleListing = computed(() => {
+  const category = String(property.value?.listing_category || '').toLowerCase()
+  const purpose = String(property.value?.purpose || '').toLowerCase()
+
+  return category === 'property_sale' ||
+    category === 'land_sale' ||
+    purpose === 'for sale' ||
+    purpose === 'land for sale'
+})
+
+const listingTypeLabel = computed(() => {
+  if (isLandListing.value) return 'Land for Sale'
+  if (isSaleListing.value) return 'Property for Sale'
+  return String(property.value?.purpose || 'Property')
+})
+
+const estimatedSystemCharge = computed(() => {
+  const askingPrice = Number(property.value?.price || 0)
+  const rate = Number(property.value?.system_charge_rate ?? 5)
+
+  if (!Number.isFinite(askingPrice) || askingPrice <= 0) return 0
+  if (!Number.isFinite(rate) || rate < 0) return 0
+
+  return askingPrice * rate / 100
+})
+
+const formatNaira = (amount: unknown) => {
+  const value = Number(amount || 0)
+  return Number.isFinite(value) ? `₦${value.toLocaleString('en-NG')}` : '—'
+}
+
+const getErrorMessage = (err: unknown, fallback: string) => {
+  if (err instanceof Error && err.message) return err.message
+  if (typeof err === 'object' && err !== null && 'message' in err) {
+    const message = (err as { message?: unknown }).message
+    if (typeof message === 'string' && message.trim()) return message
+  }
+  return fallback
+}
 const loading = ref(true)
 const error = ref('')
 const mainImage = ref('')
@@ -602,9 +689,9 @@ const toggleSave = async () => {
         .insert({ user_id: user.id, property_id: property.value.id })
       isSaved.value = true
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err)
-    alert(err.message || 'Failed to save property')
+    alert(getErrorMessage(err, 'Failed to save property'))
   } finally {
     saving.value = false
   }
@@ -697,7 +784,7 @@ const initOrLoadChat = async (userId: string) => {
         await supabase.from('property_chat_messages').insert({
           chat_id: existing.id,
           sender_type: 'system',
-          content: `You're chatting about:\n• ${property.value.title}\n• ${property.value.area}, ${property.value.city}, ${property.value.state}\n• ₦${Number(property.value.price || 0).toLocaleString()} (${property.value.purpose})\n\nAsk me anything about this property!`
+          content: `You're chatting about:\n• ${property.value.title}\n• ${property.value.area}, ${property.value.city}, ${property.value.state}\n• ₦${Number(property.value.price || 0).toLocaleString()} (${listingTypeLabel.value})\n${isLandListing.value ? `• Land size: ${property.value.land_size || 'Not provided'} ${property.value.land_size_unit || ''}\n• Land use: ${property.value.land_use || 'Not provided'}\n• Road access: ${property.value.access_road || 'Not provided'}\n• Title documents: ${property.value.title_document_status || 'Not provided'}\n` : ''}\nAsk me anything about this property!`
         })
       }
     }
@@ -709,9 +796,9 @@ const initOrLoadChat = async (userId: string) => {
     chatId.value = existing.id
     await loadMessages()
     subscribeToMessages(existing.id)
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('initOrLoadChat error:', err)
-    alert(err.message || 'Could not open chat')
+    alert(getErrorMessage(err, 'Could not open chat'))
     showChat.value = false
   } finally {
     chatLoading.value = false
@@ -768,9 +855,9 @@ const sendMessage = async () => {
     if (error) throw error
 
     await generateAIReply(content)
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err)
-    alert('Failed to send message')
+    alert(getErrorMessage(err, 'Failed to send message'))
     messages.value = messages.value.filter(m => m.id !== tempId)
   } finally {
     sending.value = false
@@ -834,6 +921,17 @@ const generateAIReply = async (userQuestion: string) => {
       title: property.value.title,
       price: property.value.price,
       purpose: property.value.purpose,
+      listing_category: property.value.listing_category,
+      listing_type: listingTypeLabel.value,
+      land_size: property.value.land_size,
+      land_size_unit: property.value.land_size_unit,
+      land_use: property.value.land_use,
+      access_road: property.value.access_road,
+      title_document_status: property.value.title_document_status,
+      estimated_system_charge: isSaleListing.value ? estimatedSystemCharge.value : null,
+      system_charge_note: isSaleListing.value
+        ? 'This is an estimate based on the asking price. The final charge is calculated from the agreed sale price.'
+        : null,
       location: `${property.value.area}, ${property.value.city}, ${property.value.state}`,
       bedrooms: property.value.bedrooms,
       bathrooms: property.value.bathrooms,

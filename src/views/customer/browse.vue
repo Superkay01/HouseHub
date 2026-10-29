@@ -238,7 +238,7 @@ const filters = ref({
   city: '',
   area: '',
   property_type: '',
-  purpose: 'For Rent',
+  purpose: '',
   minPrice: null as number | null,
   maxPrice: null as number | null,
   bedrooms: null as number | null,
@@ -286,7 +286,9 @@ const fetchProperties = async () => {
     }
 
     if (filters.value.property_type) q = q.eq('property_type', filters.value.property_type)
-    if (filters.value.purpose) q = q.eq('purpose', filters.value.purpose)
+   if (filters.value.purpose.trim()) {
+  q = q.eq('purpose', filters.value.purpose)
+}
 
     if (filters.value.minPrice) q = q.gte('price', Number(filters.value.minPrice))
     if (filters.value.maxPrice) q = q.lte('price', Number(filters.value.maxPrice))

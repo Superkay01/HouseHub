@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-screen flex items-center justify-center overflow-hidden">
+  <div class="relative min-h-[50vh] xs:min-h-[55vh] sm:min-h-[70vh] md:min-h-screen flex items-center justify-center overflow-hidden">
     <!-- Sliding Background Images -->
     <div class="absolute inset-0 z-0">
       <div
@@ -11,27 +11,27 @@
         ]"
         :style="{ backgroundImage: `url(${image.url})` }"
       >
-        <div class="absolute inset-0 bg-black/55 md:bg-black/50"></div>
+        <div class="absolute inset-0 bg-black/60 sm:bg-black/55 md:bg-black/50"></div>
       </div>
     </div>
 
     <!-- Content -->
-    <div class="relative z-10 w-full max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 md:pt-20 pb-10 sm:pb-14 md:pb-16">
+    <div class="relative z-10 w-full max-w-4xl mx-auto text-center px-3 xs:px-4 sm:px-6 lg:px-8 pt-6 xs:pt-8 sm:pt-14 md:pt-20 pb-6 xs:pb-8 sm:pb-12 md:pb-16">
       <!-- Heading -->
-      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-snug tracking-tight text-white mb-3 sm:mb-5">
+      <h1 class="text-lg xs:text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight sm:leading-snug tracking-tight text-white mb-2 sm:mb-4 md:mb-5">
         Find Your Perfect Home<br class="hidden sm:block" />
         Within Ilorin and Ijebu Ode
       </h1>
 
-      <p class="text-sm sm:text-base md:text-lg text-[#ebf8ff] max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed">
+      <p class="text-xs xs:text-sm sm:text-base md:text-lg text-[#ebf8ff] max-w-xs xs:max-w-sm sm:max-w-xl md:max-w-2xl mx-auto mb-4 xs:mb-5 sm:mb-8 md:mb-10 leading-snug sm:leading-relaxed">
         Find verified homes and apartments across Ilorin and Ijebu Ode.
         <br class="hidden md:block" />
         Browse trusted listings, connect with agents, and rent with confidence.
       </p>
 
-      <!-- Search Bar -->
-      <div class="max-w-2xl mx-auto bg-white rounded-2xl sm:rounded-3xl p-2 shadow-2xl">
-        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <!-- Search Bar — hidden on mobile, visible from sm up -->
+      <div class="hidden sm:block max-w-sm sm:max-w-xl md:max-w-2xl mx-auto bg-white rounded-2xl md:rounded-3xl p-2 shadow-2xl">
+        <div class="flex flex-row gap-2 md:gap-3">
           <div class="flex-1 relative">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--royal-blue)] pointer-events-none">
               <MapPin class="w-5 h-5" />
@@ -41,52 +41,52 @@
               v-model="searchLocation"
               @keyup.enter="handleSearch"
               placeholder="Enter city (e.g. Ilorin or Ijebu Ode)"
-              class="w-full pl-12 pr-4 py-3 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0025cc] text-sm sm:text-base text-[#424242] placeholder:text-gray-400"
+              class="w-full pl-12 pr-4 py-3 rounded-xl md:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0025cc] text-sm md:text-base text-[#424242] placeholder:text-gray-400"
             />
           </div>
 
           <button
             @click="handleSearch"
-            class="bg-[#0025cc] hover:bg-[#001fa3] active:scale-95 text-white px-6 sm:px-8 py-3 rounded-xl sm:rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all text-sm sm:text-base whitespace-nowrap"
+            class="inline-flex bg-[#0025cc] hover:bg-[#001fa3] active:scale-95 text-white px-6 md:px-8 py-3 rounded-xl md:rounded-2xl font-semibold items-center justify-center gap-2 transition-all text-sm md:text-base whitespace-nowrap"
           >
-            <Search class="w-4 h-4 sm:w-5 sm:h-5" />
+            <Search class="w-4 h-4 md:w-5 md:h-5" />
             Search Homes
           </button>
         </div>
       </div>
 
       <!-- Quick Stats -->
-      <div class="flex justify-center gap-8 sm:gap-12 md:gap-16 mt-8 sm:mt-12 text-white">
-        <div class="text-center min-w-[80px]">
-          <div class="text-2xl sm:text-3xl font-bold tabular-nums">
+      <div class="flex justify-center gap-4 xs:gap-6 sm:gap-10 md:gap-16 mt-5 xs:mt-6 sm:mt-10 md:mt-12 text-white">
+        <div class="text-center min-w-[60px] xs:min-w-[70px] sm:min-w-[80px]">
+          <div class="text-base xs:text-lg sm:text-2xl md:text-3xl font-bold tabular-nums">
             {{ statsLoading ? '…' : formatNumber(stats.properties) }}
           </div>
-          <div class="text-xs sm:text-sm opacity-80 mt-1">Properties</div>
+          <div class="text-[10px] xs:text-xs sm:text-sm opacity-80 mt-0.5 sm:mt-1">Properties</div>
         </div>
 
-        <div class="text-center min-w-[80px]">
-          <div class="text-2xl sm:text-3xl font-bold tabular-nums">
+        <div class="text-center min-w-[60px] xs:min-w-[70px] sm:min-w-[80px]">
+          <div class="text-base xs:text-lg sm:text-2xl md:text-3xl font-bold tabular-nums">
             {{ statsLoading ? '…' : stats.states }}
           </div>
-          <div class="text-xs sm:text-sm opacity-80 mt-1">States</div>
+          <div class="text-[10px] xs:text-xs sm:text-sm opacity-80 mt-0.5 sm:mt-1">States</div>
         </div>
 
-        <div class="text-center min-w-[80px]">
-          <div class="text-2xl sm:text-3xl font-bold tabular-nums">
+        <div class="text-center min-w-[60px] xs:min-w-[70px] sm:min-w-[80px]">
+          <div class="text-base xs:text-lg sm:text-2xl md:text-3xl font-bold tabular-nums">
             {{ statsLoading ? '…' : formatNumber(stats.tenants) }}
           </div>
-          <div class="text-xs sm:text-sm opacity-80 mt-1">Happy Tenants</div>
+          <div class="text-[10px] xs:text-xs sm:text-sm opacity-80 mt-0.5 sm:mt-1">Happy Tenants</div>
         </div>
       </div>
 
       <!-- Sign In Button -->
-      <div class="mt-6 sm:mt-10">
+      <div class="mt-4 xs:mt-5 sm:mt-8 md:mt-10">
         <router-link
           to="/login"
-          class="inline-flex items-center justify-center gap-2 bg-[var(--royal-blue)] hover:bg-[var(--steel-blue)] text-white text-sm sm:text-base font-semibold px-8 py-3 sm:px-10 sm:py-3.5 rounded-full border border-white/20 shadow-lg transition-all hover:scale-[1.03] active:scale-95"
+          class="inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-[var(--royal-blue)] hover:bg-[var(--steel-blue)] text-white text-xs xs:text-sm sm:text-base font-semibold px-5 xs:px-6 sm:px-8 md:px-10 py-2 xs:py-2.5 sm:py-3 md:py-3.5 rounded-full border border-white/20 shadow-lg transition-all hover:scale-[1.03] active:scale-95"
         >
           Get Started
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 xs:h-5 xs:w-5 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </router-link>
@@ -94,13 +94,13 @@
     </div>
 
     <!-- Slide Indicators -->
-    <div class="absolute bottom-5 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2.5 z-20">
+    <div class="absolute bottom-3 sm:bottom-5 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2 md:gap-2.5 z-20">
       <button
         v-for="(image, index) in heroImages"
         :key="index"
         @click="currentSlide = index"
         :class="[
-          'w-2.5 h-2.5 rounded-full transition-all duration-300',
+          'w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300',
           currentSlide === index ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'
         ]"
       />
@@ -190,13 +190,11 @@ const handleSearch = () => {
     return
   }
 
-  // Match Ilorin
   if (query.includes('ilorin') || query.includes('kwara')) {
     router.push('/ilorin')
     return
   }
 
-  // Match Ijebu Ode
   if (
     query.includes('ijebu') ||
     query.includes('ijebu ode') ||
@@ -207,7 +205,6 @@ const handleSearch = () => {
     return
   }
 
-  // Fallback – still go to one of the city pages or show message
   alert('Please search for Ilorin or Ijebu Ode')
 }
 

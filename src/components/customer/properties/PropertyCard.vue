@@ -11,8 +11,9 @@
     <div class="relative h-48 sm:h-56 overflow-hidden">
       <img
         :src="property.cover_image || 'https://via.placeholder.com/600x400?text=No+Image'"
-        :alt="property.title"
+        :alt="property.title || 'Property image'"
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
       />
 
       <!-- Verified Badge -->
@@ -23,15 +24,15 @@
         <span class="text-green-500">✓</span> Verified
       </div>
 
-      <!-- Share + Save (top right) -->
+      <!-- Share + Save -->
       <div class="absolute top-3 right-3 flex items-center gap-2 z-10">
-        <!-- SHARE -->
         <div v-if="enableShare" class="relative" @click.stop>
           <button
             type="button"
             @click="toggleShare"
             class="w-8 h-8 bg-white/90 hover:bg-white rounded-xl flex items-center justify-center shadow transition-all hover:scale-110"
             aria-label="Share property"
+            :aria-expanded="showShare"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -46,55 +47,38 @@
           <div
             v-if="showShare"
             class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden"
+            @click.stop
           >
-            <button
-              type="button"
-              class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
-              @click="copyLink"
-            >
+            <button type="button" class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50" @click="copyLink">
               Copy link
             </button>
-            <button
-              type="button"
-              class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
-              @click="shareWhatsApp"
-            >
+            <button type="button" class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50" @click="shareWhatsApp">
               WhatsApp
             </button>
-            <button
-              type="button"
-              class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
-              @click="shareFacebook"
-            >
+            <button type="button" class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50" @click="shareFacebook">
               Facebook
             </button>
-            <button
-              type="button"
-              class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50"
-              @click="shareNative"
-            >
+            <button type="button" class="w-full text-left px-4 py-2.5 text-sm text-[var(--royal-blue)] hover:bg-gray-50" @click="shareNative">
               More…
             </button>
           </div>
         </div>
 
-        <!-- SAVE -->
         <button
           type="button"
           @click.stop="toggleSave"
           :disabled="saving"
+          :aria-pressed="isSaved"
+          :aria-label="isSaved ? 'Remove saved property' : 'Save property'"
           class="w-8 h-8 bg-white/90 hover:bg-white rounded-xl flex items-center justify-center shadow transition-all hover:scale-110 disabled:opacity-50"
         >
-          <Heart
-            :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']"
-            class="w-4 h-4 transition-colors"
-          />
+          <Heart :class="[isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600']" class="w-4 h-4 transition-colors" />
         </button>
       </div>
 
-      <!-- Purpose Badge -->
+      <!-- Listing Purpose Badge -->
       <div class="absolute bottom-3 left-3 bg-[var(--light-blue)] text-[var(--royal-blue)] text-[10px] sm:text-xs font-medium px-3 py-1 rounded-xl">
-        {{ property.purpose }}
+        {{ listingTypeLabel }}
       </div>
     </div>
 
@@ -103,67 +87,88 @@
       <div class="flex justify-between items-start gap-3 mb-2">
         <div class="flex-1 min-w-0">
           <h3 class="font-semibold text-sm sm:text-base leading-snug text-gray-900 line-clamp-2">
-            {{ property.title }}
+            {{ property.title || 'Untitled property' }}
           </h3>
           <p class="text-xs text-[var(--royal-blue)] mt-1 flex items-center gap-1 truncate">
-            📍 {{ property.area }}, {{ property.city }}
+            📍 {{ property.area || 'Area not specified' }}, {{ property.city || 'City not specified' }}
           </p>
         </div>
 
         <div class="text-right flex-shrink-0">
           <p class="font-bold text-base sm:text-lg text-[#0025cc] leading-tight">
-            ₦{{ Number(property.price || 0).toLocaleString() }}
+            ₦{{ formatNaira(property.price) }}
           </p>
-          <p class="text-[10px] sm:text-xs text-[var(--hover-blue)]">per year</p>
+          <p class="text-[10px] sm:text-xs text-[var(--hover-blue)]">{{ pricePeriodLabel }}</p>
+          <p v-if="isSaleListing" class="text-[10px] text-gray-500 mt-1">5% platform fee applies on completed sale</p>
         </div>
       </div>
 
+      <!-- Inspection Fee -->
       <div class="mb-2">
         <p class="text-xs sm:text-sm font-medium text-gray-700">
-          {{
-            property.inspection_fee
-              ? `Inspection Fee: ₦${Number(property.inspection_fee).toLocaleString()}`
-              : 'No Inspection Fee'
-          }}
+          {{ inspectionFeeLabel }}
         </p>
       </div>
 
+      <!-- Views -->
       <div class="flex items-center gap-1.5 text-[var(--royal-blue)] text-xs mb-3">
         <span>👁️</span>
         <span>{{ formatViews(viewCount) }} views</span>
       </div>
 
-      <div class="flex flex-wrap gap-3 sm:gap-4 text-xs mb-3">
+      <!-- Residential Features -->
+      <div v-if="!isLandListing" class="flex items-center gap-1.5 sm:gap-4 text-xs mb-3">
         <div class="flex items-center gap-1">
           <span class="text-[#0025cc]">🛏️</span>
-          <span class="font-medium">{{ property.bedrooms || 0 }}</span>
+          <span class="font-medium">{{ property.bedrooms ?? 0 }}</span>
+          <span class="text-gray-500">beds</span>
         </div>
         <div class="flex items-center gap-1">
           <span class="text-[#0025cc]">🚿</span>
-          <span class="font-medium">{{ property.bathrooms || 0 }}</span>
+          <span class="font-medium">{{ property.bathrooms ?? 0 }}</span>
+          <span class="text-gray-500">baths</span>
         </div>
         <div v-if="property.toilets" class="flex items-center gap-1">
           <span class="text-[#0025cc]">🚽</span>
           <span class="font-medium">{{ property.toilets }}</span>
+          <span class="text-gray-500">toilets</span>
         </div>
       </div>
 
+      <!-- Land Details -->
+      <div v-else class="mb-3 rounded-xl bg-blue-50/80 border border-blue-100 p-3 space-y-1.5">
+        <p v-if="landSizeLabel" class="text-xs text-gray-700">
+          <span class="font-semibold text-[#0025cc]">Land size:</span> {{ landSizeLabel }}
+        </p>
+        <p v-if="property.land_use" class="text-xs text-gray-700">
+          <span class="font-semibold text-[#0025cc]">Land use:</span> {{ property.land_use }}
+        </p>
+        <p v-if="property.access_road" class="text-xs text-gray-700">
+          <span class="font-semibold text-[#0025cc]">Road access:</span> {{ property.access_road }}
+        </p>
+        <p v-if="property.title_document_status" class="text-xs text-gray-700">
+          <span class="font-semibold text-[#0025cc]">Title:</span> {{ property.title_document_status }}
+        </p>
+        <p v-if="!landSizeLabel && !property.land_use && !property.access_road && !property.title_document_status" class="text-xs text-gray-500">
+          Land details available on the listing page.
+        </p>
+      </div>
+
+      <!-- Amenities -->
       <div v-if="property.amenities?.length" class="flex flex-wrap gap-1.5 mb-4">
         <span
           v-for="(amenity, i) in property.amenities.slice(0, 3)"
-          :key="i"
+          :key="`${amenity}-${i}`"
           class="text-[10px] sm:text-xs bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-xl"
         >
           {{ amenity }}
         </span>
-        <span
-          v-if="property.amenities.length > 3"
-          class="text-[10px] sm:text-xs text-gray-400 self-center"
-        >
+        <span v-if="property.amenities.length > 3" class="text-[10px] sm:text-xs text-gray-400 self-center">
           +{{ property.amenities.length - 3 }}
         </span>
       </div>
 
+      <!-- Agent -->
       <div class="mt-auto pt-3 border-t flex items-center gap-2.5">
         <button
           type="button"
@@ -175,7 +180,8 @@
           <img
             :src="property.profiles?.avatar_url || 'https://via.placeholder.com/40'"
             class="w-7 h-7 rounded-full object-cover border border-gray-200 flex-shrink-0"
-            alt=""
+            :alt="property.profiles?.full_name ? `${property.profiles.full_name} profile photo` : 'Agent profile photo'"
+            loading="lazy"
           />
           <div class="flex-1 min-w-0">
             <p class="text-xs font-medium text-gray-900 truncate">
@@ -205,11 +211,44 @@ import { Heart } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient.js'
 
+type PropertyProfile = {
+  id?: string | null
+  verified?: boolean | null
+  is_verified?: boolean | null
+  avatar_url?: string | null
+  full_name?: string | null
+  agency_name?: string | null
+}
+
+type PropertyCardData = {
+  id?: string | number | null
+  agent_id?: string | null
+  title?: string | null
+  cover_image?: string | null
+  purpose?: string | null
+  listing_category?: string | null
+  property_type?: string | null
+  price?: number | string | null
+  inspection_fee?: number | string | null
+  area?: string | null
+  city?: string | null
+  bedrooms?: number | null
+  bathrooms?: number | null
+  toilets?: number | null
+  amenities?: string[] | null
+  land_size?: number | string | null
+  land_size_unit?: string | null
+  land_use?: string | null
+  access_road?: string | null
+  title_document_status?: string | null
+  profiles?: PropertyProfile | null
+}
+
 const PENDING_SAVES_KEY = 'lodgenext_pending_saves'
 
 const props = withDefaults(
   defineProps<{
-    property: any
+    property: PropertyCardData
     detailRouteName?: string
     enableShare?: boolean
   }>(),
@@ -230,20 +269,72 @@ const isSaved = ref(false)
 const saving = ref(false)
 const showShare = ref(false)
 
-const agentId = computed(() => {
-  return props.property?.agent_id || props.property?.profiles?.id || null
+const normalizedCategory = computed(() => String(props.property?.listing_category || '').toLowerCase().replace(/[\s-]+/g, '_'))
+const normalizedPurpose = computed(() => String(props.property?.purpose || '').toLowerCase().trim())
+
+const isLandListing = computed(() =>
+  normalizedCategory.value === 'land_sale' ||
+  normalizedPurpose.value === 'land for sale' ||
+  (normalizedPurpose.value.includes('land') && normalizedPurpose.value.includes('sale'))
+)
+
+const isSaleListing = computed(() =>
+  isLandListing.value ||
+  normalizedCategory.value === 'property_sale' ||
+  normalizedPurpose.value === 'for sale' ||
+  normalizedPurpose.value.includes('sale')
+)
+
+const listingTypeLabel = computed(() => {
+  if (isLandListing.value) return 'Land for Sale'
+  if (isSaleListing.value) return 'For Sale'
+  return props.property?.purpose || 'Property'
 })
 
-const getPropertyUrl = () => {
+const pricePeriodLabel = computed(() => {
+  if (isLandListing.value) return 'asking price for land'
+  if (isSaleListing.value) return 'asking price'
+  if (normalizedPurpose.value === 'for lease') return 'per lease term'
+  return 'per year'
+})
+
+const inspectionFeeLabel = computed(() => {
+  const fee = props.property?.inspection_fee
+  if (fee === null || fee === undefined || String(fee).trim() === '') return 'No Inspection Fee'
+  const numericFee = Number(fee)
+  if (Number.isFinite(numericFee)) return `Inspection Fee: ₦${numericFee.toLocaleString()}`
+  return `Inspection Fee: ${String(fee)}`
+})
+
+const landSizeLabel = computed(() => {
+  const size = props.property?.land_size
+  if (size === null || size === undefined || String(size).trim() === '') return ''
+  const unit = props.property?.land_size_unit ? ` ${props.property.land_size_unit}` : ''
+  return `${Number.isFinite(Number(size)) ? Number(size).toLocaleString() : String(size)}${unit}`
+})
+
+const agentId = computed(() => props.property?.agent_id || props.property?.profiles?.id || null)
+
+const formatNaira = (value: number | string | null | undefined): string => {
+  const amount = Number(value ?? 0)
+  return (Number.isFinite(amount) ? amount : 0).toLocaleString('en-NG')
+}
+
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message
+    if (typeof message === 'string') return message
+  }
+  return 'An unexpected error occurred.'
+}
+
+const getPropertyUrl = (): string => {
   const id = props.property?.id
   try {
-    const resolved = router.resolve({
-      name: props.detailRouteName,
-      params: { id },
-    })
+    const resolved = router.resolve({ name: props.detailRouteName, params: { id } })
     return `${window.location.origin}${resolved.href}`
   } catch {
-    // Public fallback
     if (props.detailRouteName === 'PublicPropertyDetail') {
       return `${window.location.origin}/properties/${id}`
     }
@@ -251,15 +342,15 @@ const getPropertyUrl = () => {
   }
 }
 
-const toggleShare = () => {
+const toggleShare = (): void => {
   showShare.value = !showShare.value
 }
 
-const closeShare = () => {
+const closeShare = (): void => {
   showShare.value = false
 }
 
-const copyLink = async () => {
+const copyLink = async (): Promise<void> => {
   const url = getPropertyUrl()
   try {
     await navigator.clipboard.writeText(url)
@@ -275,24 +366,20 @@ const copyLink = async () => {
   closeShare()
 }
 
-const shareWhatsApp = () => {
+const shareWhatsApp = (): void => {
   const url = getPropertyUrl()
   const text = `Check out this property on LodgeNext: ${props.property?.title || 'Property'}\n${url}`
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
   closeShare()
 }
 
-const shareFacebook = () => {
+const shareFacebook = (): void => {
   const url = getPropertyUrl()
-  window.open(
-    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-    '_blank',
-    'noopener,noreferrer'
-  )
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank', 'noopener,noreferrer')
   closeShare()
 }
 
-const shareNative = async () => {
+const shareNative = async (): Promise<void> => {
   const url = getPropertyUrl()
   if (navigator.share) {
     try {
@@ -302,7 +389,7 @@ const shareNative = async () => {
         url,
       })
     } catch {
-      // cancelled
+      // The share dialog may be dismissed by the user.
     }
     closeShare()
     return
@@ -310,32 +397,36 @@ const shareNative = async () => {
   await copyLink()
 }
 
-const onDocClick = () => {
-  showShare.value = false
+const onDocClick = (): void => {
+  closeShare()
 }
 
-const formatViews = (count: number) => {
-  if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M'
-  if (count >= 10000) return Math.floor(count / 1000) + 'K'
-  if (count >= 1000) return (count / 1000).toFixed(1) + 'K'
+const formatViews = (count: number): string => {
+  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`
+  if (count >= 10_000) return `${Math.floor(count / 1_000)}K`
+  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}K`
   return count.toLocaleString()
 }
 
 const getPendingSaves = (): string[] => {
   try {
     const raw = localStorage.getItem(PENDING_SAVES_KEY)
-    const list = raw ? JSON.parse(raw) : []
+    const list: unknown = raw ? JSON.parse(raw) : []
     return Array.isArray(list) ? list.map(String) : []
   } catch {
     return []
   }
 }
 
-const setPendingSaves = (ids: string[]) => {
-  localStorage.setItem(PENDING_SAVES_KEY, JSON.stringify([...new Set(ids)]))
+const setPendingSaves = (ids: string[]): void => {
+  try {
+    localStorage.setItem(PENDING_SAVES_KEY, JSON.stringify([...new Set(ids)]))
+  } catch (error: unknown) {
+    console.error('Could not update pending saves:', getErrorMessage(error))
+  }
 }
 
-const addPendingSave = (propertyId: string) => {
+const addPendingSave = (propertyId: string): void => {
   const list = getPendingSaves()
   if (!list.includes(propertyId)) {
     list.push(propertyId)
@@ -343,16 +434,19 @@ const addPendingSave = (propertyId: string) => {
   }
 }
 
-const removePendingSave = (propertyId: string) => {
+const removePendingSave = (propertyId: string): void => {
   setPendingSaves(getPendingSaves().filter((id) => id !== propertyId))
 }
 
-const toggleSave = async () => {
-  if (saving.value) return
-  if (!props.property?.id) return
+const toggleSave = async (): Promise<void> => {
+  if (saving.value || !props.property?.id) return
 
   const propertyId = String(props.property.id)
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError) {
+    alert('Unable to check your login status. Please try again.')
+    return
+  }
 
   if (!user) {
     if (isSaved.value) {
@@ -361,14 +455,13 @@ const toggleSave = async () => {
     } else {
       addPendingSave(propertyId)
       isSaved.value = true
-      router.push({
+      await router.push({
         path: '/login',
         query: {
-          redirect:
-            props.detailRouteName === 'PublicPropertyDetail'
-              ? `/properties/${propertyId}`
-              : `/customer/properties/${propertyId}`
-        }
+          redirect: props.detailRouteName === 'PublicPropertyDetail'
+            ? `/properties/${propertyId}`
+            : `/customer/properties/${propertyId}`,
+        },
       })
     }
     return
@@ -382,44 +475,36 @@ const toggleSave = async () => {
         .delete()
         .eq('user_id', user.id)
         .eq('property_id', propertyId)
-
       if (error) throw error
       removePendingSave(propertyId)
       isSaved.value = false
     } else {
       const { error } = await supabase
         .from('saved_properties')
-        .insert({
-          user_id: user.id,
-          property_id: propertyId
-        })
-
+        .insert({ user_id: user.id, property_id: propertyId })
       if (error) throw error
       removePendingSave(propertyId)
       isSaved.value = true
     }
-  } catch (err: any) {
-    console.error('Save error:', err)
-    alert(err.message || 'Failed to save property')
+  } catch (error: unknown) {
+    console.error('Save error:', error)
+    alert(getErrorMessage(error) || 'Failed to save property')
   } finally {
     saving.value = false
   }
 }
 
-const loadViewCount = async () => {
+const loadViewCount = async (): Promise<void> => {
   if (!props.property?.id) return
-
   const { count, error } = await supabase
     .from('property_views')
     .select('*', { count: 'exact', head: true })
     .eq('property_id', props.property.id)
 
-  if (!error) {
-    viewCount.value = count || 0
-  }
+  if (!error) viewCount.value = count || 0
 }
 
-const syncPendingSaves = async (userId: string) => {
+const syncPendingSaves = async (userId: string): Promise<void> => {
   const pending = getPendingSaves()
   if (!pending.length) return
 
@@ -427,24 +512,23 @@ const syncPendingSaves = async (userId: string) => {
     const { error } = await supabase
       .from('saved_properties')
       .upsert(
-        {
-          user_id: userId,
-          property_id: propertyId
-        },
+        { user_id: userId, property_id: propertyId },
         { onConflict: 'user_id,property_id', ignoreDuplicates: true }
       )
 
-    if (!error) {
-      removePendingSave(propertyId)
-    }
+    if (!error) removePendingSave(propertyId)
   }
 }
 
-const checkIfSaved = async () => {
+const checkIfSaved = async (): Promise<void> => {
   if (!props.property?.id) return
-
   const propertyId = String(props.property.id)
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+  if (userError) {
+    console.error('Could not check saved property status:', userError.message)
+    return
+  }
 
   if (!user) {
     isSaved.value = getPendingSaves().includes(propertyId)
@@ -452,71 +536,61 @@ const checkIfSaved = async () => {
   }
 
   await syncPendingSaves(user.id)
-
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('saved_properties')
     .select('id')
     .eq('user_id', user.id)
     .eq('property_id', propertyId)
     .limit(1)
 
-  isSaved.value = !!(data && data.length > 0)
+  if (!error) isSaved.value = Boolean(data?.length)
 }
 
-const viewDetails = async () => {
+const viewDetails = async (): Promise<void> => {
   if (!props.property?.id) return
 
   const { data: { user } } = await supabase.auth.getUser()
-
   if (user) {
     await supabase
       .from('property_views')
       .upsert(
-        {
-          property_id: props.property.id,
-          user_id: user.id
-        },
+        { property_id: props.property.id, user_id: user.id },
         { onConflict: 'property_id,user_id' }
       )
-
     await loadViewCount()
   }
 
   const id = String(props.property.id)
   emit('view-details', id)
-
-  router.push({
+  await router.push({
     name: props.detailRouteName || 'CustomerPropertyDetail',
-    params: { id }
+    params: { id },
   })
 }
 
-const viewAgentProfile = () => {
+const viewAgentProfile = async (): Promise<void> => {
   if (!agentId.value) {
     alert('Agent profile not available')
     return
   }
 
   if (props.detailRouteName === 'PublicPropertyDetail') {
-    router.push({
+    await router.push({
       path: '/login',
-      query: { redirect: `/customer/agents/${agentId.value}` }
+      query: { redirect: `/customer/agents/${agentId.value}` },
     })
     return
   }
 
-  router.push({
+  await router.push({
     name: 'CustomerAgentProfile',
-    params: { id: agentId.value }
+    params: { id: agentId.value },
   })
 }
 
 onMounted(async () => {
   document.addEventListener('click', onDocClick)
-  await Promise.all([
-    loadViewCount(),
-    checkIfSaved()
-  ])
+  await Promise.all([loadViewCount(), checkIfSaved()])
 })
 
 onBeforeUnmount(() => {
