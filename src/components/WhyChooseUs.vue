@@ -1,96 +1,112 @@
 <template>
-  <section 
+  <section
     ref="sectionRef"
-    class="relative py-24 overflow-hidden min-h-screen flex items-center"
+    class="relative py-10 sm:py-16 md:py-24 overflow-hidden flex items-center"
   >
     <!-- Background Image with Overlay -->
-    <div 
-      class="absolute inset-0 bg-cover bg-center bg-no-repeat" 
-      style="background-image: url('https://picsum.photos/id/1015/2000/1200');">
+    <div
+      class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+      style="background-image: url('https://picsum.photos/id/1015/2000/1200');"
     ></div>
-    
+
     <!-- Dark Blue Gradient Overlay -->
     <div class="absolute inset-0 bg-gradient-to-br from-[var(--royal-blue)]/50 via-[var(--medium-blue)]/40 to-[var(--steel-blue)]/70"></div>
 
     <!-- Subtle Animated Gradient Blobs -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-20 left-20 w-96 h-96 bg-[#697fe1] rounded-full blur-3xl opacity-20 animate-pulse"></div>
-      <div class="absolute bottom-32 right-32 w-[500px] h-[500px] bg-[#546cdd] rounded-full blur-3xl opacity-15 animate-pulse" style="animation-delay: 1.5s"></div>
+      <div class="absolute top-10 left-10 sm:top-20 sm:left-20 w-40 sm:w-56 md:w-96 h-40 sm:h-56 md:h-96 bg-[#697fe1] rounded-full blur-3xl opacity-20 animate-pulse"></div>
+      <div class="absolute bottom-10 right-10 sm:bottom-32 sm:right-32 w-52 sm:w-80 md:w-[500px] h-52 sm:h-80 md:h-[500px] bg-[#546cdd] rounded-full blur-3xl opacity-15 animate-pulse" style="animation-delay: 1.5s"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-6 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
       <!-- Header -->
-      <div class="text-center mb-16">
-        <div class="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-3 rounded-3xl text-sm font-medium mb-6">
-          <span class="text-[#00db00]">✦</span>
+      <div class="text-center mb-8 sm:mb-12 md:mb-16">
+        <div class="inline-flex items-center gap-1.5 sm:gap-3 bg-white/10 backdrop-blur-md border border-white/20 text-white px-3 sm:px-8 py-1.5 sm:py-3 rounded-full sm:rounded-3xl text-[10px] sm:text-sm font-medium mb-3 sm:mb-6">
+          <span class="text-[#00db00] text-xs sm:text-sm">✦</span>
           PREMIUM EXPERIENCE
         </div>
-        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight mb-4 heading-font">
+        <h2 class="text-xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight mb-2 sm:mb-4 heading-font">
           Why Choose LodgeNext?
         </h2>
-        <p class="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-white/90">
+        <p class="max-w-2xl mx-auto text-xs sm:text-base md:text-lg text-white/90 px-2 leading-snug sm:leading-normal">
           Making it easier to find trusted rental properties in Ilorin and Ijebu Ode.
         </p>
       </div>
 
-      <!-- Features Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div 
-          v-for="(feature, index) in features" 
+      <!-- Features Grid — 2 col mobile, 2 col md, 3 col lg -->
+      <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 md:gap-8">
+        <div
+          v-for="(feature, index) in features"
           :key="index"
-          class="glass-card group p-8 rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20 hover:border-[#9faffa]/50 transition-all duration-500 hover:-translate-y-3"
+          class="glass-card group p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20 hover:border-[#9faffa]/50 transition-all duration-500 hover:-translate-y-1 sm:hover:-translate-y-3"
         >
-          <div class="w-14 h-14 flex items-center justify-center bg-[#00db00]/20 rounded-2xl mb-8 group-hover:scale-110 transition-transform">
-            <Check class="w-6 h-6 text-[#00db00]" />
+          <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center bg-[#00db00]/20 rounded-xl sm:rounded-2xl mb-4 sm:mb-8 group-hover:scale-110 transition-transform">
+            <Check class="w-5 h-5 sm:w-6 sm:h-6 text-[#00db00]" />
           </div>
 
-          <h3 class="text-2xl font-semibold text-white mb-4">{{ feature.title }}</h3>
-          <p class="text-white/80 leading-relaxed">{{ feature.description }}</p>
+          <h3 class="text-sm sm:text-xl md:text-2xl font-semibold text-white mb-1.5 sm:mb-3 md:mb-4 leading-tight">
+            {{ feature.title }}
+          </h3>
+          <p class="text-[11px] sm:text-sm md:text-base text-white/80 leading-snug sm:leading-relaxed">
+            {{ feature.description }}
+          </p>
         </div>
       </div>
 
       <!-- Statistics with Count-up Animation -->
-      <div class="grid grid-cols-4 mt-20 text-white">
-        <div class="text-center ">
-          <div class="text-4xl sm:text-6xl font-bold tabular-nums">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-2 mt-10 sm:mt-16 md:mt-20 text-white">
+        <div class="text-center">
+          <div class="text-2xl sm:text-4xl md:text-6xl font-bold tabular-nums">
             {{ displayStats.agents }}
           </div>
-          <div class="text-xs sm:text-sm opacity-80 mt-1">Trusted Agents</div>
+          <div class="text-[10px] sm:text-xs md:text-sm opacity-80 mt-0.5 sm:mt-1 leading-tight">
+            Trusted Agents
+          </div>
         </div>
 
-        <div class="text-center min-w-[100px]">
-          <div class="text-4xl sm:text-6xl font-bold tabular-nums">
+        <div class="text-center">
+          <div class="text-2xl sm:text-4xl md:text-6xl font-bold tabular-nums">
             {{ displayStats.properties }}
           </div>
-          <div class="text-xs sm:text-sm opacity-80 mt-1">Verified Properties</div>
+          <div class="text-[10px] sm:text-xs md:text-sm opacity-80 mt-0.5 sm:mt-1 leading-tight">
+            Verified Properties
+          </div>
         </div>
 
-        <div class="text-center min-w-[100px]">
-          <div class="text-4xl sm:text-6xl font-bold tabular-nums">
+        <div class="text-center">
+          <div class="text-2xl sm:text-4xl md:text-6xl font-bold tabular-nums">
             {{ displayStats.ilorin }}
           </div>
-          <div class="text-xs sm:text-sm opacity-80 mt-1">Ilorin Coverage</div>
+          <div class="text-[10px] sm:text-xs md:text-sm opacity-80 mt-0.5 sm:mt-1 leading-tight">
+            Ilorin Coverage
+          </div>
         </div>
 
-        <div class="text-center min-w-[100px]">
-          <div class="text-4xl sm:text-6xl font-bold tabular-nums">
+        <div class="text-center">
+          <div class="text-2xl sm:text-4xl md:text-6xl font-bold tabular-nums">
             {{ displayStats.ijebuOde }}
           </div>
-          <div class="text-xs sm:text-sm opacity-80 mt-1">Ijebu Ode Coverage</div>
+          <div class="text-[10px] sm:text-xs md:text-sm opacity-80 mt-0.5 sm:mt-1 leading-tight">
+            Ijebu Ode Coverage
+          </div>
         </div>
       </div>
 
       <!-- CTA -->
-      <div class="mt-20 text-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12 max-w-2xl mx-auto">
-        <h3 class="text-3xl font-semibold text-white mb-3">Ready to Find Your Next Home?</h3>
-        <p class="text-white/80 mb-8">Browse available properties and connect with trusted agents today.</p>
-        
-        <router-link 
+      <div class="mt-10 sm:mt-16 md:mt-20 text-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 max-w-2xl mx-auto">
+        <h3 class="text-lg sm:text-2xl md:text-3xl font-semibold text-white mb-2 sm:mb-3 leading-tight">
+          Ready to Find Your Next Home?
+        </h3>
+        <p class="text-xs sm:text-sm md:text-base text-white/80 mb-5 sm:mb-6 md:mb-8">
+          Browse available properties and connect with trusted agents today.
+        </p>
+
+        <router-link
           to="/property"
-          class="group inline-flex items-center gap-3 bg-[#0025cc] hover:bg-[#9faffa] text-white font-semibold text-lg px-12 py-6 rounded-3xl transition-all duration-300 hover:shadow-2xl hover:shadow-[#0025cc]/40 active:scale-95"
+          class="group inline-flex items-center gap-1.5 sm:gap-2 md:gap-3 bg-[#0025cc] hover:bg-[#9faffa] text-white font-semibold text-xs sm:text-base md:text-lg px-5 sm:px-8 md:px-12 py-2.5 sm:py-4 md:py-6 rounded-xl sm:rounded-2xl md:rounded-3xl transition-all duration-300 hover:shadow-2xl hover:shadow-[#0025cc]/40 active:scale-95"
         >
           Explore Properties
-          <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+          <i class="fas fa-arrow-right text-xs sm:text-base md:text-lg transition-transform group-hover:translate-x-1"></i>
         </router-link>
       </div>
     </div>

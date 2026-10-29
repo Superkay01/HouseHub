@@ -1,39 +1,41 @@
 <template>
-  <section class="relative py-20 bg-[var(--light-blue)]">
-    <div class="relative z-10 max-w-4xl mx-auto px-5 sm:px-6 lg:px-8">
-      
+  <section class="relative py-10 sm:py-16 md:py-20 bg-[var(--light-blue)]">
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
       <!-- Header -->
-      <div class="text-center mb-14">
-        <h2 class="text-4xl md:text-5xl font-bold text-[var(--royal-blue)] tracking-tight mb-4">
+      <div class="text-center mb-8 sm:mb-12 md:mb-14">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--royal-blue)] tracking-tight mb-2 sm:mb-4 leading-tight">
           Frequently Asked Questions
         </h2>
-        <p class="text-[var(--medium-blue)] text-lg max-w-2xl mx-auto">
+        <p class="text-xs sm:text-sm md:text-lg text-[var(--medium-blue)] max-w-2xl mx-auto px-2 leading-snug sm:leading-normal">
           Find answers to common questions about renting properties, connecting with agents, and using LodgeNext.
         </p>
       </div>
 
       <!-- FAQ Accordion -->
-      <div class="space-y-4">
+      <div class="space-y-2.5 sm:space-y-3 md:space-y-4">
         <div
           v-for="(faq, index) in faqs"
           :key="index"
-          class="bg-[var(--periwinkle)] backdrop-blur-2xl border border-[var(--royal-blue)]/20 rounded-3xl overflow-hidden hover:bg-[var(--hover-blue)] transition-all"
+          class="bg-[var(--periwinkle)] backdrop-blur-2xl border border-[var(--royal-blue)]/20 rounded-2xl sm:rounded-3xl overflow-hidden hover:bg-[var(--hover-blue)] transition-all"
         >
           <!-- Question -->
           <button
             @click="toggleFAQ(index)"
-            class="w-full px-8 py-6 text-left flex items-center justify-between group"
+            class="w-full px-3 sm:px-6 md:px-8 py-3.5 sm:py-5 md:py-6 text-left flex items-center justify-between gap-2 group"
           >
-            <div class="flex items-start gap-4">
-              <span class="text-2xl text-white mt-0.5 transition-transform" 
-                    :class="{ 'rotate-45': openIndex === index }">✦</span>
-              <span class="text-lg font-medium text-white leading-relaxed pr-8 text-left">
+            <div class="flex items-start gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
+              <span
+                class="text-base sm:text-xl md:text-2xl text-white mt-0.5 transition-transform shrink-0"
+                :class="{ 'rotate-45': openIndex === index }"
+              >✦</span>
+              <span class="text-xs sm:text-base md:text-lg font-medium text-white leading-snug sm:leading-relaxed pr-2 sm:pr-4 md:pr-8 text-left">
                 {{ faq.question }}
               </span>
             </div>
-            
+
             <span
-              class="text-3xl font-light text-white transition-transform duration-300 flex-shrink-0"
+              class="text-xl sm:text-2xl md:text-3xl font-light text-white transition-transform duration-300 flex-shrink-0"
               :class="{ 'rotate-45': openIndex === index }"
             >
               +
@@ -43,9 +45,9 @@
           <!-- Answer -->
           <div
             v-if="openIndex === index"
-            class="px-8 pb-8 text-[var(--light-blue)] leading-relaxed border-t border-white"
+            class="px-3 sm:px-6 md:px-8 pb-4 sm:pb-6 md:pb-8 text-[var(--light-blue)] text-xs sm:text-sm md:text-base leading-relaxed border-t border-white"
           >
-            <p class="pt-6">
+            <p class="pt-3 sm:pt-4 md:pt-6">
               {{ faq.answer }}
             </p>
           </div>
@@ -53,23 +55,25 @@
       </div>
 
       <!-- Bottom CTA -->
-      <div class="mt-16 bg-[var(--periwinkle)] backdrop-blur-2xl border border-white/20 rounded-3xl p-10 md:p-12 text-center">
-        <h3 class="text-3xl font-bold text-white mb-3">
+      <div class="mt-10 sm:mt-14 md:mt-16 bg-[var(--periwinkle)] backdrop-blur-2xl border border-white/20 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 lg:p-12 text-center">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1.5 sm:mb-2 md:mb-3 leading-tight">
           Still Have Questions?
         </h3>
-        <p class="text-[var(--light-blue)] mb-8 max-w-md mx-auto">
+        <p class="text-xs sm:text-sm md:text-base text-[var(--light-blue)] mb-4 sm:mb-6 md:mb-8 max-w-md mx-auto px-1">
           Our team is here to help you find the right property in Ilorin and Ijebu Ode.
         </p>
-        
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button 
-          @click="goToSupport"
-            class="bg-white text-[var(--royal-blue)] font-semibold px-8 py-4 rounded-2xl hover:bg-[var(--light-blue)] transition-all hover:scale-105">
+
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center">
+          <button
+            @click="goToSupport"
+            class="bg-white text-[var(--royal-blue)] font-semibold px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm md:text-base hover:bg-[var(--light-blue)] transition-all hover:scale-105"
+          >
             Contact Support
           </button>
-          <button 
-          @click="goToProperties"
-            class="border border-white/70 text-white font-medium px-8 py-4 rounded-2xl hover:bg-white/10 transition-all">
+          <button
+            @click="goToProperties"
+            class="border border-white/70 text-white font-medium px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm md:text-base hover:bg-white/10 transition-all"
+          >
             Browse Properties
           </button>
         </div>

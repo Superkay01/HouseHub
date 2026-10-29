@@ -1,5 +1,5 @@
 <template>
-  <section class="relative py-20 overflow-hidden">
+  <section class="relative py-10 sm:py-16 md:py-20 overflow-hidden">
     <!-- Background -->
     <div
       class="absolute inset-0 bg-cover bg-center"
@@ -7,34 +7,34 @@
     ></div>
     <div class="absolute inset-0 bg-gradient-to-br from-[#000000]/90 via-[#546cdd]/85 to-[var(--royal-blue)]/90"></div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
-      <div class="text-center mb-14">
-        <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
+      <div class="text-center mb-8 sm:mb-12 md:mb-14">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-2 sm:mb-4">
           What Our Users Say
         </h2>
-        <p class="text-light-blue text-lg max-w-2xl mx-auto">
+        <p class="text-xs sm:text-sm md:text-lg text-light-blue max-w-2xl mx-auto px-2 leading-snug sm:leading-normal">
           Discover how LodgeNext is helping renters find quality homes and property agents connect with the right tenants in Ilorin and Ijebu Ode.
         </p>
 
         <!-- Average rating (only when we have real reviews) -->
         <div
           v-if="displayReviews.length && !usingFallback"
-          class="flex items-center justify-center gap-2 mt-5"
+          class="flex items-center justify-center gap-1.5 sm:gap-2 mt-3 sm:mt-5"
         >
-          <div class="flex text-bright-green text-2xl">
+          <div class="flex text-bright-green text-sm sm:text-lg md:text-2xl">
             <span v-for="star in 5" :key="star">
               {{ star <= Math.round(averageRating) ? '★' : '☆' }}
             </span>
           </div>
-          <span class="text-white font-medium">
+          <span class="text-white text-xs sm:text-sm md:text-base font-medium">
             {{ averageRating }} · {{ displayReviews.length }} review{{ displayReviews.length > 1 ? 's' : '' }}
           </span>
         </div>
       </div>
 
       <!-- Loading -->
-      <div v-if="loading" class="text-center py-16 text-white/80">
+      <div v-if="loading" class="text-center py-10 sm:py-16 text-white/80 text-xs sm:text-base">
         Loading reviews...
       </div>
 
@@ -44,7 +44,7 @@
         <button
           v-if="canScrollPrev"
           @click="prev"
-          class="hidden md:flex absolute -left-4 lg:-left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 items-center justify-center text-white text-2xl transition"
+          class="hidden md:flex absolute -left-3 lg:-left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 items-center justify-center text-white text-xl sm:text-2xl transition"
           aria-label="Previous"
         >
           ‹
@@ -52,7 +52,7 @@
         <button
           v-if="canScrollNext"
           @click="next"
-          class="hidden md:flex absolute -right-4 lg:-right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 items-center justify-center text-white text-2xl transition"
+          class="hidden md:flex absolute -right-3 lg:-right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 items-center justify-center text-white text-xl sm:text-2xl transition"
           aria-label="Next"
         >
           ›
@@ -61,37 +61,37 @@
         <!-- Track -->
         <div
           ref="track"
-          class="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 scrollbar-hide"
+          class="flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-3 sm:pb-4 scrollbar-hide"
           @scroll="updateScrollState"
         >
           <div
             v-for="(item, index) in displayReviews"
             :key="item.id || index"
-            class="snap-start shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
+            class="snap-start shrink-0 w-full sm:w-[calc(50%-8px)] md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
           >
             <div
-              class="h-full group bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 hover:bg-white/20 transition-all duration-300 hover:-translate-y-1"
+              class="h-full group bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 hover:bg-white/20 transition-all duration-300 hover:-translate-y-1"
             >
               <!-- Quote Icon -->
-              <div class="text-5xl text-white/30 mb-5 leading-none">“</div>
+              <div class="text-3xl sm:text-4xl md:text-5xl text-white/30 mb-2 sm:mb-3 md:mb-5 leading-none">“</div>
 
               <!-- Rating -->
-              <div class="flex text-bright-green mb-5 text-lg tracking-wider">
+              <div class="flex text-bright-green mb-2 sm:mb-3 md:mb-5 text-sm sm:text-base md:text-lg tracking-wider">
                 <span v-for="star in 5" :key="star">
                   {{ star <= (item.rating || 5) ? '★' : '☆' }}
                 </span>
               </div>
 
               <!-- Testimonial Text -->
-              <p class="text-white text-lg leading-relaxed mb-8 min-h-[120px]">
+              <p class="text-white text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-6 md:mb-8 min-h-[80px] sm:min-h-[100px] md:min-h-[120px]">
                 "{{ item.text || item.review }}"
               </p>
 
               <!-- User Info -->
-              <div class="flex items-center gap-4 mt-auto">
+              <div class="flex items-center gap-2.5 sm:gap-3 md:gap-4 mt-auto">
                 <div
                   v-if="item.avatar"
-                  class="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-white/50 shrink-0"
+                  class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl overflow-hidden ring-2 ring-white/50 shrink-0"
                 >
                   <img
                     :src="item.avatar"
@@ -101,15 +101,21 @@
                 </div>
                 <div
                   v-else
-                  class="w-14 h-14 rounded-2xl bg-[var(--royal-blue)] text-white flex items-center justify-center font-bold text-lg ring-2 ring-white/50 shrink-0"
+                  class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-[var(--royal-blue)] text-white flex items-center justify-center font-bold text-sm sm:text-base md:text-lg ring-2 ring-white/50 shrink-0"
                 >
                   {{ getInitials(item.name) }}
                 </div>
 
                 <div class="min-w-0">
-                  <h4 class="font-semibold text-white truncate">{{ item.name }}</h4>
-                  <p class="text-light-blue text-sm truncate">{{ item.location }}</p>
-                  <p class="text-white/70 text-sm font-medium">{{ item.role }}</p>
+                  <h4 class="font-semibold text-white text-xs sm:text-sm md:text-base truncate">
+                    {{ item.name }}
+                  </h4>
+                  <p class="text-light-blue text-[10px] sm:text-xs md:text-sm truncate">
+                    {{ item.location }}
+                  </p>
+                  <p class="text-white/70 text-[10px] sm:text-xs md:text-sm font-medium truncate">
+                    {{ item.role }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -117,40 +123,42 @@
         </div>
 
         <!-- Dots (mobile & tablet) -->
-        <div class="flex justify-center gap-2 mt-8 md:hidden">
+        <div class="flex justify-center gap-1.5 sm:gap-2 mt-5 sm:mt-8 md:hidden">
           <button
             v-for="(_, i) in Math.ceil(displayReviews.length / slidesPerView)"
             :key="i"
             @click="goToSlide(i)"
-            class="w-2.5 h-2.5 rounded-full transition-all"
-            :class="currentSlide === i ? 'bg-white w-6' : 'bg-white/40'"
+            class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all"
+            :class="currentSlide === i ? 'bg-white w-5 sm:w-6' : 'bg-white/40'"
           ></button>
         </div>
       </div>
 
       <!-- Trust Indicators -->
-      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div class="mt-10 sm:mt-14 md:mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
         <div
           v-for="(item, i) in trustItems"
           :key="i"
           class="flex flex-col items-center"
         >
-          <div class="text-bright-green text-2xl mb-2">✓</div>
-          <p class="text-white font-medium text-sm sm:text-base">{{ item }}</p>
+          <div class="text-bright-green text-lg sm:text-2xl mb-1 sm:mb-2">✓</div>
+          <p class="text-white font-medium text-xs sm:text-sm md:text-base">
+            {{ item }}
+          </p>
         </div>
       </div>
 
       <!-- Final CTA -->
-      <div class="mt-20 text-center">
-        <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">
+      <div class="mt-10 sm:mt-14 md:mt-20 text-center">
+        <h3 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-4">
           Ready to Find Your Next Home?
         </h3>
-        <p class="text-light-blue mb-8 max-w-md mx-auto">
+        <p class="text-xs sm:text-sm md:text-base text-light-blue mb-5 sm:mb-6 md:mb-8 max-w-md mx-auto px-2">
           Join hundreds of renters and agents already using LodgeNext.
         </p>
         <button
           @click="exploreProperties"
-          class="bg-white text-[var(--royal-blue)] hover:bg-light-blue font-semibold px-10 py-4 rounded-2xl text-lg transition-all hover:scale-105 active:scale-95 shadow-xl"
+          class="bg-white text-[var(--royal-blue)] hover:bg-light-blue font-semibold px-5 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-base md:text-lg transition-all hover:scale-105 active:scale-95 shadow-xl"
         >
           Start Exploring Properties
         </button>
